@@ -25,7 +25,7 @@ export default async function AdminPage() {
           {requests.map((request) => (
             <Card key={request.id}>
               <CardHeader className="flex items-center justify-between">
-                <CardTitle>{request.user.email}</CardTitle>
+                <CardTitle>{request.user?.email ?? request.userId}</CardTitle>
                 <Badge variant="outline">{request.status}</Badge>
               </CardHeader>
               <CardContent className="space-y-2 text-sm text-slate-600">

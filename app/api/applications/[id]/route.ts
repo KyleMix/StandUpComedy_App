@@ -13,7 +13,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     where: { id: params.id },
     include: { gig: true }
   });
-  if (!application || application.gig.createdByUserId !== session.user.id) {
+  if (!application || !application.gig || application.gig.createdByUserId !== session.user.id) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 

@@ -54,6 +54,10 @@ export default async function DashboardPage() {
     );
   }
 
+  const applications = user.applications ?? [];
+  const gigs = user.gigs ?? [];
+  const favorites = user.favorites ?? [];
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -72,12 +76,12 @@ export default async function DashboardPage() {
             <CardTitle>Recent applications</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-sm text-slate-600">
-            {user.applications.length === 0 ? (
+            {applications.length === 0 ? (
               <p>
                 No applications yet. Head to <Link className="text-brand" href="/gigs">Gigs</Link> to apply.
               </p>
             ) : (
-              user.applications.map((application) => (
+              applications.map((application) => (
                 <div key={application.id} className="flex items-center justify-between">
                   <span>{application.message.slice(0, 48)}...</span>
                   <Badge variant="outline">{application.status}</Badge>
@@ -94,10 +98,10 @@ export default async function DashboardPage() {
             <CardTitle>Your gigs</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-sm text-slate-600">
-            {user.gigs.length === 0 ? (
+            {gigs.length === 0 ? (
               <p>No gigs yet. Start by creating one.</p>
             ) : (
-              user.gigs.map((gig) => (
+              gigs.map((gig) => (
                 <div key={gig.id} className="flex items-center justify-between">
                   <span>{gig.title}</span>
                   <Badge variant="outline">{gig.status}</Badge>
@@ -117,10 +121,10 @@ export default async function DashboardPage() {
             <CardTitle>Saved gigs</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-sm text-slate-600">
-            {user.favorites.length === 0 ? (
+            {favorites.length === 0 ? (
               <p>You have not saved any gigs yet.</p>
             ) : (
-              user.favorites.map((favorite) => (
+              favorites.map((favorite) => (
                 <div key={favorite.id}>{favorite.gigId ? `Gig: ${favorite.gigId}` : `Venue: ${favorite.venueId}`}</div>
               ))
             )}

@@ -1,6 +1,7 @@
 import {
   addFavorite,
   createApplication,
+  createComedianProfile,
   createGig,
   createUser,
   createVerificationRequest,
@@ -25,7 +26,30 @@ import {
   updateVenueProfile,
   deleteGig
 } from "@/lib/dataStore";
+import type {
+  Application,
+  ComedianProfile,
+  Favorite,
+  Gig,
+  PromoterProfile,
+  User,
+  VerificationRequest,
+  VenueProfile
+} from "@/lib/dataStore";
 import type { ApplicationStatus, GigCompensationType, GigStatus, Role, VerificationStatus } from "@/lib/prismaEnums";
+
+type VerificationUserInclude = true | { include?: { promoter?: boolean; venue?: boolean } };
+
+type PrismaUser = User & {
+  comedian?: ComedianProfile | null;
+  promoter?: PromoterProfile | null;
+  venue?: VenueProfile | null;
+  applications?: Application[];
+  gigs?: Gig[];
+  favorites?: Favorite[];
+};
+
+type PrismaApplicationWithGig = Application & { gig: Gig | null };
 
 interface FindUniqueUserArgs {
   where: { id?: string; email?: string };
@@ -36,14 +60,6 @@ interface FindUniqueUserArgs {
     applications?: { take?: number; orderBy?: { createdAt?: "asc" | "desc" } };
     gigs?: { take?: number; orderBy?: { createdAt?: "asc" | "desc" } };
     favorites?: { take?: number; orderBy?: { createdAt?: "asc" | "desc" } };
-  };
-  select?: {
-    id?: boolean;
-    name?: boolean;
-    email?: boolean;
-    role?: boolean;
-    promoter?: { select?: { verificationStatus?: boolean } } | boolean;
-    venue?: { select?: { verificationStatus?: boolean } } | boolean;
   };
 }
 
@@ -94,18 +110,21 @@ interface UpdateGigArgs {
   data: Partial<CreateGigArgs["data"]>;
 }
 
-interface VerificationQueryArgs {
+type VerificationRequestWithUser = VerificationRequest & { user: PrismaUser | null };
+
+type VerificationQueryArgs<IncludeUser extends boolean | VerificationUserInclude | undefined = undefined> = {
   where?: { userId?: string };
   orderBy?: { createdAt?: "asc" | "desc" };
   include?: {
-    user?: {
-      include?: {
-        promoter?: boolean;
-        venue?: boolean;
-      };
-    } | boolean;
+    user?: IncludeUser;
   };
-}
+};
+
+type VerificationQueryResult<IncludeUser extends boolean | VerificationUserInclude | undefined> = IncludeUser extends
+  | true
+  | { include?: { promoter?: boolean; venue?: boolean } }
+  ? VerificationRequestWithUser
+  : VerificationRequest;
 
 interface CreateVerificationArgs {
   data: {
@@ -160,8 +179,8 @@ function applyPagination<T>(items: T[], take?: number, skip?: number) {
 
 export const prisma = {
   user: {
-    async findUnique(args: FindUniqueUserArgs) {
-      const { where, include, select } = args;
+    async findUnique(args: FindUniqueUserArgs): Promise<PrismaUser | null> {
+      const { where, include } = args;
       let user = null;
       if (where.id) {
         user = await getUserById(where.id);
@@ -169,9 +188,9 @@ export const prisma = {
         user = await getUserByEmail(where.email);
       }
       if (!user) return null;
-      const needsPromoter = include?.promoter || select?.promoter;
-      const needsVenue = include?.venue || select?.venue;
-      const result: Record<string, unknown> = { ...user };
+      const needsPromoter = include?.promoter;
+      const needsVenue = include?.venue;
+      const result: PrismaUser = { ...user };
       const promoterProfile = needsPromoter ? await getPromoterProfile(user.id) : undefined;
       const venueProfile = needsVenue ? await getVenueProfile(user.id) : undefined;
       if (include?.comedian) {
@@ -200,30 +219,6 @@ export const prisma = {
           order: include.favorites.orderBy?.createdAt ?? "desc"
         });
         result.favorites = favorites;
-      }
-      if (select) {
-        const selected: Record<string, unknown> = {};
-        if (select.id) selected.id = user.id;
-        if (select.name) selected.name = user.name ?? null;
-        if (select.email) selected.email = user.email;
-        if (select.role) selected.role = user.role;
-        if (select.promoter) {
-          const profile = promoterProfile ?? null;
-          if (typeof select.promoter === "object" && select.promoter.select?.verificationStatus) {
-            selected.promoter = profile ? { verificationStatus: profile.verificationStatus } : null;
-          } else {
-            selected.promoter = profile;
-          }
-        }
-        if (select.venue) {
-          const profile = venueProfile ?? null;
-          if (typeof select.venue === "object" && select.venue.select?.verificationStatus) {
-            selected.venue = profile ? { verificationStatus: profile.verificationStatus } : null;
-          } else {
-            selected.venue = profile;
-          }
-        }
-        return selected;
       }
       return result;
     },
@@ -255,8 +250,12 @@ export const prisma = {
     async create(args: CreateGigArgs) {
       return createGig({
         ...args.data,
-        dateStart: args.data.dateStart,
-        dateEnd: args.data.dateEnd,
+        dateStart:
+          args.data.dateStart instanceof Date ? args.data.dateStart.toISOString() : args.data.dateStart,
+        dateEnd:
+          args.data.dateEnd instanceof Date
+            ? args.data.dateEnd.toISOString()
+            : args.data.dateEnd ?? null,
         minAge: args.data.minAge,
         payoutUsd: args.data.payoutUsd,
         isPublished: args.data.isPublished,
@@ -264,11 +263,28 @@ export const prisma = {
       });
     },
     async update(args: UpdateGigArgs) {
-      return updateGig(args.where.id, args.data);
+      const payload = { ...args.data } as Parameters<typeof updateGig>[1];
+      if (args.data.dateStart instanceof Date) {
+        payload.dateStart = args.data.dateStart.toISOString();
+      }
+      if (args.data.dateEnd instanceof Date) {
+        payload.dateEnd = args.data.dateEnd.toISOString();
+      } else if (args.data.dateEnd === null) {
+        payload.dateEnd = null;
+      }
+      return updateGig(args.where.id, payload);
     },
     async delete(args: { where: { id: string } }) {
       await deleteGig(args.where.id);
       return { id: args.where.id };
+    }
+  },
+  comedianProfile: {
+    async create(args: { data: { userId: string; stageName: string } }) {
+      return createComedianProfile(args.data);
+    },
+    async findUnique(args: { where: { userId: string } }) {
+      return getComedianProfile(args.where.userId);
     }
   },
   promoterProfile: {
@@ -288,39 +304,45 @@ export const prisma = {
     }
   },
   verificationRequest: {
-    async findMany(args: VerificationQueryArgs = {}) {
+    async findMany<IncludeUser extends boolean | VerificationUserInclude | undefined = undefined>(
+      args: VerificationQueryArgs<IncludeUser> = {}
+    ): Promise<VerificationQueryResult<IncludeUser>[]> {
       const items = args.where?.userId
         ? await listVerificationRequestsByUser(args.where.userId)
         : await listVerificationRequests({ orderBy: args.orderBy });
       if (!args.include?.user) {
-        return items;
+        return items as VerificationQueryResult<IncludeUser>[];
       }
-      return Promise.all(
+      const include = args.include.user;
+      const requestsWithUser = await Promise.all(
         items.map(async (request) => {
           const user = await prisma.user.findUnique({
             where: { id: request.userId },
-            include:
-              typeof args.include?.user === "object"
-                ? args.include.user.include
-                : undefined
+            include: typeof include === "object" ? include.include : undefined
           });
           return { ...request, user };
         })
       );
+      return requestsWithUser as VerificationQueryResult<IncludeUser>[];
     },
-    async findFirst(args: VerificationQueryArgs = {}) {
+    async findFirst<IncludeUser extends boolean | VerificationUserInclude | undefined = undefined>(
+      args: VerificationQueryArgs<IncludeUser> = {}
+    ): Promise<VerificationQueryResult<IncludeUser> | null> {
       const records = await prisma.verificationRequest.findMany({ ...args });
       return records[0] ?? null;
     },
-    async findUnique(args: { where: { id: string }; include?: VerificationQueryArgs["include"] }) {
+    async findUnique<IncludeUser extends boolean | VerificationUserInclude | undefined = undefined>(
+      args: { where: { id: string }; include?: VerificationQueryArgs<IncludeUser>["include"] }
+    ): Promise<VerificationQueryResult<IncludeUser> | null> {
       const request = await getVerificationRequestById(args.where.id);
       if (!request) return null;
-      if (!args.include?.user) return request;
+      if (!args.include?.user) return request as VerificationQueryResult<IncludeUser>;
+      const include = args.include.user;
       const user = await prisma.user.findUnique({
         where: { id: request.userId },
-        include: typeof args.include.user === "object" ? args.include.user.include : undefined
+        include: typeof include === "object" ? include.include : undefined
       });
-      return { ...request, user };
+      return { ...request, user } as VerificationQueryResult<IncludeUser>;
     },
     async create(args: CreateVerificationArgs) {
       return createVerificationRequest(args.data);
@@ -338,14 +360,16 @@ export const prisma = {
         status: args.data.status
       });
     },
-    async findUnique(args: { where: { id: string }; include?: { gig?: boolean } }) {
+    async findUnique<IncludeGig extends boolean | undefined = undefined>(
+      args: { where: { id: string }; include?: { gig?: IncludeGig } }
+    ): Promise<(IncludeGig extends true ? PrismaApplicationWithGig : Application) | null> {
       const application = await getApplicationById(args.where.id);
       if (!application) return null;
       if (args.include?.gig) {
         const gig = await prisma.gig.findUnique({ where: { id: application.gigId } });
-        return { ...application, gig };
+        return { ...application, gig } as IncludeGig extends true ? PrismaApplicationWithGig : Application;
       }
-      return application;
+      return application as IncludeGig extends true ? PrismaApplicationWithGig : Application;
     },
     async update(args: UpdateApplicationArgs) {
       return updateApplication(args.where.id, args.data);

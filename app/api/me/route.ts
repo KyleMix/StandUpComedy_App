@@ -9,15 +9,21 @@ export async function GET() {
   }
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      role: true,
-      promoter: { select: { verificationStatus: true } },
-      venue: { select: { verificationStatus: true } }
-    }
+    include: { promoter: true, venue: true }
   });
 
-  return NextResponse.json({ user });
+  if (!user) {
+    return NextResponse.json({ user: null }, { status: 200 });
+  }
+
+  return NextResponse.json({
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      promoter: user.promoter ? { verificationStatus: user.promoter.verificationStatus } : null,
+      venue: user.venue ? { verificationStatus: user.venue.verificationStatus } : null
+    }
+  });
 }

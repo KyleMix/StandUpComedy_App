@@ -217,6 +217,38 @@ export async function getComedianProfile(userId: string): Promise<ComedianProfil
   return record ? mapComedian(record) : null;
 }
 
+interface CreateComedianProfileInput {
+  userId: string;
+  stageName: string;
+}
+
+export async function createComedianProfile(input: CreateComedianProfileInput): Promise<ComedianProfile> {
+  const snapshot = await loadSnapshot();
+  const now = nowIso();
+  const record: ComedianProfileRecord = {
+    userId: input.userId,
+    stageName: input.stageName,
+    bio: null,
+    credits: null,
+    website: null,
+    reelUrl: null,
+    instagram: null,
+    travelRadiusMiles: null,
+    homeCity: null,
+    homeState: null,
+    createdAt: now,
+    updatedAt: now
+  };
+  const index = snapshot.comedianProfiles.findIndex((profile) => profile.userId === input.userId);
+  if (index >= 0) {
+    snapshot.comedianProfiles[index] = record;
+  } else {
+    snapshot.comedianProfiles.push(record);
+  }
+  await persist(snapshot);
+  return mapComedian(record);
+}
+
 export async function getPromoterProfile(userId: string): Promise<PromoterProfile | null> {
   const snapshot = await loadSnapshot();
   const record = snapshot.promoterProfiles.find((profile) => profile.userId === userId);

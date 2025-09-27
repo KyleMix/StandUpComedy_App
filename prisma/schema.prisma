@@ -1,0 +1,209 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  COMEDIAN
+  PROMOTER
+  VENUE
+  FAN
+  ADMIN
+}
+
+enum VerificationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum GigCompensationType {
+  FLAT
+  DOOR_SPLIT
+  TIPS
+  UNPAID
+}
+
+enum GigStatus {
+  OPEN
+  CLOSED
+  CANCELLED
+}
+
+enum ApplicationStatus {
+  SUBMITTED
+  SHORTLISTED
+  ACCEPTED
+  REJECTED
+  WITHDRAWN
+}
+
+model User {
+  id             String            @id @default(cuid())
+  name           String?
+  email          String            @unique
+  hashedPassword String?
+  role           Role              @default(FAN)
+  createdAt      DateTime          @default(now())
+  comedian       ComedianProfile?
+  promoter       PromoterProfile?
+  venue          VenueProfile?
+  verificationRequests VerificationRequest[]
+  gigs           Gig[]             @relation("UserGigs")
+  applications   Application[]     @relation("ComedianApplications")
+  bookings       Booking[]         @relation("ComedianBookings")
+  favorites      Favorite[]
+  notifications  Notification[]
+}
+
+model ComedianProfile {
+  userId            String   @id
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  stageName         String
+  bio               String?
+  credits           String?
+  website           String?
+  reelUrl           String?
+  instagram         String?
+  travelRadiusMiles Int?
+  homeCity          String?
+  homeState         String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model PromoterProfile {
+  userId            String              @id
+  user              User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization      String
+  contactName       String
+  phone             String?
+  website           String?
+  verificationStatus VerificationStatus @default(PENDING)
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+}
+
+model VenueProfile {
+  userId            String              @id
+  user              User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  venueName         String
+  address1          String
+  address2          String?
+  city              String
+  state             String
+  postalCode        String
+  capacity          Int?
+  contactEmail      String
+  phone             String?
+  verificationStatus VerificationStatus @default(PENDING)
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  shows             Show[]
+}
+
+model VerificationRequest {
+  id            String              @id @default(cuid())
+  userId        String
+  user          User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  roleRequested Role
+  message       String
+  documents     Json
+  status        VerificationStatus  @default(PENDING)
+  reviewedBy    String?
+  reviewer      User?               @relation("VerificationReviewer", fields: [reviewedBy], references: [id])
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+}
+
+model Gig {
+  id               String            @id @default(cuid())
+  createdByUserId  String
+  creator          User              @relation("UserGigs", fields: [createdByUserId], references: [id], onDelete: Cascade)
+  title            String
+  description      String
+  compensationType GigCompensationType
+  payoutUsd        Int?
+  dateStart        DateTime
+  dateEnd          DateTime?
+  timezone         String
+  city             String
+  state            String
+  minAge           Int?
+  isPublished      Boolean           @default(false)
+  status           GigStatus         @default(OPEN)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  applications     Application[]
+  bookings         Booking[]
+  shows            Show[]
+  favorites        Favorite[]
+}
+
+model Application {
+  id              String             @id @default(cuid())
+  gigId           String
+  gig             Gig                @relation(fields: [gigId], references: [id], onDelete: Cascade)
+  comedianUserId  String
+  comedian        User               @relation("ComedianApplications", fields: [comedianUserId], references: [id], onDelete: Cascade)
+  message         String
+  status          ApplicationStatus  @default(SUBMITTED)
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+}
+
+model Booking {
+  id             String    @id @default(cuid())
+  gigId          String
+  gig            Gig       @relation(fields: [gigId], references: [id], onDelete: Cascade)
+  comedianUserId String
+  comedian       User      @relation("ComedianBookings", fields: [comedianUserId], references: [id], onDelete: Cascade)
+  terms          String
+  agreedAt       DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+model Show {
+  id        String   @id @default(cuid())
+  gigId     String?
+  gig       Gig?     @relation(fields: [gigId], references: [id], onDelete: SetNull)
+  venueId   String?
+  venue     VenueProfile? @relation(fields: [venueId], references: [userId], onDelete: SetNull)
+  title     String
+  dateTime  DateTime
+  city      String
+  state     String
+  ticketUrl String?
+  createdAt DateTime @default(now())
+}
+
+model Favorite {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  gigId     String?
+  gig       Gig?     @relation(fields: [gigId], references: [id], onDelete: Cascade)
+  venueId   String?
+  venue     VenueProfile? @relation(fields: [venueId], references: [userId], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([userId, gigId])
+  @@index([userId, venueId])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String
+  payload   Json
+  readAt    DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([userId, readAt])
+}

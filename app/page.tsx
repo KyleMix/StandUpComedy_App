@@ -98,6 +98,7 @@ export default function LandingPage() {
                 Free to join • Personalized matches • Trusted by industry leaders
               </p>
             </div>
+            <a href="/the-funny">The Funny UI</a>
             <div className="grid gap-6 sm:grid-cols-3">
               {stats.map((stat) => (
                 <div key={stat.label} className="rounded-2xl border border-slate-200/70 bg-white/70 p-4 shadow-sm">

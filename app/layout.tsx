@@ -1,4 +1,4 @@
-import "../styles/globals.css";
+import "./globals.css";
 import { Navbar } from "@/components/navbar";
 import { ReactNode } from "react";
 

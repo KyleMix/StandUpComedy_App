@@ -1,0 +1,7 @@
+{
+  "extends": ["next", "next/core-web-vitals", "prettier"],
+  "plugins": ["@typescript-eslint", "tailwindcss"],
+  "rules": {
+    "tailwindcss/no-custom-classname": "off"
+  }
+}

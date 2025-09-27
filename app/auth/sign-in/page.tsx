@@ -11,7 +11,7 @@ async function handleSignIn(formData: FormData) {
   if (typeof email !== "string" || typeof password !== "string") {
     throw new Error("Invalid credentials");
   }
-  await signIn("credentials", {
+  await signIn({
     email,
     password,
     redirectTo: "/dashboard"

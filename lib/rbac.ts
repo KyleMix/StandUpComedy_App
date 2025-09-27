@@ -1,4 +1,4 @@
-import { Role, VerificationStatus } from "@prisma/client";
+import { Role, VerificationStatus } from "@/lib/prismaEnums";
 
 export const roleLabelMap: Record<Role, string> = {
   [Role.COMEDIAN]: "Comedian",

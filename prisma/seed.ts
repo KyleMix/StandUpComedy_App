@@ -1,4 +1,11 @@
-import { PrismaClient, Role, VerificationStatus, GigCompensationType, GigStatus, ApplicationStatus } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
+import {
+  ApplicationStatus,
+  GigCompensationType,
+  GigStatus,
+  Role,
+  VerificationStatus
+} from "../lib/prismaEnums";
 import { hash } from "bcryptjs";
 
 const prisma = new PrismaClient();

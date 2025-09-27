@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { Role, VerificationStatus } from "@prisma/client";
+import { Role, VerificationStatus } from "@/lib/prismaEnums";
 import { canApplyToGig, canPublishGig } from "@/lib/rbac";
 
 describe("RBAC helpers", () => {

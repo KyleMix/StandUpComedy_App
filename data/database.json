@@ -1,0 +1,221 @@
+{
+  "users": [
+    {
+      "id": "user-admin",
+      "name": "Alex Admin",
+      "email": "admin@thefunny.local",
+      "hashedPassword": "$2a$10$iUHEZj.G7ukeDi6DtYbOi.QGJgZWlh/prWD/6EX00u2TooWqQp2G.",
+      "role": "ADMIN",
+      "createdAt": "2024-01-01T12:00:00.000Z"
+    },
+    {
+      "id": "user-promoter",
+      "name": "Polly Promoter",
+      "email": "promoter@thefunny.local",
+      "hashedPassword": "$2a$10$iUHEZj.G7ukeDi6DtYbOi.QGJgZWlh/prWD/6EX00u2TooWqQp2G.",
+      "role": "PROMOTER",
+      "createdAt": "2024-01-02T12:00:00.000Z"
+    },
+    {
+      "id": "user-venue",
+      "name": "Vince Venue",
+      "email": "venue@thefunny.local",
+      "hashedPassword": "$2a$10$iUHEZj.G7ukeDi6DtYbOi.QGJgZWlh/prWD/6EX00u2TooWqQp2G.",
+      "role": "VENUE",
+      "createdAt": "2024-01-03T12:00:00.000Z"
+    },
+    {
+      "id": "user-comic1",
+      "name": "Casey Comic",
+      "email": "comic1@thefunny.local",
+      "hashedPassword": "$2a$10$iUHEZj.G7ukeDi6DtYbOi.QGJgZWlh/prWD/6EX00u2TooWqQp2G.",
+      "role": "COMEDIAN",
+      "createdAt": "2024-01-04T12:00:00.000Z"
+    },
+    {
+      "id": "user-comic2",
+      "name": "Cory Comic",
+      "email": "comic2@thefunny.local",
+      "hashedPassword": "$2a$10$iUHEZj.G7ukeDi6DtYbOi.QGJgZWlh/prWD/6EX00u2TooWqQp2G.",
+      "role": "COMEDIAN",
+      "createdAt": "2024-01-05T12:00:00.000Z"
+    },
+    {
+      "id": "user-fan",
+      "name": "Fran Fan",
+      "email": "fan@thefunny.local",
+      "hashedPassword": "$2a$10$iUHEZj.G7ukeDi6DtYbOi.QGJgZWlh/prWD/6EX00u2TooWqQp2G.",
+      "role": "FAN",
+      "createdAt": "2024-01-06T12:00:00.000Z"
+    }
+  ],
+  "comedianProfiles": [
+    {
+      "userId": "user-comic1",
+      "stageName": "Casey the Comic",
+      "bio": "Observational comic with a love for crowd work.",
+      "credits": "Opened for national headliners",
+      "website": "https://caseycomic.example.com",
+      "reelUrl": "https://youtu.be/example",
+      "instagram": "@caseycomic",
+      "travelRadiusMiles": 200,
+      "homeCity": "Chicago",
+      "homeState": "IL",
+      "createdAt": "2024-01-04T12:00:00.000Z",
+      "updatedAt": "2024-03-01T12:00:00.000Z"
+    },
+    {
+      "userId": "user-comic2",
+      "stageName": "Cory the Comic",
+      "bio": "High energy storyteller.",
+      "credits": "Clubs across the Midwest",
+      "website": null,
+      "reelUrl": null,
+      "instagram": "@corycomic",
+      "travelRadiusMiles": 150,
+      "homeCity": "Milwaukee",
+      "homeState": "WI",
+      "createdAt": "2024-01-05T12:00:00.000Z",
+      "updatedAt": "2024-03-02T12:00:00.000Z"
+    }
+  ],
+  "promoterProfiles": [
+    {
+      "userId": "user-promoter",
+      "organization": "Laugh Track Productions",
+      "contactName": "Polly Promoter",
+      "phone": "555-0001",
+      "website": "https://laughtrack.example.com",
+      "verificationStatus": "APPROVED",
+      "createdAt": "2024-01-02T12:00:00.000Z",
+      "updatedAt": "2024-03-10T12:00:00.000Z"
+    }
+  ],
+  "venueProfiles": [
+    {
+      "userId": "user-venue",
+      "venueName": "The Punchline Loft",
+      "address1": "123 Main St",
+      "address2": "Suite 200",
+      "city": "Denver",
+      "state": "CO",
+      "postalCode": "80202",
+      "capacity": 150,
+      "contactEmail": "info@punchlineloft.local",
+      "phone": "555-0002",
+      "verificationStatus": "APPROVED",
+      "createdAt": "2024-01-03T12:00:00.000Z",
+      "updatedAt": "2024-03-12T12:00:00.000Z"
+    }
+  ],
+  "gigs": [
+    {
+      "id": "gig-1",
+      "createdByUserId": "user-promoter",
+      "title": "Friday Night Showcase",
+      "description": "A curated lineup of emerging comics for a packed Friday crowd.",
+      "compensationType": "FLAT",
+      "payoutUsd": 200,
+      "dateStart": "2024-06-07T02:00:00.000Z",
+      "dateEnd": null,
+      "timezone": "America/Chicago",
+      "city": "Chicago",
+      "state": "IL",
+      "minAge": 21,
+      "isPublished": true,
+      "status": "OPEN",
+      "createdAt": "2024-03-15T12:00:00.000Z",
+      "updatedAt": "2024-03-15T12:00:00.000Z"
+    },
+    {
+      "id": "gig-2",
+      "createdByUserId": "user-promoter",
+      "title": "Corporate Happy Hour",
+      "description": "Looking for a clean comedian for a corporate happy hour.",
+      "compensationType": "FLAT",
+      "payoutUsd": 500,
+      "dateStart": "2024-06-21T00:00:00.000Z",
+      "dateEnd": null,
+      "timezone": "America/Chicago",
+      "city": "Chicago",
+      "state": "IL",
+      "minAge": 18,
+      "isPublished": true,
+      "status": "OPEN",
+      "createdAt": "2024-03-18T12:00:00.000Z",
+      "updatedAt": "2024-03-18T12:00:00.000Z"
+    },
+    {
+      "id": "gig-3",
+      "createdByUserId": "user-venue",
+      "title": "Open Mic Night",
+      "description": "Weekly open mic to test new material.",
+      "compensationType": "UNPAID",
+      "payoutUsd": null,
+      "dateStart": "2024-06-05T01:00:00.000Z",
+      "dateEnd": null,
+      "timezone": "America/Denver",
+      "city": "Denver",
+      "state": "CO",
+      "minAge": 21,
+      "isPublished": false,
+      "status": "OPEN",
+      "createdAt": "2024-03-20T12:00:00.000Z",
+      "updatedAt": "2024-03-20T12:00:00.000Z"
+    }
+  ],
+  "applications": [
+    {
+      "id": "app-1",
+      "gigId": "gig-1",
+      "comedianUserId": "user-comic1",
+      "message": "I'd love to bring my 15-minute festival set to this show!",
+      "status": "SUBMITTED",
+      "createdAt": "2024-03-16T12:00:00.000Z",
+      "updatedAt": "2024-03-16T12:00:00.000Z"
+    },
+    {
+      "id": "app-2",
+      "gigId": "gig-2",
+      "comedianUserId": "user-comic2",
+      "message": "Corporate clean set with interactive bits.",
+      "status": "SHORTLISTED",
+      "createdAt": "2024-03-19T12:00:00.000Z",
+      "updatedAt": "2024-03-19T12:00:00.000Z"
+    }
+  ],
+  "verificationRequests": [
+    {
+      "id": "verify-1",
+      "userId": "user-promoter",
+      "roleRequested": "PROMOTER",
+      "message": "Production company specializing in indie comedy.",
+      "documents": {"taxId": "123-45-6789"},
+      "status": "APPROVED",
+      "reviewedBy": "user-admin",
+      "createdAt": "2024-02-01T12:00:00.000Z",
+      "updatedAt": "2024-03-10T12:00:00.000Z"
+    },
+    {
+      "id": "verify-2",
+      "userId": "user-venue",
+      "roleRequested": "VENUE",
+      "message": "Neighborhood comedy loft seeking verified status.",
+      "documents": {"businessLicense": "LIC-2024-001"},
+      "status": "PENDING",
+      "reviewedBy": null,
+      "createdAt": "2024-02-05T12:00:00.000Z",
+      "updatedAt": "2024-02-05T12:00:00.000Z"
+    }
+  ],
+  "favorites": [
+    {
+      "id": "fav-1",
+      "userId": "user-fan",
+      "gigId": "gig-1",
+      "venueId": null,
+      "createdAt": "2024-03-21T12:00:00.000Z",
+      "updatedAt": "2024-03-21T12:00:00.000Z"
+    }
+  ]
+}

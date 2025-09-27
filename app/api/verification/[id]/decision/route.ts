@@ -25,6 +25,11 @@ export async function POST(request: Request, { params }: { params: { id: string 
     return NextResponse.json({ error: "Request not found" }, { status: 404 });
   }
 
+  const user = existing.user;
+  if (!user) {
+    return NextResponse.json({ error: "User not found" }, { status: 404 });
+  }
+
   const verification = await prisma.verificationRequest.update({
     where: { id: params.id },
     data: {
@@ -33,23 +38,23 @@ export async function POST(request: Request, { params }: { params: { id: string 
     }
   });
 
-  if (existing.user.promoter && parsed.data.status !== existing.user.promoter.verificationStatus) {
+  if (user.promoter && parsed.data.status !== user.promoter.verificationStatus) {
     await prisma.promoterProfile.update({
       where: { userId: existing.userId },
       data: { verificationStatus: parsed.data.status }
     });
   }
 
-  if (existing.user.venue && parsed.data.status !== existing.user.venue.verificationStatus) {
+  if (user.venue && parsed.data.status !== user.venue.verificationStatus) {
     await prisma.venueProfile.update({
       where: { userId: existing.userId },
       data: { verificationStatus: parsed.data.status }
     });
   }
 
-  if (existing.user.email) {
-    const template = mailTemplates.verificationDecision(existing.user.name ?? "there", parsed.data.status);
-    await sendMail({ to: existing.user.email, ...template });
+  if (user.email) {
+    const template = mailTemplates.verificationDecision(user.name ?? "there", parsed.data.status);
+    await sendMail({ to: user.email, ...template });
   }
 
   return NextResponse.json({ request: verification });

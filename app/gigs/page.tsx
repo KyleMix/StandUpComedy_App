@@ -64,7 +64,6 @@ export default function GigsPage({ searchParams }: { searchParams: Record<string
         <p className="text-sm text-slate-600">Filter by location, compensation, and more.</p>
       </div>
       <Suspense key={JSON.stringify(searchParams)} fallback={<p>Loading gigs...</p>}>
-        {/* @ts-expect-error Server Component */}
         <GigsList searchParams={searchParams} />
       </Suspense>
     </section>

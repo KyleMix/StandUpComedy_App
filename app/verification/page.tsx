@@ -32,7 +32,8 @@ async function submitVerification(formData: FormData) {
       userId: session.user.id,
       roleRequested: parsed.data.role,
       message: parsed.data.message,
-      documents: parsed.data.documents
+      documents: parsed.data.documents,
+      status: "PENDING"
     }
   });
   redirect("/dashboard");

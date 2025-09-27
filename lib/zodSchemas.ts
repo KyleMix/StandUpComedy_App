@@ -1,5 +1,11 @@
 import { z } from "zod";
-import { ApplicationStatus, GigCompensationType, GigStatus, Role, VerificationStatus } from "@prisma/client";
+import {
+  ApplicationStatus,
+  GigCompensationType,
+  GigStatus,
+  Role,
+  VerificationStatus
+} from "@/lib/prismaEnums";
 
 export const registerSchema = z.object({
   name: z.string().min(1),

@@ -8,6 +8,9 @@ import {
   getApplicationById,
   getGigById,
   getComedianProfile,
+  listComedianProfiles,
+  listComedianVideosForUser,
+  listComedianAppearancesForUser,
   getPromoterProfile,
   getUserByEmail,
   getUserById,
@@ -28,7 +31,9 @@ import {
 } from "@/lib/dataStore";
 import type {
   Application,
+  ComedianAppearance,
   ComedianProfile,
+  ComedianVideo,
   Favorite,
   Gig,
   PromoterProfile,
@@ -50,6 +55,27 @@ type PrismaUser = User & {
 };
 
 type PrismaApplicationWithGig = Application & { gig: Gig | null };
+
+type PrismaComedianProfile = ComedianProfile & {
+  user?: User | null;
+  videos?: ComedianVideo[];
+  appearances?: ComedianAppearance[];
+};
+
+interface ComedianInclude {
+  user?: boolean;
+  videos?: { take?: number; orderBy?: { postedAt?: "asc" | "desc" } };
+  appearances?: { take?: number; orderBy?: { performedAt?: "asc" | "desc" } };
+}
+
+interface FindManyComedianArgs {
+  include?: ComedianInclude;
+}
+
+interface FindUniqueComedianArgs {
+  where: { userId: string };
+  include?: ComedianInclude;
+}
 
 interface FindUniqueUserArgs {
   where: { id?: string; email?: string };
@@ -177,6 +203,39 @@ function applyPagination<T>(items: T[], take?: number, skip?: number) {
   return items.slice(start, end);
 }
 
+async function hydrateComedianProfile(
+  profile: ComedianProfile,
+  include?: ComedianInclude
+): Promise<PrismaComedianProfile> {
+  const result: PrismaComedianProfile = { ...profile };
+  if (include?.user) {
+    result.user = await getUserById(profile.userId);
+  }
+  if (include?.videos) {
+    const config = include.videos;
+    let videos = await listComedianVideosForUser(profile.userId);
+    if (config.orderBy?.postedAt === "asc") {
+      videos = [...videos].sort((a, b) => a.postedAt.getTime() - b.postedAt.getTime());
+    }
+    if (config.take !== undefined) {
+      videos = videos.slice(0, config.take);
+    }
+    result.videos = videos;
+  }
+  if (include?.appearances) {
+    const config = include.appearances;
+    let appearances = await listComedianAppearancesForUser(profile.userId);
+    if (config.orderBy?.performedAt === "asc") {
+      appearances = [...appearances].sort((a, b) => a.performedAt.getTime() - b.performedAt.getTime());
+    }
+    if (config.take !== undefined) {
+      appearances = appearances.slice(0, config.take);
+    }
+    result.appearances = appearances;
+  }
+  return result;
+}
+
 export const prisma = {
   user: {
     async findUnique(args: FindUniqueUserArgs): Promise<PrismaUser | null> {
@@ -277,6 +336,17 @@ export const prisma = {
     async delete(args: { where: { id: string } }) {
       await deleteGig(args.where.id);
       return { id: args.where.id };
+    }
+  },
+  comedian: {
+    async findMany(args: FindManyComedianArgs = {}) {
+      const profiles = await listComedianProfiles();
+      return Promise.all(profiles.map((profile) => hydrateComedianProfile(profile, args.include)));
+    },
+    async findUnique(args: FindUniqueComedianArgs) {
+      const profile = await getComedianProfile(args.where.userId);
+      if (!profile) return null;
+      return hydrateComedianProfile(profile, args.include);
     }
   },
   comedianProfile: {

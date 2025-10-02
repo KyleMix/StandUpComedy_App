@@ -440,11 +440,19 @@ const Pricing = () => (
 const FAQ = () => (
   <section id="faq" className="mx-auto max-w-7xl px-4 py-12">
     <h3 className="mb-6 text-2xl font-bold">FAQ</h3>
-    <Accordion items={[
-      { q: "How do promoter/venue verifications work?", a: "We verify business details and a valid contact so comics know they\'re submitting to legit gigs." },
-      { q: "Is there a fee to submit avails?", a: "Free plan includes 3 submissions/month; Pro unlocks unlimited." },
-      { q: "Do you handle payments?", a: "Venues pay comics directly; we\'re rolling out optional escrow and invoice tools soon." },
-    ]} />
+    <Accordion
+      items={[
+        {
+          q: "How do promoter/venue verifications work?",
+          a: "We verify business details and a valid contact so comics know they&apos;re submitting to legit gigs."
+        },
+        { q: "Is there a fee to submit avails?", a: "Free plan includes 3 submissions/month; Pro unlocks unlimited." },
+        {
+          q: "Do you handle payments?",
+          a: "Venues pay comics directly; we&apos;re rolling out optional escrow and invoice tools soon."
+        }
+      ]}
+    />
   </section>
 );
 
@@ -454,7 +462,7 @@ const FinalCTA = () => (
     <div className="absolute inset-0 -z-10 bg-gradient-to-br from-indigo-600 via-indigo-500 to-fuchsia-500"/>
     <div className="mx-auto max-w-7xl px-4 py-14 text-white">
       <h3 className="text-3xl font-extrabold">Ready to get funny?</h3>
-      <p className="mt-2 max-w-2xl text-indigo-100">Join the network, post gigs, and fill rooms. It\'s free to start and takes 60 seconds.</p>
+      <p className="mt-2 max-w-2xl text-indigo-100">Join the network, post gigs, and fill rooms. It&apos;s free to start and takes 60 seconds.</p>
       <div className="mt-5 flex flex-wrap gap-3">
         <a className={`${btn.base} bg-white text-gray-900`} href="#signup">Create free account</a>
         <a className={`${btn.base} ${btn.ghost} border border-white/30`} href="#demo">See how it works</a>

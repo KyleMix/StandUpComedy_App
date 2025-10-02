@@ -58,6 +58,8 @@
       "website": "https://caseycomic.example.com",
       "reelUrl": "https://youtu.be/example",
       "instagram": "@caseycomic",
+      "tiktokHandle": "@caseycomic",
+      "youtubeChannel": "https://www.youtube.com/@caseycomic",
       "travelRadiusMiles": 200,
       "homeCity": "Chicago",
       "homeState": "IL",
@@ -72,11 +74,89 @@
       "website": null,
       "reelUrl": null,
       "instagram": "@corycomic",
+      "tiktokHandle": "@corycomic",
+      "youtubeChannel": "https://www.youtube.com/@corycomic",
       "travelRadiusMiles": 150,
       "homeCity": "Milwaukee",
       "homeState": "WI",
       "createdAt": "2024-01-05T12:00:00.000Z",
       "updatedAt": "2024-03-02T12:00:00.000Z"
+    }
+  ],
+  "comedianVideos": [
+    {
+      "id": "video-casey-1",
+      "comedianUserId": "user-comic1",
+      "title": "Friday crowd work highlight",
+      "platform": "YOUTUBE",
+      "url": "https://www.youtube.com/watch?v=caseyclip1",
+      "postedAt": "2024-02-15T12:00:00.000Z"
+    },
+    {
+      "id": "video-casey-2",
+      "comedianUserId": "user-comic1",
+      "title": "TikTok: Late night train bits",
+      "platform": "TIKTOK",
+      "url": "https://www.tiktok.com/@caseycomic/video/1234567890",
+      "postedAt": "2024-03-05T12:00:00.000Z"
+    },
+    {
+      "id": "video-cory-1",
+      "comedianUserId": "user-comic2",
+      "title": "Corporate clean five",
+      "platform": "YOUTUBE",
+      "url": "https://www.youtube.com/watch?v=coryclip1",
+      "postedAt": "2024-01-28T12:00:00.000Z"
+    },
+    {
+      "id": "video-cory-2",
+      "comedianUserId": "user-comic2",
+      "title": "TikTok: Storytime sprint",
+      "platform": "TIKTOK",
+      "url": "https://www.tiktok.com/@corycomic/video/987654321",
+      "postedAt": "2024-03-12T12:00:00.000Z"
+    }
+  ],
+  "comedianAppearances": [
+    {
+      "id": "appearance-casey-1",
+      "comedianUserId": "user-comic1",
+      "showName": "Laugh Factory Showcase",
+      "venueName": "Laugh Factory",
+      "city": "Chicago",
+      "state": "IL",
+      "performedAt": "2024-02-01T01:00:00.000Z",
+      "gigId": "gig-1"
+    },
+    {
+      "id": "appearance-casey-2",
+      "comedianUserId": "user-comic1",
+      "showName": "High Plains Festival",
+      "venueName": "Main Stage",
+      "city": "Denver",
+      "state": "CO",
+      "performedAt": "2023-08-18T03:00:00.000Z",
+      "gigId": null
+    },
+    {
+      "id": "appearance-cory-1",
+      "comedianUserId": "user-comic2",
+      "showName": "Corporate Happy Hour",
+      "venueName": "Skyline HQ",
+      "city": "Chicago",
+      "state": "IL",
+      "performedAt": "2024-02-22T23:00:00.000Z",
+      "gigId": "gig-2"
+    },
+    {
+      "id": "appearance-cory-2",
+      "comedianUserId": "user-comic2",
+      "showName": "Riverwest Comedy Night",
+      "venueName": "The Harbor Room",
+      "city": "Milwaukee",
+      "state": "WI",
+      "performedAt": "2024-01-12T02:00:00.000Z",
+      "gigId": null
     }
   ],
   "promoterProfiles": [

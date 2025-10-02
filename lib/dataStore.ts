@@ -3,7 +3,9 @@ import path from "node:path";
 import { randomUUID } from "node:crypto";
 import type {
   ApplicationRecord,
+  ComedianAppearanceRecord,
   ComedianProfileRecord,
+  ComedianVideoRecord,
   DatabaseSnapshot,
   FavoriteRecord,
   GigRecord,
@@ -26,6 +28,8 @@ async function ensureDataStore() {
     const emptySnapshot: DatabaseSnapshot = {
       users: [],
       comedianProfiles: [],
+      comedianVideos: [],
+      comedianAppearances: [],
       promoterProfiles: [],
       venueProfiles: [],
       gigs: [],
@@ -44,6 +48,14 @@ export interface User extends Omit<UserRecord, "createdAt"> {
 export interface ComedianProfile extends Omit<ComedianProfileRecord, "createdAt" | "updatedAt"> {
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface ComedianVideo extends Omit<ComedianVideoRecord, "postedAt"> {
+  postedAt: Date;
+}
+
+export interface ComedianAppearance extends Omit<ComedianAppearanceRecord, "performedAt"> {
+  performedAt: Date;
 }
 
 export interface PromoterProfile extends Omit<PromoterProfileRecord, "createdAt" | "updatedAt"> {
@@ -90,6 +102,8 @@ async function loadSnapshot(): Promise<DatabaseSnapshot> {
       cache = {
         users: [],
         comedianProfiles: [],
+        comedianVideos: [],
+        comedianAppearances: [],
         promoterProfiles: [],
         venueProfiles: [],
         gigs: [],
@@ -124,11 +138,28 @@ function mapComedian(record: ComedianProfileRecord): ComedianProfile {
     website: record.website ?? null,
     reelUrl: record.reelUrl ?? null,
     instagram: record.instagram ?? null,
+    tiktokHandle: record.tiktokHandle ?? null,
+    youtubeChannel: record.youtubeChannel ?? null,
     travelRadiusMiles: record.travelRadiusMiles ?? null,
     homeCity: record.homeCity ?? null,
     homeState: record.homeState ?? null,
     createdAt: new Date(record.createdAt),
     updatedAt: new Date(record.updatedAt)
+  };
+}
+
+function mapComedianVideo(record: ComedianVideoRecord): ComedianVideo {
+  return {
+    ...record,
+    postedAt: new Date(record.postedAt)
+  };
+}
+
+function mapComedianAppearance(record: ComedianAppearanceRecord): ComedianAppearance {
+  return {
+    ...record,
+    gigId: record.gigId ?? null,
+    performedAt: new Date(record.performedAt)
   };
 }
 
@@ -194,6 +225,27 @@ function mapFavorite(record: FavoriteRecord): Favorite {
 
 function nowIso() {
   return new Date().toISOString();
+}
+
+export async function listComedianProfiles(): Promise<ComedianProfile[]> {
+  const snapshot = await loadSnapshot();
+  return snapshot.comedianProfiles.map(mapComedian);
+}
+
+export async function listComedianVideosForUser(userId: string): Promise<ComedianVideo[]> {
+  const snapshot = await loadSnapshot();
+  return snapshot.comedianVideos
+    .filter((video) => video.comedianUserId === userId)
+    .map(mapComedianVideo)
+    .sort((a, b) => b.postedAt.getTime() - a.postedAt.getTime());
+}
+
+export async function listComedianAppearancesForUser(userId: string): Promise<ComedianAppearance[]> {
+  const snapshot = await loadSnapshot();
+  return snapshot.comedianAppearances
+    .filter((appearance) => appearance.comedianUserId === userId)
+    .map(mapComedianAppearance)
+    .sort((a, b) => b.performedAt.getTime() - a.performedAt.getTime());
 }
 
 export async function getUserById(id: string): Promise<User | null> {
@@ -269,6 +321,8 @@ export async function createComedianProfile(input: CreateComedianProfileInput): 
     website: null,
     reelUrl: null,
     instagram: null,
+    tiktokHandle: null,
+    youtubeChannel: null,
     travelRadiusMiles: null,
     homeCity: null,
     homeState: null,

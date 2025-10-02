@@ -166,7 +166,7 @@ export default function LandingPage() {
             {boardThreads.map((thread) => (
               <article key={thread.title} className="space-y-3 rounded-2xl border border-slate-200/80 p-4">
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-                  <h3 className="text-lg font-semibold text-slate-900">{thread.title}</h3>
+                  <h3 className="font-display text-lg font-semibold text-slate-900">{thread.title}</h3>
                   <span className="text-xs text-slate-500">Updated {thread.updated}</span>
                 </div>
                 <p className="text-sm text-slate-600">{thread.excerpt}</p>

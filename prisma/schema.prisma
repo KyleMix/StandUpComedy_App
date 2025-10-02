@@ -1,0 +1,237 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  COMEDIAN
+  PROMOTER
+  VENUE
+  ADMIN
+}
+
+enum ApplicationStatus {
+  PENDING
+  REVIEWING
+  ACCEPTED
+  REJECTED
+  WITHDRAWN
+}
+
+enum ReviewTargetType {
+  USER
+  GIG
+}
+
+model User {
+  id                String                 @id @default(cuid())
+  name              String?
+  email             String?                @unique
+  emailVerified     DateTime?
+  image             String?
+  role              Role                   @default(COMEDIAN)
+  passwordHash      String?
+  createdAt         DateTime               @default(now())
+  updatedAt         DateTime               @updatedAt
+  accounts          Account[]
+  sessions          Session[]
+  comedianProfile   ComedianProfile?
+  venueProfile      VenueProfile?
+  promoterProfile   PromoterProfile?
+  gigs              Gig[]                  @relation("GigCreator")
+  applications      Application[]          @relation("ComedianApplications")
+  follows           Follow[]               @relation("UserFollowing")
+  followers         Follow[]               @relation("UserFollowers")
+  favorites         Favorite[]             @relation("UserFavorites")
+  favoriteOf        Favorite[]             @relation("TargetUserFavorites")
+  reviewsGiven      Review[]               @relation("ReviewsGiven")
+  reviewsReceived   Review[]               @relation("ReviewsReceived")
+  messageThreads    MessageThreadParticipant[]
+  messages          Message[]
+}
+
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String? @map("refreshToken")
+  access_token       String? @map("accessToken")
+  expires_at         Int?    @map("expiresAt")
+  token_type         String? @map("tokenType")
+  scope              String?
+  id_token           String? @map("idToken")
+  session_state      String? @map("sessionState")
+  oauth_token_secret String? @map("oauthTokenSecret")
+  oauth_token        String? @map("oauthToken")
+  user               User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model ComedianProfile {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  stageName   String?
+  bio         String?
+  styles      Json     @default("[]")
+  socials     Json     @default("{}")
+  location    Json     @default("{}")
+  reelUrl     String?
+  media       Json     @default("[]")
+  rating      Float    @default(0)
+  ratingCount Int      @default(0)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // Ratings are derived from related reviews on the owning user
+}
+
+model VenueProfile {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  name        String?
+  bio         String?
+  socials     Json     @default("{}")
+  location    Json     @default("{}")
+  media       Json     @default("[]")
+  capacity    Int?
+  amenities   Json     @default("[]")
+  rating      Float    @default(0)
+  ratingCount Int      @default(0)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // Ratings are derived from related reviews on the owning user
+}
+
+model PromoterProfile {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  organization String?
+  bio         String?
+  socials     Json     @default("{}")
+  location    Json     @default("{}")
+  media       Json     @default("[]")
+  rating      Float    @default(0)
+  ratingCount Int      @default(0)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // Ratings are derived from related reviews on the owning user
+}
+
+model Gig {
+  id              String        @id @default(cuid())
+  title           String
+  description     String
+  styles          Json          @default("[]")
+  city            String
+  state           String
+  payout          Decimal       @db.Decimal(10, 2)
+  setLengthMin    Int           @default(15)
+  ageRestriction  Int?
+  dateStart       DateTime
+  dateEnd         DateTime?
+  published       Boolean       @default(false)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  createdByUserId String
+  createdBy       User          @relation("GigCreator", fields: [createdByUserId], references: [id], onDelete: Cascade)
+  applications    Application[]
+  favorites       Favorite[]
+}
+
+model Application {
+  id            String             @id @default(cuid())
+  gigId         String
+  comedianId    String
+  status        ApplicationStatus  @default(PENDING)
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  gig           Gig                @relation(fields: [gigId], references: [id], onDelete: Cascade)
+  comedian      User               @relation("ComedianApplications", fields: [comedianId], references: [id], onDelete: Cascade)
+
+  @@unique([gigId, comedianId])
+}
+
+model Follow {
+  followerId String
+  followingId String
+  createdAt DateTime @default(now())
+  follower  User     @relation("UserFollowing", fields: [followerId], references: [id], onDelete: Cascade)
+  following User     @relation("UserFollowers", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@id([followerId, followingId])
+}
+
+model Favorite {
+  id            String   @id @default(cuid())
+  userId        String
+  gigId         String?
+  targetUserId  String?
+  createdAt     DateTime @default(now())
+  user          User     @relation("UserFavorites", fields: [userId], references: [id], onDelete: Cascade)
+  gig           Gig?     @relation(fields: [gigId], references: [id], onDelete: Cascade)
+  targetUser    User?    @relation("TargetUserFavorites", fields: [targetUserId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([gigId])
+  @@index([targetUserId])
+}
+
+model Review {
+  id              String           @id @default(cuid())
+  targetUserId    String
+  targetType      ReviewTargetType @default(USER)
+  rating          Int
+  comment         String?
+  createdByUserId String
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  targetUser      User             @relation("ReviewsReceived", fields: [targetUserId], references: [id], onDelete: Cascade)
+  createdBy       User             @relation("ReviewsGiven", fields: [createdByUserId], references: [id], onDelete: Cascade)
+}
+
+model MessageThread {
+  id            String                        @id @default(cuid())
+  createdAt     DateTime                      @default(now())
+  updatedAt     DateTime                      @updatedAt
+  participants  MessageThreadParticipant[]
+  messages      Message[]
+}
+
+model MessageThreadParticipant {
+  id        String        @id @default(cuid())
+  threadId  String
+  userId    String
+  thread    MessageThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([threadId, userId])
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  threadId  String
+  senderId  String
+  body      String
+  createdAt DateTime @default(now())
+  thread    MessageThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  sender    User      @relation(fields: [senderId], references: [id], onDelete: Cascade)
+}

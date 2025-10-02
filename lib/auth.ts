@@ -7,12 +7,20 @@ import type { Role } from "@/lib/prismaEnums";
 
 const SESSION_COOKIE_NAME = "standup_session";
 const SESSION_TTL_MS = 1000 * 60 * 60 * 24 * 7; // 7 days
-const SESSION_SECRET = process.env.SESSION_SECRET ?? "development-secret";
+const SESSION_ROTATION_INTERVAL_MS = 1000 * 60 * 60 * 24; // 24 hours
+
+const rawSessionSecret = process.env.SESSION_SECRET;
+if (process.env.NODE_ENV === "production" && !rawSessionSecret) {
+  throw new Error("SESSION_SECRET is required in production");
+}
+
+const SESSION_SECRET = rawSessionSecret ?? "development-secret";
 
 interface SessionPayload {
   userId: string;
   role: Role;
   expiresAt: number;
+  issuedAt?: number;
 }
 
 export interface Session {
@@ -49,6 +57,29 @@ function decodePayload(token: string): SessionPayload | null {
   return payload;
 }
 
+function issuePayload(userId: string, role: Role): SessionPayload {
+  const issuedAt = Date.now();
+  return {
+    userId,
+    role,
+    issuedAt,
+    expiresAt: issuedAt + SESSION_TTL_MS
+  };
+}
+
+function setSessionCookie(payload: SessionPayload) {
+  const token = encodePayload(payload);
+  cookies().set({
+    name: SESSION_COOKIE_NAME,
+    value: token,
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    expires: new Date(payload.expiresAt),
+    path: "/"
+  });
+}
+
 export async function auth(): Promise<Session | null> {
   const cookie = cookies().get(SESSION_COOKIE_NAME);
   if (!cookie) {
@@ -63,6 +94,12 @@ export async function auth(): Promise<Session | null> {
   if (!user) {
     cookies().delete(SESSION_COOKIE_NAME);
     return null;
+  }
+
+  const issuedAt = payload.issuedAt ?? payload.expiresAt - SESSION_TTL_MS;
+  if (Date.now() - issuedAt > SESSION_ROTATION_INTERVAL_MS) {
+    const refreshed = issuePayload(user.id, user.role);
+    setSessionCookie(refreshed);
   }
   return {
     user: {
@@ -89,18 +126,8 @@ export async function signIn(options: SignInOptions): Promise<void> {
   if (!valid) {
     throw new Error("Invalid credentials");
   }
-  const expiresAt = Date.now() + SESSION_TTL_MS;
-  const payload: SessionPayload = { userId: user.id, role: user.role, expiresAt };
-  const token = encodePayload(payload);
-  cookies().set({
-    name: SESSION_COOKIE_NAME,
-    value: token,
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    expires: new Date(expiresAt),
-    path: "/"
-  });
+  const payload = issuePayload(user.id, user.role);
+  setSessionCookie(payload);
   if (options.redirectTo) {
     redirect(options.redirectTo);
   }

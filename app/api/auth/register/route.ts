@@ -2,8 +2,13 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { registerSchema } from "@/lib/zodSchemas";
 import { hash } from "bcryptjs";
+import { rateLimit } from "@/lib/rateLimit";
 
 export async function POST(request: Request) {
+  const identifier = request.headers.get("x-forwarded-for") ?? request.headers.get("x-real-ip") ?? "anonymous";
+  if (!rateLimit(`auth:register:${identifier}`)) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+  }
   const body = await request.json();
   const parsed = registerSchema.safeParse(body);
   if (!parsed.success) {

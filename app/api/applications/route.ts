@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { applicationSchema } from "@/lib/zodSchemas";
 import { canApplyToGig } from "@/lib/rbac";
+import { rateLimit } from "@/lib/rateLimit";
 
 export async function POST(request: Request) {
   const session = await auth();
@@ -12,6 +13,10 @@ export async function POST(request: Request) {
 
   if (!canApplyToGig(session.user.role)) {
     return NextResponse.json({ error: "Only comedians can apply" }, { status: 403 });
+  }
+
+  if (!rateLimit(`application:create:${session.user.id}`)) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
 
   const data = await request.json();

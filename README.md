@@ -10,6 +10,7 @@ Production-ready starter for a stand-up comedy marketplace built with Next.js 14
 - Verification request management with document uploads and admin approvals
 - Tailwind CSS + shadcn-inspired UI primitives for rapid extension
 - REST API endpoints secured with rate limiting and role checks
+- Messaging center with offer/quote workflow, payout-protected bookings, and reporting tools
 - Vitest unit tests
 - Dockerfile and docker-compose for local development
 

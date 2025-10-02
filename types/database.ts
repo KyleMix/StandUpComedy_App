@@ -1,8 +1,14 @@
 import type {
   ApplicationStatus,
+  BookingStatus,
+  CancellationPolicy,
   GigCompensationType,
   GigStatus,
+  MessageKind,
+  OfferStatus,
+  ReportTarget,
   Role,
+  ThreadState,
   VerificationStatus
 } from "@/lib/prismaEnums";
 
@@ -131,6 +137,83 @@ export interface FavoriteRecord {
   updatedAt: string;
 }
 
+export interface ThreadRecord {
+  id: string;
+  gigId: string;
+  createdById: string;
+  participantIds: string[];
+  state: ThreadState;
+  lastMessageAt: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface MessageRecord {
+  id: string;
+  threadId: string;
+  senderId: string;
+  kind: MessageKind;
+  body: string | null;
+  fileUrl: string | null;
+  offerId: string | null;
+  createdAt: string;
+}
+
+export interface OfferRecord {
+  id: string;
+  threadId: string;
+  fromUserId: string;
+  amount: number;
+  currency: string;
+  terms: string;
+  eventDate: string;
+  expiresAt: string | null;
+  status: OfferStatus;
+  createdAt: string;
+}
+
+export interface BookingRecord {
+  id: string;
+  gigId: string;
+  comedianId: string;
+  promoterId: string;
+  offerId: string;
+  status: BookingStatus;
+  payoutProtection: boolean;
+  cancellationPolicy: CancellationPolicy;
+  paymentIntentId: string | null;
+  createdAt: string;
+}
+
+export interface ConversationReviewRecord {
+  id: string;
+  bookingId: string;
+  fromUserId: string;
+  toUserId: string;
+  rating: number;
+  body: string;
+  visible: boolean;
+  createdAt: string;
+}
+
+export interface AvailabilityRecord {
+  id: string;
+  userId: string;
+  date: string;
+  status: "free" | "busy";
+}
+
+export interface ReportRecord {
+  id: string;
+  reporterId: string;
+  targetType: ReportTarget;
+  targetId: string;
+  reason: string;
+  details: string | null;
+  createdAt: string;
+  resolvedAt: string | null;
+}
+
 export interface DatabaseSnapshot {
   users: UserRecord[];
   comedianProfiles: ComedianProfileRecord[];
@@ -142,4 +225,11 @@ export interface DatabaseSnapshot {
   applications: ApplicationRecord[];
   verificationRequests: VerificationRequestRecord[];
   favorites: FavoriteRecord[];
+  threads: ThreadRecord[];
+  messages: MessageRecord[];
+  offers: OfferRecord[];
+  bookings: BookingRecord[];
+  conversationReviews: ConversationReviewRecord[];
+  availability: AvailabilityRecord[];
+  reports: ReportRecord[];
 }

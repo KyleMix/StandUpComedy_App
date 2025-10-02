@@ -297,5 +297,124 @@
       "createdAt": "2024-03-21T12:00:00.000Z",
       "updatedAt": "2024-03-21T12:00:00.000Z"
     }
-  ]
+  ],
+  "threads": [
+    {
+      "id": "thread-1",
+      "gigId": "gig-1",
+      "createdById": "user-promoter",
+      "participantIds": ["user-promoter", "user-comic1"],
+      "state": "QUOTE",
+      "lastMessageAt": "2024-03-25T18:00:00.000Z",
+      "createdAt": "2024-03-24T16:00:00.000Z",
+      "updatedAt": "2024-03-25T18:00:00.000Z"
+    }
+  ],
+  "messages": [
+    {
+      "id": "msg-1",
+      "threadId": "thread-1",
+      "senderId": "user-promoter",
+      "kind": "TEXT",
+      "body": "Hi Casey! Loved your reel and think you'd be perfect for our showcase.",
+      "fileUrl": null,
+      "offerId": null,
+      "createdAt": "2024-03-24T16:05:00.000Z"
+    },
+    {
+      "id": "msg-2",
+      "threadId": "thread-1",
+      "senderId": "user-comic1",
+      "kind": "TEXT",
+      "body": "Thanks Polly! What's the format and payout?",
+      "fileUrl": null,
+      "offerId": null,
+      "createdAt": "2024-03-24T16:25:00.000Z"
+    },
+    {
+      "id": "msg-3",
+      "threadId": "thread-1",
+      "senderId": "user-promoter",
+      "kind": "OFFER",
+      "body": null,
+      "fileUrl": null,
+      "offerId": "offer-1",
+      "createdAt": "2024-03-24T17:00:00.000Z"
+    },
+    {
+      "id": "msg-4",
+      "threadId": "thread-1",
+      "senderId": "user-comic1",
+      "kind": "SYSTEM",
+      "body": "Offer accepted. Booking created: booking-1",
+      "fileUrl": null,
+      "offerId": null,
+      "createdAt": "2024-03-25T18:00:00.000Z"
+    }
+  ],
+  "offers": [
+    {
+      "id": "offer-1",
+      "threadId": "thread-1",
+      "fromUserId": "user-promoter",
+      "amount": 45000,
+      "currency": "USD",
+      "terms": "25-minute feature set, house provides sound and lights.",
+      "eventDate": "2024-04-15T20:00:00.000Z",
+      "expiresAt": "2024-03-31T23:59:59.000Z",
+      "status": "ACCEPTED",
+      "createdAt": "2024-03-24T17:00:00.000Z"
+    }
+  ],
+  "bookings": [
+    {
+      "id": "booking-1",
+      "gigId": "gig-1",
+      "comedianId": "user-comic1",
+      "promoterId": "user-promoter",
+      "offerId": "offer-1",
+      "status": "PAID",
+      "payoutProtection": true,
+      "cancellationPolicy": "STANDARD",
+      "paymentIntentId": "pi_mock_123",
+      "createdAt": "2024-03-25T18:00:00.000Z"
+    }
+  ],
+  "conversationReviews": [
+    {
+      "id": "review-1",
+      "bookingId": "booking-1",
+      "fromUserId": "user-comic1",
+      "toUserId": "user-promoter",
+      "rating": 5,
+      "body": "Clear communication and great crowd!",
+      "visible": true,
+      "createdAt": "2024-04-16T12:00:00.000Z"
+    },
+    {
+      "id": "review-2",
+      "bookingId": "booking-1",
+      "fromUserId": "user-promoter",
+      "toUserId": "user-comic1",
+      "rating": 5,
+      "body": "Casey crushed it and was super professional.",
+      "visible": true,
+      "createdAt": "2024-04-16T12:05:00.000Z"
+    }
+  ],
+  "availability": [
+    {
+      "id": "avail-1",
+      "userId": "user-comic1",
+      "date": "2024-04-15T00:00:00.000Z",
+      "status": "busy"
+    },
+    {
+      "id": "avail-2",
+      "userId": "user-comic1",
+      "date": "2024-04-16T00:00:00.000Z",
+      "status": "free"
+    }
+  ],
+  "reports": []
 }

@@ -2,8 +2,11 @@ import { prisma } from "@/lib/prisma";
 import { gigFiltersSchema } from "@/lib/zodSchemas";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Suspense } from "react";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { HeroBackground } from "@/components/ui/HeroBackground";
 
 async function GigsList({ searchParams }: { searchParams: Record<string, string | string[] | undefined> }) {
   const parsed = gigFiltersSchema.safeParse(searchParams);
@@ -26,7 +29,27 @@ async function GigsList({ searchParams }: { searchParams: Record<string, string 
   });
 
   if (gigs.length === 0) {
-    return <p className="text-sm text-slate-600">No gigs match the filters yet.</p>;
+    return (
+      <div className="relative overflow-hidden rounded-3xl border border-slate-200/80 bg-slate-50/80">
+        <HeroBackground pattern="jigsaw" />
+        <EmptyState
+          title="No gigs match yet"
+          message="Adjust your filters or check back soon—new shows are posted every week."
+          illustration="events-placeholder.svg"
+          className="border-none bg-white/70 backdrop-blur-sm"
+          actions={
+            <div className="flex flex-wrap gap-3">
+              <Button asChild>
+                <Link href="/post-gig">Post a gig</Link>
+              </Button>
+              <Button asChild variant="outline">
+                <Link href="/gigs">Reset filters</Link>
+              </Button>
+            </div>
+          }
+        />
+      </div>
+    );
   }
 
   return (

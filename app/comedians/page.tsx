@@ -1,9 +1,13 @@
+import Image from "next/image";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CalendarDays, MapPin, Play, Video } from "lucide-react";
+import { Icon } from "@/components/ui/Icon";
+import { avatarDataUrl } from "@/lib/assets/avatar";
+import { AssetAttribution } from "@/components/ui/AssetAttribution";
+import { LICENSED_STYLES } from "@/lib/assets/config";
 
 const dateFormatter = new Intl.DateTimeFormat("en-US", {
   month: "short",
@@ -31,6 +35,13 @@ export default async function ComediansPage() {
     }
   });
 
+  const enriched = await Promise.all(
+    comedians.map(async (comedian) => ({
+      ...comedian,
+      avatar: comedian.user?.image ?? (await avatarDataUrl(comedian.userId))
+    }))
+  );
+
   return (
     <div className="space-y-10">
       <div className="space-y-3">
@@ -45,17 +56,29 @@ export default async function ComediansPage() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
-        {comedians.map((comedian) => {
+        {enriched.map((comedian) => {
           const location = formatLocation(comedian.homeCity, comedian.homeState);
           return (
             <Card key={comedian.userId} className="flex h-full flex-col justify-between border-slate-200/80 bg-white/80">
               <CardHeader className="space-y-2">
                 <div className="flex items-start justify-between gap-4">
-                  <div className="space-y-1">
-                    <CardTitle className="text-xl font-semibold text-slate-900">
-                      {comedian.stageName}
-                    </CardTitle>
-                    {comedian.user?.name && <p className="text-sm text-slate-500">{comedian.user.name}</p>}
+                  <div className="flex items-center gap-3">
+                    <div className="relative h-14 w-14 overflow-hidden rounded-full border border-slate-200 bg-white">
+                      <Image
+                        src={comedian.avatar}
+                        alt=""
+                        width={56}
+                        height={56}
+                        className="h-full w-full object-cover"
+                        unoptimized
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <CardTitle className="text-xl font-semibold text-slate-900">
+                        {comedian.stageName}
+                      </CardTitle>
+                      {comedian.user?.name && <p className="text-sm text-slate-500">{comedian.user.name}</p>}
+                    </div>
                   </div>
                   <Badge variant="outline" className="border-brand/30 text-[10px] uppercase tracking-wide text-brand">
                     Comedian
@@ -63,7 +86,7 @@ export default async function ComediansPage() {
                 </div>
                 {location && (
                   <p className="flex items-center gap-1 text-xs text-slate-500">
-                    <MapPin className="h-3.5 w-3.5 text-brand" />
+                    <Icon name="MapPin" className="h-3.5 w-3.5 text-brand" />
                     {location}
                     {comedian.travelRadiusMiles ? ` • Travels ${comedian.travelRadiusMiles} mi` : null}
                   </p>
@@ -111,7 +134,11 @@ export default async function ComediansPage() {
                             className="flex items-center gap-2 text-sm text-brand transition hover:text-brand-dark"
                           >
                             <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-brand/10 text-brand">
-                              {video.platform === "YOUTUBE" ? <Play className="h-3.5 w-3.5" /> : <Video className="h-3.5 w-3.5" />}
+                              {video.platform === "YOUTUBE" ? (
+                                <Icon name="Play" className="h-3.5 w-3.5" />
+                              ) : (
+                                <Icon name="Video" className="h-3.5 w-3.5" />
+                              )}
                             </span>
                             <span className="flex-1">
                               {video.title}
@@ -139,7 +166,7 @@ export default async function ComediansPage() {
                             </p>
                           </div>
                           <span className="flex items-center gap-1 text-xs text-slate-500">
-                            <CalendarDays className="h-3.5 w-3.5" />
+                            <Icon name="CalendarDays" className="h-3.5 w-3.5" />
                             {dateFormatter.format(appearance.performedAt)}
                           </span>
                         </li>
@@ -150,9 +177,18 @@ export default async function ComediansPage() {
                   )}
                 </div>
 
-                <Button asChild variant="outline" className="w-full border-brand/40 text-brand">
-                  <Link href={`/comedians/${comedian.userId}`}>View full profile</Link>
-                </Button>
+                <div className="space-y-3">
+                  <Button asChild variant="outline" className="w-full border-brand/40 text-brand">
+                    <Link href={`/comedians/${comedian.userId}`}>View full profile</Link>
+                  </Button>
+                  {!comedian.user?.image && (
+                    <AssetAttribution
+                      source="DiceBear"
+                      author={LICENSED_STYLES.dicebear.style}
+                      url="https://www.dicebear.com/styles/bottts-neutral"
+                    />
+                  )}
+                </div>
               </CardContent>
             </Card>
           );

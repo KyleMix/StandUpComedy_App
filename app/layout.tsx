@@ -1,6 +1,7 @@
 import "./globals.css";
 import { Navbar } from "@/components/navbar";
 import { ReactNode } from "react";
+import { inter, display } from "./fonts";
 
 export const metadata = {
   title: "the-funny",
@@ -9,7 +10,7 @@ export const metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${inter.variable} ${display.variable}`}>
       <body className="relative min-h-screen bg-slate-100 text-slate-900 antialiased">
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <div className="absolute left-1/2 top-[-15%] h-[32rem] w-[32rem] -translate-x-1/2 rounded-full bg-brand/10 blur-3xl" />

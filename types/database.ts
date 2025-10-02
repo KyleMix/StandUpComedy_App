@@ -23,11 +23,35 @@ export interface ComedianProfileRecord {
   website: string | null;
   reelUrl: string | null;
   instagram: string | null;
+  tiktokHandle: string | null;
+  youtubeChannel: string | null;
   travelRadiusMiles: number | null;
   homeCity: string | null;
   homeState: string | null;
   createdAt: string;
   updatedAt: string;
+}
+
+export type ComedianVideoPlatform = "YOUTUBE" | "TIKTOK";
+
+export interface ComedianVideoRecord {
+  id: string;
+  comedianUserId: string;
+  title: string;
+  platform: ComedianVideoPlatform;
+  url: string;
+  postedAt: string;
+}
+
+export interface ComedianAppearanceRecord {
+  id: string;
+  comedianUserId: string;
+  showName: string;
+  venueName: string;
+  city: string;
+  state: string;
+  performedAt: string;
+  gigId: string | null;
 }
 
 export interface PromoterProfileRecord {
@@ -110,6 +134,8 @@ export interface FavoriteRecord {
 export interface DatabaseSnapshot {
   users: UserRecord[];
   comedianProfiles: ComedianProfileRecord[];
+  comedianVideos: ComedianVideoRecord[];
+  comedianAppearances: ComedianAppearanceRecord[];
   promoterProfiles: PromoterProfileRecord[];
   venueProfiles: VenueProfileRecord[];
   gigs: GigRecord[];

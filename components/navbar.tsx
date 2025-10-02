@@ -20,6 +20,9 @@ export async function Navbar() {
           <Link className="transition hover:text-brand" href="/gigs">
             Gigs
           </Link>
+          <Link className="transition hover:text-brand" href="/comedians">
+            Comedians
+          </Link>
           {user?.role === "ADMIN" && (
             <Link className="transition hover:text-brand" href="/admin">
               Admin

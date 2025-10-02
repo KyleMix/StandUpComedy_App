@@ -1,0 +1,11 @@
+<svg width="1440" height="900" viewBox="0 0 1440 900" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="haikeiGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#312e81" />
+      <stop offset="100%" stop-color="#0ea5e9" />
+    </linearGradient>
+  </defs>
+  <rect width="1440" height="900" fill="#0f172a" />
+  <path d="M0 628L60 602C120 576 240 524 360 500C480 476 600 480 720 518C840 556 960 628 1080 636C1200 644 1320 588 1380 560L1440 532V900H1380C1320 900 1200 900 1080 900C960 900 840 900 720 900C600 900 480 900 360 900C240 900 120 900 60 900H0V628Z" fill="url(#haikeiGradient)" opacity="0.85" />
+  <path d="M0 700L60 686C120 672 240 644 360 616C480 588 600 560 720 566C840 572 960 612 1080 622C1200 632 1320 612 1380 602L1440 592V900H1380C1320 900 1200 900 1080 900C960 900 840 900 720 900C600 900 480 900 360 900C240 900 120 900 60 900H0V700Z" fill="#1d4ed8" opacity="0.45" />
+</svg>

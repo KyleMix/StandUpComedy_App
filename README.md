@@ -62,6 +62,32 @@ npm run lint
 - `data/` – JSON datastore seeded with demo users, gigs, and verification requests
 - `tests/` – Vitest unit tests
 
+## Assets & Licenses
+
+All creative assets are served locally from `public/assets` to keep pages fast, private, and compliant. Approved hero imagery and video filenames live in [`lib/assets/hero.ts`](./lib/assets/hero.ts); drop the corresponding files into `public/assets/hero` or `public/assets/video` before launch. Placeholder graphics (e.g., `stage-lights.svg`) are generated in-house and can be replaced with licensed photography when available.
+
+Automated avatar fallbacks use DiceBear's `botttsNeutral` sprite with non-attribution commercial use per DiceBear guidance. Attribution tooling lives in [`lib/assets/licenses.ts`](./lib/assets/licenses.ts) and [`components/ui/AssetAttribution.tsx`](./components/ui/AssetAttribution.tsx), governed by [`lib/assets/config.ts`](./lib/assets/config.ts).
+
+### Provider overview
+
+| Provider | License | How we use it |
+| --- | --- | --- |
+| [Unsplash](https://unsplash.com/license) | Unsplash License | Optional hero photography stored in `/public/assets/hero`; attribution appreciated but optional. |
+| [Pexels](https://www.pexels.com/license/) | Pexels License | Alternative hero photos or b-roll video clips stored locally; no attribution required. |
+| [Pixabay](https://pixabay.com/service/license/) | Pixabay License | Backup photography or footage with prohibited-use caveats documented in-source. |
+| [unDraw](https://undraw.co/license) | unDraw License | Illustration SVGs saved under `/public/assets/illustrations` for empty states and onboarding flows. |
+| [Heroicons](https://github.com/tailwindlabs/heroicons/blob/master/LICENSE) | MIT | UI glyphs available via the icon shim. |
+| [Lucide](https://github.com/lucide-icons/lucide/blob/main/LICENSE) | ISC | Default icon set surfaced through `components/ui/Icon.tsx`. |
+| [Tabler](https://github.com/tabler/tabler-icons/blob/master/LICENSE) | MIT | Optional icon family accessible through the shim. |
+| [Phosphor](https://github.com/phosphor-icons/phosphor-home/blob/master/LICENSE) | MIT | Supplemental icons (e.g., chat) exposed via the shim. |
+| [DiceBear](https://www.dicebear.com/licenses) | DiceBear License | `botttsNeutral` avatar sprites hashed with SHA-256; free for commercial use with no attribution required. |
+| [OpenMoji](https://openmoji.org/license/) | CC BY-SA 4.0 | Emoji assets—attribution is rendered automatically when enabled. |
+| [Google Fonts](https://developers.google.com/fonts/licensing) | Open-source font licenses | `Inter` for UI text and `Bricolage Grotesque` for headlines via `next/font`. |
+| [Hero Patterns](https://www.heropatterns.com/) | MIT | Inline SVG patterns rendered by `HeroBackground`. |
+| [Haikei](https://app.haikei.app/) | Haikei License | Locally exported wave backgrounds referenced in hero/empty states. |
+
+DiceBear, OpenMoji, and other attribution-sensitive sources respect the global mode defined in [`lib/assets/config.ts`](./lib/assets/config.ts). Toggle to `always` if you prefer permanent credits.
+
 ## Default accounts
 
 Use the preloaded accounts from `data/database.json` to explore:

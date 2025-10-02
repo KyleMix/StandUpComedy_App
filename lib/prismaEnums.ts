@@ -33,6 +33,47 @@ const fallbackApplicationStatus = {
   WITHDRAWN: "WITHDRAWN"
 } as const;
 
+const fallbackThreadState = {
+  INQUIRY: "INQUIRY",
+  QUOTE: "QUOTE",
+  BOOKED: "BOOKED",
+  COMPLETED: "COMPLETED"
+} as const;
+
+const fallbackMessageKind = {
+  TEXT: "TEXT",
+  FILE: "FILE",
+  OFFER: "OFFER",
+  SYSTEM: "SYSTEM"
+} as const;
+
+const fallbackOfferStatus = {
+  PENDING: "PENDING",
+  ACCEPTED: "ACCEPTED",
+  DECLINED: "DECLINED",
+  WITHDRAWN: "WITHDRAWN",
+  EXPIRED: "EXPIRED"
+} as const;
+
+const fallbackBookingStatus = {
+  PENDING: "PENDING",
+  PAID: "PAID",
+  COMPLETED: "COMPLETED",
+  CANCELLED: "CANCELLED"
+} as const;
+
+const fallbackCancellationPolicy = {
+  FLEX: "FLEX",
+  STANDARD: "STANDARD",
+  STRICT: "STRICT"
+} as const;
+
+const fallbackReportTarget = {
+  USER: "USER",
+  THREAD: "THREAD",
+  GIG: "GIG"
+} as const;
+
 function loadPrismaEnum<T extends Record<string, string>>(
   selector: (mod: Record<string, unknown>) => Record<string, string> | undefined,
   fallback: T
@@ -76,3 +117,39 @@ export const ApplicationStatus = loadPrismaEnum(
   fallbackApplicationStatus
 );
 export type ApplicationStatus = (typeof ApplicationStatus)[keyof typeof ApplicationStatus];
+
+export const ThreadState = loadPrismaEnum(
+  (mod) => mod.ThreadState as Record<string, string> | undefined,
+  fallbackThreadState
+);
+export type ThreadState = (typeof ThreadState)[keyof typeof ThreadState];
+
+export const MessageKind = loadPrismaEnum(
+  (mod) => mod.MessageKind as Record<string, string> | undefined,
+  fallbackMessageKind
+);
+export type MessageKind = (typeof MessageKind)[keyof typeof MessageKind];
+
+export const OfferStatus = loadPrismaEnum(
+  (mod) => mod.OfferStatus as Record<string, string> | undefined,
+  fallbackOfferStatus
+);
+export type OfferStatus = (typeof OfferStatus)[keyof typeof OfferStatus];
+
+export const BookingStatus = loadPrismaEnum(
+  (mod) => mod.BookingStatus as Record<string, string> | undefined,
+  fallbackBookingStatus
+);
+export type BookingStatus = (typeof BookingStatus)[keyof typeof BookingStatus];
+
+export const CancellationPolicy = loadPrismaEnum(
+  (mod) => mod.CancellationPolicy as Record<string, string> | undefined,
+  fallbackCancellationPolicy
+);
+export type CancellationPolicy = (typeof CancellationPolicy)[keyof typeof CancellationPolicy];
+
+export const ReportTarget = loadPrismaEnum(
+  (mod) => mod.ReportTarget as Record<string, string> | undefined,
+  fallbackReportTarget
+);
+export type ReportTarget = (typeof ReportTarget)[keyof typeof ReportTarget];

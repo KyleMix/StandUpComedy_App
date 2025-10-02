@@ -3,18 +3,36 @@ import path from "node:path";
 import { randomUUID } from "node:crypto";
 import type {
   ApplicationRecord,
+  AvailabilityRecord,
+  BookingRecord,
   ComedianAppearanceRecord,
   ComedianProfileRecord,
   ComedianVideoRecord,
+  ConversationReviewRecord,
   DatabaseSnapshot,
   FavoriteRecord,
   GigRecord,
+  MessageRecord,
+  OfferRecord,
   PromoterProfileRecord,
+  ReportRecord,
+  ThreadRecord,
   UserRecord,
   VenueProfileRecord,
   VerificationRequestRecord
 } from "@/types/database";
-import type { ApplicationStatus, GigCompensationType, GigStatus, Role, VerificationStatus } from "@/lib/prismaEnums";
+import type {
+  ApplicationStatus,
+  BookingStatus,
+  CancellationPolicy,
+  GigCompensationType,
+  GigStatus,
+  MessageKind,
+  OfferStatus,
+  Role,
+  ThreadState,
+  VerificationStatus
+} from "@/lib/prismaEnums";
 import { sanitizeHtml } from "@/lib/sanitize";
 
 const DATA_DIR = path.join(process.cwd(), "data");
@@ -35,7 +53,14 @@ async function ensureDataStore() {
       gigs: [],
       applications: [],
       verificationRequests: [],
-      favorites: []
+      favorites: [],
+      threads: [],
+      messages: [],
+      offers: [],
+      bookings: [],
+      conversationReviews: [],
+      availability: [],
+      reports: []
     };
     await fs.writeFile(DATABASE_PATH, JSON.stringify(emptySnapshot, null, 2));
   }
@@ -90,6 +115,61 @@ export interface Favorite extends Omit<FavoriteRecord, "createdAt" | "updatedAt"
   updatedAt: Date;
 }
 
+export interface Thread extends Omit<ThreadRecord, "createdAt" | "updatedAt" | "lastMessageAt"> {
+  createdAt: Date;
+  updatedAt: Date;
+  lastMessageAt: Date;
+}
+
+export interface Message extends Omit<MessageRecord, "createdAt"> {
+  createdAt: Date;
+}
+
+export interface Offer extends Omit<OfferRecord, "createdAt" | "eventDate" | "expiresAt"> {
+  createdAt: Date;
+  eventDate: Date;
+  expiresAt: Date | null;
+}
+
+export interface Booking extends Omit<BookingRecord, "createdAt"> {
+  createdAt: Date;
+}
+
+export interface ConversationReview extends Omit<ConversationReviewRecord, "createdAt"> {
+  createdAt: Date;
+}
+
+export interface Availability extends Omit<AvailabilityRecord, "date"> {
+  date: Date;
+}
+
+export interface Report extends Omit<ReportRecord, "createdAt" | "resolvedAt"> {
+  createdAt: Date;
+  resolvedAt: Date | null;
+}
+
+function withDefaults(snapshot: Partial<DatabaseSnapshot>): DatabaseSnapshot {
+  return {
+    users: snapshot.users ?? [],
+    comedianProfiles: snapshot.comedianProfiles ?? [],
+    comedianVideos: snapshot.comedianVideos ?? [],
+    comedianAppearances: snapshot.comedianAppearances ?? [],
+    promoterProfiles: snapshot.promoterProfiles ?? [],
+    venueProfiles: snapshot.venueProfiles ?? [],
+    gigs: snapshot.gigs ?? [],
+    applications: snapshot.applications ?? [],
+    verificationRequests: snapshot.verificationRequests ?? [],
+    favorites: snapshot.favorites ?? [],
+    threads: snapshot.threads ?? [],
+    messages: snapshot.messages ?? [],
+    offers: snapshot.offers ?? [],
+    bookings: snapshot.bookings ?? [],
+    conversationReviews: snapshot.conversationReviews ?? [],
+    availability: snapshot.availability ?? [],
+    reports: snapshot.reports ?? []
+  };
+}
+
 let cache: DatabaseSnapshot | null = null;
 
 async function loadSnapshot(): Promise<DatabaseSnapshot> {
@@ -97,20 +177,9 @@ async function loadSnapshot(): Promise<DatabaseSnapshot> {
     await ensureDataStore();
     const raw = await fs.readFile(DATABASE_PATH, "utf-8");
     try {
-      cache = JSON.parse(raw) as DatabaseSnapshot;
+      cache = withDefaults(JSON.parse(raw) as Partial<DatabaseSnapshot>);
     } catch (error) {
-      cache = {
-        users: [],
-        comedianProfiles: [],
-        comedianVideos: [],
-        comedianAppearances: [],
-        promoterProfiles: [],
-        venueProfiles: [],
-        gigs: [],
-        applications: [],
-        verificationRequests: [],
-        favorites: []
-      };
+      cache = withDefaults({});
     }
   }
   return cache;
@@ -220,6 +289,65 @@ function mapFavorite(record: FavoriteRecord): Favorite {
     venueId: record.venueId ?? null,
     createdAt: new Date(record.createdAt),
     updatedAt: new Date(record.updatedAt)
+  };
+}
+
+function mapThread(record: ThreadRecord): Thread {
+  return {
+    ...record,
+    lastMessageAt: new Date(record.lastMessageAt),
+    createdAt: new Date(record.createdAt),
+    updatedAt: new Date(record.updatedAt)
+  };
+}
+
+function mapMessage(record: MessageRecord): Message {
+  return {
+    ...record,
+    body: record.body ?? null,
+    fileUrl: record.fileUrl ?? null,
+    offerId: record.offerId ?? null,
+    createdAt: new Date(record.createdAt)
+  };
+}
+
+function mapOffer(record: OfferRecord): Offer {
+  return {
+    ...record,
+    currency: record.currency ?? "USD",
+    createdAt: new Date(record.createdAt),
+    eventDate: new Date(record.eventDate),
+    expiresAt: record.expiresAt ? new Date(record.expiresAt) : null
+  };
+}
+
+function mapBooking(record: BookingRecord): Booking {
+  return {
+    ...record,
+    createdAt: new Date(record.createdAt)
+  };
+}
+
+function mapConversationReview(record: ConversationReviewRecord): ConversationReview {
+  return {
+    ...record,
+    createdAt: new Date(record.createdAt)
+  };
+}
+
+function mapAvailability(record: AvailabilityRecord): Availability {
+  return {
+    ...record,
+    date: new Date(record.date)
+  };
+}
+
+function mapReport(record: ReportRecord): Report {
+  return {
+    ...record,
+    details: record.details ?? null,
+    createdAt: new Date(record.createdAt),
+    resolvedAt: record.resolvedAt ? new Date(record.resolvedAt) : null
   };
 }
 
@@ -680,6 +808,274 @@ export async function addFavorite(input: { userId: string; gigId?: string | null
   snapshot.favorites.push(record);
   await persist(snapshot);
   return mapFavorite(record);
+}
+
+export async function listThreadsForUser(userId: string): Promise<Thread[]> {
+  const snapshot = await loadSnapshot();
+  return snapshot.threads
+    .filter((thread) => thread.participantIds.includes(userId))
+    .map(mapThread)
+    .sort((a, b) => b.lastMessageAt.getTime() - a.lastMessageAt.getTime());
+}
+
+export async function getThreadById(threadId: string): Promise<Thread | null> {
+  const snapshot = await loadSnapshot();
+  const record = snapshot.threads.find((thread) => thread.id === threadId);
+  return record ? mapThread(record) : null;
+}
+
+interface CreateThreadInput {
+  gigId: string;
+  createdById: string;
+  participantIds: string[];
+  state?: ThreadState;
+}
+
+export async function createThread(input: CreateThreadInput): Promise<Thread> {
+  const snapshot = await loadSnapshot();
+  const now = nowIso();
+  const uniqueParticipantIds = Array.from(new Set([input.createdById, ...input.participantIds]));
+  const record: ThreadRecord = {
+    id: randomUUID(),
+    gigId: input.gigId,
+    createdById: input.createdById,
+    participantIds: uniqueParticipantIds,
+    state: input.state ?? "INQUIRY",
+    lastMessageAt: now,
+    createdAt: now,
+    updatedAt: now
+  };
+  snapshot.threads.push(record);
+  await persist(snapshot);
+  return mapThread(record);
+}
+
+export async function markThreadState(threadId: string, state: ThreadState): Promise<Thread | null> {
+  const snapshot = await loadSnapshot();
+  const record = snapshot.threads.find((thread) => thread.id === threadId);
+  if (!record) return null;
+  record.state = state;
+  record.updatedAt = nowIso();
+  await persist(snapshot);
+  return mapThread(record);
+}
+
+export async function listMessagesForThread(threadId: string): Promise<Message[]> {
+  const snapshot = await loadSnapshot();
+  return snapshot.messages
+    .filter((message) => message.threadId === threadId)
+    .map(mapMessage)
+    .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+}
+
+interface CreateMessageInput {
+  threadId: string;
+  senderId: string;
+  kind: MessageKind;
+  body?: string | null;
+  fileUrl?: string | null;
+  offerId?: string | null;
+}
+
+export async function createMessage(input: CreateMessageInput): Promise<Message> {
+  const snapshot = await loadSnapshot();
+  const thread = snapshot.threads.find((item) => item.id === input.threadId);
+  if (!thread) {
+    throw new Error("Thread not found");
+  }
+  const now = nowIso();
+  const record: MessageRecord = {
+    id: randomUUID(),
+    threadId: input.threadId,
+    senderId: input.senderId,
+    kind: input.kind,
+    body: input.body ? sanitizeHtml(input.body) : null,
+    fileUrl: input.fileUrl ?? null,
+    offerId: input.offerId ?? null,
+    createdAt: now
+  };
+  snapshot.messages.push(record);
+  thread.lastMessageAt = now;
+  thread.updatedAt = now;
+  await persist(snapshot);
+  return mapMessage(record);
+}
+
+interface CreateOfferInput {
+  threadId: string;
+  fromUserId: string;
+  amount: number;
+  currency?: string;
+  terms: string;
+  eventDate: Date;
+  expiresAt?: Date | null;
+}
+
+export async function createOffer(input: CreateOfferInput): Promise<Offer> {
+  const snapshot = await loadSnapshot();
+  const now = nowIso();
+  const record: OfferRecord = {
+    id: randomUUID(),
+    threadId: input.threadId,
+    fromUserId: input.fromUserId,
+    amount: input.amount,
+    currency: input.currency ?? "USD",
+    terms: sanitizeHtml(input.terms),
+    eventDate: input.eventDate.toISOString(),
+    expiresAt: input.expiresAt ? input.expiresAt.toISOString() : null,
+    status: "PENDING",
+    createdAt: now
+  };
+  snapshot.offers.push(record);
+  await persist(snapshot);
+  return mapOffer(record);
+}
+
+export async function listOffersForThread(threadId: string): Promise<Offer[]> {
+  const snapshot = await loadSnapshot();
+  return snapshot.offers
+    .filter((offer) => offer.threadId === threadId)
+    .map(mapOffer)
+    .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+}
+
+export async function getOfferById(offerId: string): Promise<Offer | null> {
+  const snapshot = await loadSnapshot();
+  const record = snapshot.offers.find((offer) => offer.id === offerId);
+  return record ? mapOffer(record) : null;
+}
+
+export async function updateOfferStatus(offerId: string, status: OfferStatus): Promise<Offer | null> {
+  const snapshot = await loadSnapshot();
+  const record = snapshot.offers.find((offer) => offer.id === offerId);
+  if (!record) return null;
+  record.status = status;
+  await persist(snapshot);
+  return mapOffer(record);
+}
+
+interface CreateBookingInput {
+  gigId: string;
+  comedianId: string;
+  promoterId: string;
+  offerId: string;
+  status?: BookingStatus;
+  payoutProtection?: boolean;
+  cancellationPolicy?: CancellationPolicy;
+  paymentIntentId?: string | null;
+}
+
+export async function createBooking(input: CreateBookingInput): Promise<Booking> {
+  const snapshot = await loadSnapshot();
+  const now = nowIso();
+  const record: BookingRecord = {
+    id: randomUUID(),
+    gigId: input.gigId,
+    comedianId: input.comedianId,
+    promoterId: input.promoterId,
+    offerId: input.offerId,
+    status: input.status ?? "PENDING",
+    payoutProtection: input.payoutProtection ?? true,
+    cancellationPolicy: input.cancellationPolicy ?? "STANDARD",
+    paymentIntentId: input.paymentIntentId ?? null,
+    createdAt: now
+  };
+  snapshot.bookings.push(record);
+  await persist(snapshot);
+  return mapBooking(record);
+}
+
+export async function getBookingById(bookingId: string): Promise<Booking | null> {
+  const snapshot = await loadSnapshot();
+  const record = snapshot.bookings.find((booking) => booking.id === bookingId);
+  return record ? mapBooking(record) : null;
+}
+
+export async function updateBooking(
+  bookingId: string,
+  data: Partial<Omit<BookingRecord, "id" | "gigId" | "comedianId" | "promoterId" | "offerId" | "createdAt">>
+): Promise<Booking | null> {
+  const snapshot = await loadSnapshot();
+  const record = snapshot.bookings.find((booking) => booking.id === bookingId);
+  if (!record) return null;
+  if (data.status !== undefined) record.status = data.status;
+  if (data.payoutProtection !== undefined) record.payoutProtection = data.payoutProtection;
+  if (data.cancellationPolicy !== undefined) record.cancellationPolicy = data.cancellationPolicy;
+  if (data.paymentIntentId !== undefined) record.paymentIntentId = data.paymentIntentId;
+  await persist(snapshot);
+  return mapBooking(record);
+}
+
+interface CreateConversationReviewInput {
+  bookingId: string;
+  fromUserId: string;
+  toUserId: string;
+  rating: number;
+  body: string;
+  visible?: boolean;
+}
+
+export async function createConversationReview(input: CreateConversationReviewInput): Promise<ConversationReview> {
+  const snapshot = await loadSnapshot();
+  const record: ConversationReviewRecord = {
+    id: randomUUID(),
+    bookingId: input.bookingId,
+    fromUserId: input.fromUserId,
+    toUserId: input.toUserId,
+    rating: input.rating,
+    body: sanitizeHtml(input.body),
+    visible: input.visible ?? true,
+    createdAt: nowIso()
+  };
+  snapshot.conversationReviews.push(record);
+  await persist(snapshot);
+  return mapConversationReview(record);
+}
+
+export async function listConversationReviewsForUser(userId: string): Promise<ConversationReview[]> {
+  const snapshot = await loadSnapshot();
+  return snapshot.conversationReviews
+    .filter((review) => review.toUserId === userId)
+    .map(mapConversationReview)
+    .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+}
+
+export async function listConversationReviewsForBooking(bookingId: string): Promise<ConversationReview[]> {
+  const snapshot = await loadSnapshot();
+  return snapshot.conversationReviews
+    .filter((review) => review.bookingId === bookingId)
+    .map(mapConversationReview)
+    .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+}
+
+interface CreateReportInput {
+  reporterId: string;
+  targetType: ReportRecord["targetType"];
+  targetId: string;
+  reason: string;
+  details?: string | null;
+}
+
+export async function createReport(input: CreateReportInput): Promise<Report> {
+  const snapshot = await loadSnapshot();
+  const record: ReportRecord = {
+    id: randomUUID(),
+    reporterId: input.reporterId,
+    targetType: input.targetType,
+    targetId: input.targetId,
+    reason: input.reason,
+    details: input.details ? sanitizeHtml(input.details) : null,
+    createdAt: nowIso(),
+    resolvedAt: null
+  };
+  snapshot.reports.push(record);
+  await persist(snapshot);
+  return mapReport(record);
+}
+
+export async function listReports(): Promise<Report[]> {
+  const snapshot = await loadSnapshot();
+  return snapshot.reports.map(mapReport).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 }
 
 export type DatabaseUser = User;

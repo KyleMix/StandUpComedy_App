@@ -7,6 +7,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { HeroBackground } from "@/components/ui/HeroBackground";
+import { GigFilters } from "./GigFilters";
 
 async function GigsList({ searchParams }: { searchParams: Record<string, string | string[] | undefined> }) {
   const parsed = gigFiltersSchema.safeParse(searchParams);
@@ -86,6 +87,7 @@ export default function GigsPage({ searchParams }: { searchParams: Record<string
         <h1 className="text-3xl font-semibold">Browse gigs</h1>
         <p className="text-sm text-slate-600">Filter by location, compensation, and more.</p>
       </div>
+      <GigFilters />
       <Suspense key={JSON.stringify(searchParams)} fallback={<p>Loading gigs...</p>}>
         <GigsList searchParams={searchParams} />
       </Suspense>

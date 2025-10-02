@@ -34,31 +34,62 @@ export const verificationRequestSchema = z.object({
     .max(3)
 });
 
+const citySchema = z
+  .string()
+  .trim()
+  .regex(/^[a-zA-Z\s'\-]{2,60}$/u, "City must contain only letters and common punctuation")
+  .optional();
+
+const stateSchema = z
+  .string()
+  .trim()
+  .regex(/^[A-Z]{2}$/u, "State must be a 2-letter code")
+  .optional();
+
 export const gigFiltersSchema = z.object({
-  search: z.string().optional(),
-  city: z.string().optional(),
-  state: z.string().optional(),
+  search: z.string().trim().min(1).max(100).optional(),
+  city: citySchema,
+  state: stateSchema,
   status: z.nativeEnum(GigStatus).optional(),
   compensationType: z.nativeEnum(GigCompensationType).optional(),
-  minPayout: z.coerce.number().optional(),
-  dateStart: z.string().optional(),
-  dateEnd: z.string().optional(),
+  minPayout: z.coerce.number().nonnegative().optional(),
+  dateStart: z.coerce.date().optional(),
+  dateEnd: z.coerce.date().optional(),
   page: z.coerce.number().default(1)
+}).refine((data) => {
+  if (data.dateStart && data.dateEnd) {
+    return data.dateEnd >= data.dateStart;
+  }
+  return true;
+}, {
+  message: "End date must be after start date",
+  path: ["dateEnd"]
 });
 
 export const gigFormSchema = z.object({
   id: z.string().optional(),
-  title: z.string().min(3),
-  description: z.string().min(20),
+  title: z.string().trim().min(3).max(120),
+  description: z.string().trim().min(20).max(4000),
   compensationType: z.nativeEnum(GigCompensationType),
-  payoutUsd: z.number().int().nonnegative().nullable().optional(),
+  payoutUsd: z.number().int().positive().nullable().optional(),
   dateStart: z.coerce.date(),
   dateEnd: z.coerce.date().optional().nullable(),
   timezone: z.string().min(2),
-  city: z.string().min(2),
-  state: z.string().min(2),
+  city: z.string().trim().regex(/^[a-zA-Z\s'\-]{2,60}$/u, "City must contain only letters and common punctuation"),
+  state: z.string().trim().regex(/^[A-Z]{2}$/u, "State must be 2 uppercase letters"),
   minAge: z.number().int().nonnegative().nullable().optional(),
   isPublished: z.boolean().optional()
+}).refine((data) => {
+  if (data.dateEnd) {
+    if (!data.dateStart) {
+      return true;
+    }
+    return data.dateEnd >= data.dateStart;
+  }
+  return true;
+}, {
+  message: "End date must be on or after the start date",
+  path: ["dateEnd"]
 });
 
 export const applicationSchema = z.object({

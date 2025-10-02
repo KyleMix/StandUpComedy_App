@@ -3,11 +3,16 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { canPublishGig } from "@/lib/rbac";
 import { gigFormSchema } from "@/lib/zodSchemas";
+import { rateLimit } from "@/lib/rateLimit";
 
 export async function PATCH(request: Request, { params }: { params: { id: string } }) {
   const session = await auth();
   if (!session?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  if (!rateLimit(`gig:update:${session.user.id}`)) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
 
   const gig = await prisma.gig.findUnique({ where: { id: params.id } });
@@ -41,6 +46,10 @@ export async function DELETE(_request: Request, { params }: { params: { id: stri
   const session = await auth();
   if (!session?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  if (!rateLimit(`gig:delete:${session.user.id}`)) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
 
   const gig = await prisma.gig.findUnique({ where: { id: params.id } });

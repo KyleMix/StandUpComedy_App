@@ -15,26 +15,31 @@ export async function GET(request: Request) {
   const { page, minPayout, ...filters } = parsed.data;
   const take = 10;
   const skip = (page - 1) * take;
-  const gigs = await prisma.gig.findMany({
-    where: {
-      isPublished: true,
-      title: filters.search ? { contains: filters.search, mode: "insensitive" } : undefined,
-      city: filters.city ? { contains: filters.city, mode: "insensitive" } : undefined,
-      state: filters.state ?? undefined,
-      compensationType: filters.compensationType ?? undefined,
-      status: filters.status ?? undefined,
-      payoutUsd:
-        typeof minPayout === "number"
-          ? {
-              gte: minPayout
-            }
-          : undefined
-    },
-    orderBy: { dateStart: "asc" },
-    skip,
-    take
+  const where = {
+    isPublished: true,
+    title: filters.search ? { contains: filters.search, mode: "insensitive" as const } : undefined,
+    city: filters.city ? { contains: filters.city, mode: "insensitive" as const } : undefined,
+    state: filters.state ?? undefined,
+    compensationType: filters.compensationType ?? undefined,
+    status: filters.status ?? undefined,
+    payoutUsd:
+      typeof minPayout === "number"
+        ? {
+            gte: minPayout
+          }
+        : undefined
+  };
+  const matching = await prisma.gig.findMany({
+    where,
+    orderBy: { dateStart: "asc" }
   });
-  return NextResponse.json({ gigs });
+  const items = matching.slice(skip, skip + take);
+  return NextResponse.json({
+    items,
+    page,
+    pageSize: take,
+    total: matching.length
+  });
 }
 
 export async function POST(request: Request) {

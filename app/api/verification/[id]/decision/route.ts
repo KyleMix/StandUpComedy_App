@@ -3,11 +3,16 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { verificationDecisionSchema } from "@/lib/zodSchemas";
 import { mailTemplates, sendMail } from "@/lib/mailer";
+import { rateLimit } from "@/lib/rateLimit";
 
 export async function POST(request: Request, { params }: { params: { id: string } }) {
   const session = await auth();
   if (!session?.user || session.user.role !== "ADMIN") {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  if (!rateLimit(`verification:decision:${session.user.id}`)) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
 
   const data = await request.json();

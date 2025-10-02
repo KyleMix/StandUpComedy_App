@@ -13,8 +13,29 @@ import type {
   VerificationRequestRecord
 } from "@/types/database";
 import type { ApplicationStatus, GigCompensationType, GigStatus, Role, VerificationStatus } from "@/lib/prismaEnums";
+import { sanitizeHtml } from "@/lib/sanitize";
 
-const DATABASE_PATH = path.join(process.cwd(), "data", "database.json");
+const DATA_DIR = path.join(process.cwd(), "data");
+const DATABASE_PATH = path.join(DATA_DIR, "database.json");
+
+async function ensureDataStore() {
+  await fs.mkdir(DATA_DIR, { recursive: true });
+  try {
+    await fs.access(DATABASE_PATH);
+  } catch (error) {
+    const emptySnapshot: DatabaseSnapshot = {
+      users: [],
+      comedianProfiles: [],
+      promoterProfiles: [],
+      venueProfiles: [],
+      gigs: [],
+      applications: [],
+      verificationRequests: [],
+      favorites: []
+    };
+    await fs.writeFile(DATABASE_PATH, JSON.stringify(emptySnapshot, null, 2));
+  }
+}
 
 export interface User extends Omit<UserRecord, "createdAt"> {
   createdAt: Date;
@@ -61,14 +82,29 @@ let cache: DatabaseSnapshot | null = null;
 
 async function loadSnapshot(): Promise<DatabaseSnapshot> {
   if (!cache) {
+    await ensureDataStore();
     const raw = await fs.readFile(DATABASE_PATH, "utf-8");
-    cache = JSON.parse(raw) as DatabaseSnapshot;
+    try {
+      cache = JSON.parse(raw) as DatabaseSnapshot;
+    } catch (error) {
+      cache = {
+        users: [],
+        comedianProfiles: [],
+        promoterProfiles: [],
+        venueProfiles: [],
+        gigs: [],
+        applications: [],
+        verificationRequests: [],
+        favorites: []
+      };
+    }
   }
   return cache;
 }
 
 async function persist(snapshot: DatabaseSnapshot) {
   cache = snapshot;
+  await ensureDataStore();
   await fs.writeFile(DATABASE_PATH, JSON.stringify(snapshot, null, 2));
 }
 
@@ -364,15 +400,15 @@ export async function createGig(input: CreateGigInput): Promise<Gig> {
   const gig: GigRecord = {
     id: randomUUID(),
     createdByUserId: input.createdByUserId,
-    title: input.title,
-    description: input.description,
+    title: sanitizeHtml(input.title),
+    description: sanitizeHtml(input.description),
     compensationType: input.compensationType,
     payoutUsd: input.payoutUsd ?? null,
     dateStart: new Date(input.dateStart).toISOString(),
     dateEnd: input.dateEnd ? new Date(input.dateEnd).toISOString() : null,
     timezone: input.timezone,
-    city: input.city,
-    state: input.state,
+    city: sanitizeHtml(input.city),
+    state: sanitizeHtml(input.state),
     minAge: input.minAge ?? null,
     isPublished: input.isPublished ?? false,
     status: input.status,
@@ -388,8 +424,8 @@ export async function updateGig(id: string, data: Partial<Omit<GigRecord, "id" |
   const snapshot = await loadSnapshot();
   const record = snapshot.gigs.find((gig) => gig.id === id);
   if (!record) return null;
-  if (data.title !== undefined) record.title = data.title;
-  if (data.description !== undefined) record.description = data.description;
+  if (data.title !== undefined) record.title = sanitizeHtml(data.title);
+  if (data.description !== undefined) record.description = sanitizeHtml(data.description);
   if (data.compensationType !== undefined) record.compensationType = data.compensationType;
   if (data.payoutUsd !== undefined) record.payoutUsd = data.payoutUsd;
   if (data.dateStart !== undefined) record.dateStart = new Date(data.dateStart).toISOString();
@@ -397,8 +433,8 @@ export async function updateGig(id: string, data: Partial<Omit<GigRecord, "id" |
     record.dateEnd = data.dateEnd ? new Date(data.dateEnd).toISOString() : null;
   }
   if (data.timezone !== undefined) record.timezone = data.timezone;
-  if (data.city !== undefined) record.city = data.city;
-  if (data.state !== undefined) record.state = data.state;
+  if (data.city !== undefined) record.city = sanitizeHtml(data.city);
+  if (data.state !== undefined) record.state = sanitizeHtml(data.state);
   if (data.minAge !== undefined) record.minAge = data.minAge;
   if (data.isPublished !== undefined) record.isPublished = data.isPublished;
   if (data.status !== undefined) record.status = data.status;
@@ -459,7 +495,7 @@ export async function createApplication(input: CreateApplicationInput): Promise<
     id: randomUUID(),
     gigId: input.gigId,
     comedianUserId: input.comedianUserId,
-    message: input.message,
+    message: sanitizeHtml(input.message),
     status: input.status,
     createdAt: now,
     updatedAt: now
@@ -476,7 +512,7 @@ export async function updateApplication(
   const snapshot = await loadSnapshot();
   const record = snapshot.applications.find((application) => application.id === id);
   if (!record) return null;
-  if (data.message !== undefined) record.message = data.message;
+  if (data.message !== undefined) record.message = sanitizeHtml(data.message);
   if (data.status !== undefined) record.status = data.status;
   record.updatedAt = nowIso();
   await persist(snapshot);

@@ -29,6 +29,7 @@ import {
   updateVenueProfile,
   deleteGig
 } from "@/lib/dataStore";
+import { PrismaClient } from "@prisma/client";
 import type {
   Application,
   ComedianAppearance,
@@ -234,6 +235,11 @@ async function hydrateComedianProfile(
     result.appearances = appearances;
   }
   return result;
+}
+
+const prismaClient: PrismaClient & { __patched?: true } = (globalThis as any).__prismaClient ?? new PrismaClient();
+if (process.env.NODE_ENV !== "production") {
+  (globalThis as any).__prismaClient = prismaClient;
 }
 
 export const prisma = {
@@ -449,5 +455,10 @@ export const prisma = {
     async create(args: { data: { userId: string; gigId?: string | null; venueId?: string | null } }) {
       return addFavorite(args.data);
     }
-  }
+  },
+  openMic: prismaClient.openMic,
+  ingestLog: prismaClient.ingestLog,
+  $transaction: prismaClient.$transaction.bind(prismaClient),
+  $disconnect: prismaClient.$disconnect.bind(prismaClient),
+  $connect: prismaClient.$connect.bind(prismaClient)
 };

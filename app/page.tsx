@@ -1,18 +1,87 @@
-const sections = [
+import { auth } from "@/lib/auth";
+import Link from "next/link";
+
+interface Highlight {
+  title: string;
+  description: string;
+}
+
+interface SignedInSection extends Highlight {
+  items: string[];
+}
+
+const guestHighlights: Highlight[] = [
   {
-    title: "Plan shows together",
+    title: "Shared show pipeline",
     description:
-      "Collect details about rooms, lineups, and schedules in one shared workspace so everyone knows what happens next.",
+      "Keep booking details, running orders, and contacts together so the team understands what is locked and what still needs work.",
   },
   {
-    title: "Keep responsibilities clear",
+    title: "Role-aware workspace",
     description:
-      "Outline who is booking, who is promoting, and what each night requires without getting lost in extra features.",
+      "Producers, comics, and venue partners get a single source of truth without wading through abandoned docs or threads.",
   },
   {
-    title: "Grow when you are ready",
+    title: "Add layers intentionally",
     description:
-      "This foundation keeps the essentials in view. Add the pieces you need later without rebuilding from scratch.",
+      "Start with the skeleton today. Layer in budgets, marketing assets, and feedback flows once the base rhythm feels right.",
+  },
+];
+
+const guestSteps: string[] = [
+  "Sign in to unlock the collaborative workspace.",
+  "Outline your upcoming shows and invite co-producers when you are ready.",
+  "Iterate on tasks, assets, and analytics as you grow the operation.",
+];
+
+const signedInSections: SignedInSection[] = [
+  {
+    title: "This week at a glance",
+    description:
+      "Review the shows you have committed to, the talent that still needs confirmation, and the rooms waiting on tech notes.",
+    items: [
+      "Confirm host and closer assignments for each night.",
+      "Share updated run-of-show with venues 48 hours out.",
+      "Highlight promo pushes that need social assets today.",
+    ],
+  },
+  {
+    title: "Strengthen the lineup",
+    description:
+      "Track submissions, auditions, and drop-in requests so you can quickly fill gaps without double-booking comics.",
+    items: [
+      "Tag new submissions with tone, credits, and availability.",
+      "Log audience feedback to inform future booking decisions.",
+      "Surface rising talent to share with partners and hosts.",
+    ],
+  },
+  {
+    title: "Promote with intent",
+    description:
+      "Coordinate design, copy, and channel assignments to keep every show visible without burning out the team.",
+    items: [
+      "Lock artwork requests and deliverables in one place.",
+      "Schedule newsletter and paid boosts from the same view.",
+      "Capture post-show metrics so you can iterate next week.",
+    ],
+  },
+];
+
+const followUpCheckpoints: Highlight[] = [
+  {
+    title: "Tighten coordination",
+    description:
+      "Log your weekly stand-up, share blockers, and flag resource needs so everyone leaves the meeting with the same priorities.",
+  },
+  {
+    title: "Invite collaborators",
+    description:
+      "Producers, photographers, and venue partners can join the workspace to update their deliverables without chasing messages.",
+  },
+  {
+    title: "Document your playbook",
+    description:
+      "Turn the workflows you repeat every week into checklists, forms, and templates ready for the next show run.",
   },
 ];
 
@@ -43,7 +112,7 @@ function GuestLanding() {
             Sign in to continue
           </Link>
           <Link
-            href="/auth/sign-up"
+            href="/auth/sign-up/comedian"
             className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-400 hover:text-slate-900"
           >
             Need an account?
@@ -53,6 +122,49 @@ function GuestLanding() {
 
       <section className="grid gap-8 sm:grid-cols-2">
         {guestHighlights.map((section) => (
+          <article key={section.title} className="space-y-3 rounded-lg border border-slate-200 p-6">
+            <h2 className="text-lg font-medium text-slate-900">{section.title}</h2>
+            <p className="text-sm text-slate-600">{section.description}</p>
+          </article>
+        ))}
+      </section>
+
+      <section className="space-y-4 rounded-lg border border-dashed border-slate-200 p-6">
+        <h2 className="text-base font-medium text-slate-900">How the skeleton comes to life</h2>
+        <ol className="space-y-3 text-sm text-slate-600">
+          {guestSteps.map((step, index) => (
+            <li key={step} className="flex gap-3">
+              <span className="mt-0.5 inline-flex h-6 w-6 flex-none items-center justify-center rounded-full border border-slate-300 text-xs font-semibold text-slate-500">
+                {index + 1}
+              </span>
+              <span>{step}</span>
+            </li>
+          ))}
+        </ol>
+      </section>
+    </div>
+  );
+}
+
+function SignedInLanding({ name }: { name: string }) {
+  return (
+    <div className="space-y-16">
+      <section className="space-y-6">
+        <p className="text-xs uppercase tracking-[0.3em] text-slate-500">Welcome back</p>
+        <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Your standup command center</h1>
+        <p className="max-w-3xl text-base text-slate-600">
+          Hey {name}, the skeleton is ready for new muscle. Use these quick-start lanes to keep bookings, show logistics, and promo momentum moving in sync without adding noise.
+        </p>
+        <div>
+          <Link
+            href="/dashboard"
+            className="inline-flex items-center rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700"
+          >
+            Jump into the workspace
+          </Link>
+        </div>
+      </section>
+
         <p className="text-xs uppercase tracking-[0.3em] text-slate-500">Skeleton</p>
         <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">the-funny workspace</h1>
         <p className="max-w-2xl text-base text-slate-600">
@@ -137,11 +249,6 @@ function SignedInLanding({ name }: { name: string }) {
         </div>
         <p className="text-xs uppercase tracking-[0.3em] text-slate-400">
           Keep iterating—add tooling only when it elevates the show.
-      <section className="space-y-4 rounded-lg border border-dashed border-slate-200 p-6 text-sm text-slate-600">
-        <h2 className="text-base font-medium text-slate-900">What happens next?</h2>
-        <p>
-          Document your workflow, invite collaborators, and decide which tools belong here. This version keeps only the
-          backbone so that future layers are intentional.
         </p>
       </section>
     </div>

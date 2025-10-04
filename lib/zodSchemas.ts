@@ -14,6 +14,34 @@ export const registerSchema = z.object({
   role: z.nativeEnum(Role)
 });
 
+export const comedianSignUpSchema = z.object({
+  stageName: z.string().trim().min(2, "Stage name is required").max(80, "Stage name is too long"),
+  legalName: z.string().trim().min(2, "Tell us who we are working with").max(120, "Legal name is too long"),
+  email: z.string().trim().email(),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  bio: z.string().trim().max(600, "Keep your bio under 600 characters").optional(),
+  homeCity: z.string().trim().max(80, "City names are capped at 80 characters").optional(),
+  homeState: z
+    .string()
+    .trim()
+    .regex(/^[A-Z]{2}$/u, "Use a two-letter state or province code")
+    .optional(),
+  travelRadiusMiles: z.number().int().positive().max(1000, "Choose a travel radius under 1000 miles").optional(),
+  website: z.string().trim().url("Enter a valid website").optional(),
+  instagram: z
+    .string()
+    .trim()
+    .regex(/^[A-Za-z0-9._]{2,30}$/u, "Instagram handles can include letters, numbers, underscores, and periods")
+    .optional(),
+  tiktok: z
+    .string()
+    .trim()
+    .regex(/^[A-Za-z0-9._]{2,30}$/u, "TikTok handles can include letters, numbers, underscores, and periods")
+    .optional(),
+  youtube: z.string().trim().url("Enter a full YouTube channel or reel URL").optional(),
+  credits: z.string().trim().max(160, "Keep credits under 160 characters").optional(),
+});
+
 export const loginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(6)

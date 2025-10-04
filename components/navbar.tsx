@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth";
 import Link from "next/link";
+
 https://github.com/KyleMix/StandUpComedy_App/pull/17/conflict?name=components%252Fnavbar.tsx&ancestor_oid=98bc5fa50738ec7673220605dfdd56f5c1aea3da&base_oid=1c1c86c37c4a17ce7476b9799fac0ce7fdc561c5&head_oid=92c46ab54ff4851adfbef967bb1fabbb8326fe30
 const links = [
   { href: "/", label: "Home" },

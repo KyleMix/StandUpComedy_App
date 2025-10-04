@@ -337,6 +337,13 @@ function mapOffer(record: OfferRecord): Offer {
 function mapCommunityBoardMessage(record: CommunityBoardMessageRecord): CommunityBoardMessage {
   return {
     ...record,
+    gigTitle: record.gigTitle ?? null,
+    gigAddress: record.gigAddress ?? null,
+    gigCity: record.gigCity ?? null,
+    gigState: record.gigState ?? null,
+    gigContactName: record.gigContactName ?? null,
+    gigContactEmail: record.gigContactEmail ?? null,
+    gigSlotsAvailable: record.gigSlotsAvailable ?? null,
     content: record.content,
     createdAt: new Date(record.createdAt),
     updatedAt: new Date(record.updatedAt)
@@ -1034,6 +1041,13 @@ interface CreateCommunityBoardMessageInput {
   authorRole: Role;
   content: string;
   category: CommunityBoardCategory;
+  gigTitle?: string | null;
+  gigAddress?: string | null;
+  gigCity?: string | null;
+  gigState?: string | null;
+  gigContactName?: string | null;
+  gigContactEmail?: string | null;
+  gigSlotsAvailable?: number | null;
 }
 
 export async function createCommunityBoardMessage(
@@ -1048,6 +1062,13 @@ export async function createCommunityBoardMessage(
     content: sanitizeHtml(input.content),
     category: input.category,
     isPinned: false,
+    gigTitle: input.gigTitle ? sanitizeHtml(input.gigTitle) : null,
+    gigAddress: input.gigAddress ? sanitizeHtml(input.gigAddress) : null,
+    gigCity: input.gigCity ? sanitizeHtml(input.gigCity) : null,
+    gigState: input.gigState ? sanitizeHtml(input.gigState) : null,
+    gigContactName: input.gigContactName ? sanitizeHtml(input.gigContactName) : null,
+    gigContactEmail: input.gigContactEmail ? sanitizeHtml(input.gigContactEmail) : null,
+    gigSlotsAvailable: input.gigSlotsAvailable ?? null,
     createdAt: now,
     updatedAt: now
   };

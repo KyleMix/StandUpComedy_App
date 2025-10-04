@@ -96,6 +96,13 @@ export interface CommunityBoardMessageRecord {
   content: string;
   category: CommunityBoardCategory;
   isPinned: boolean;
+  gigTitle: string | null;
+  gigAddress: string | null;
+  gigCity: string | null;
+  gigState: string | null;
+  gigContactName: string | null;
+  gigContactEmail: string | null;
+  gigSlotsAvailable: number | null;
   createdAt: string;
   updatedAt: string;
 }

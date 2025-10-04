@@ -52,14 +52,42 @@ interface VenueProfilePayload extends BaseProfilePayload {
   verificationStatus: string;
 }
 
+type BoardMessageAuthorProfile =
+  | {
+      kind: "PROMOTER";
+      organization: string;
+      contactName: string;
+      phone: string | null;
+      website: string | null;
+      verificationStatus: string;
+    }
+  | {
+      kind: "VENUE";
+      venueName: string;
+      address1: string;
+      city: string;
+      state: string;
+      contactEmail: string;
+      phone: string | null;
+      verificationStatus: string;
+    };
+
 export interface BoardMessagePayload {
   id: string;
   authorId: string;
   authorRole: Role;
   authorName: string | null;
+  authorProfile: BoardMessageAuthorProfile | null;
   content: string;
   category: CommunityBoardCategory;
   isPinned: boolean;
+  gigTitle: string | null;
+  gigAddress: string | null;
+  gigCity: string | null;
+  gigState: string | null;
+  gigContactName: string | null;
+  gigContactEmail: string | null;
+  gigSlotsAvailable: number | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -179,6 +207,17 @@ const ProfileWorkspace = ({ user, boardMessages }: ProfileWorkspaceProps) => {
     }))
   );
   const [messageContent, setMessageContent] = useState("");
+  const [gigTitle, setGigTitle] = useState("");
+  const [gigAddress, setGigAddress] = useState("");
+  const [gigCity, setGigCity] = useState("");
+  const [gigState, setGigState] = useState("");
+  const [gigContactName, setGigContactName] = useState(
+    () => user.promoter?.contactName ?? user.name ?? ""
+  );
+  const [gigContactEmail, setGigContactEmail] = useState(
+    () => user.venue?.contactEmail ?? user.email
+  );
+  const [gigSlotsAvailable, setGigSlotsAvailable] = useState("");
   const allowedMessageCategories = useMemo(
     () => allowedCategoriesFor(currentUser.role),
     [currentUser.role]
@@ -190,6 +229,30 @@ const ProfileWorkspace = ({ user, boardMessages }: ProfileWorkspaceProps) => {
   const [messageError, setMessageError] = useState<string | null>(null);
   const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
   const [editingContent, setEditingContent] = useState("");
+  const isOpportunityCategory = messageCategory === "OFFER";
+  const opportunityFieldsComplete = useMemo(() => {
+    if (!isOpportunityCategory) {
+      return true;
+    }
+    return (
+      gigTitle.trim().length > 0 &&
+      gigAddress.trim().length > 0 &&
+      gigCity.trim().length > 0 &&
+      gigState.trim().length === 2 &&
+      gigContactName.trim().length > 0 &&
+      gigContactEmail.trim().length > 0 &&
+      gigSlotsAvailable.trim().length > 0
+    );
+  }, [
+    isOpportunityCategory,
+    gigTitle,
+    gigAddress,
+    gigCity,
+    gigState,
+    gigContactName,
+    gigContactEmail,
+    gigSlotsAvailable
+  ]);
 
   const isAdmin = currentUser.role === "ADMIN";
   const canEditActiveTab = isAdmin || activeRole === currentUser.role;
@@ -392,13 +455,32 @@ const ProfileWorkspace = ({ user, boardMessages }: ProfileWorkspaceProps) => {
     if (!messageContent.trim()) {
       return;
     }
+    if (isOpportunityCategory && !opportunityFieldsComplete) {
+      setMessageError("Please complete the gig details before posting.");
+      return;
+    }
     setMessageSaving(true);
     setMessageError(null);
     try {
+      const payload: Record<string, unknown> = {
+        content: messageContent.trim(),
+        category: messageCategory
+      };
+      if (messageCategory === "OFFER") {
+        const slotsNumber = Number(gigSlotsAvailable);
+        payload.gigTitle = gigTitle.trim();
+        payload.gigAddress = gigAddress.trim();
+        payload.gigCity = gigCity.trim();
+        payload.gigState = gigState.trim().toUpperCase();
+        payload.gigContactName = gigContactName.trim();
+        payload.gigContactEmail = gigContactEmail.trim();
+        payload.gigSlotsAvailable = Number.isFinite(slotsNumber) ? slotsNumber : undefined;
+      }
+
       const response = await fetch("/api/profile/board/messages", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: messageContent.trim(), category: messageCategory })
+        body: JSON.stringify(payload)
       });
       const result = await response.json();
       if (!response.ok) {
@@ -411,6 +493,11 @@ const ProfileWorkspace = ({ user, boardMessages }: ProfileWorkspaceProps) => {
       } as BoardMessage;
       setMessages((prev) => [message, ...prev]);
       setMessageContent("");
+      setGigTitle("");
+      setGigAddress("");
+      setGigCity("");
+      setGigState("");
+      setGigSlotsAvailable("");
     } catch (error) {
       setMessageError(error instanceof Error ? error.message : "Unable to post message");
     } finally {
@@ -509,6 +596,146 @@ const ProfileWorkspace = ({ user, boardMessages }: ProfileWorkspaceProps) => {
     );
   }
 
+  function formatGigAddress(message: BoardMessage) {
+    const parts = [message.gigAddress, message.gigCity, message.gigState]
+      .map((part) => (part ? part.trim() : ""))
+      .filter((part) => part.length > 0);
+    return parts.join(", ");
+  }
+
+  function renderAuthorProfileCard(profile: BoardMessageAuthorProfile | null) {
+    if (!profile) {
+      return (
+        <div className="rounded-lg border border-dashed border-slate-200 p-4 text-sm text-slate-500">
+          <p className="font-medium text-slate-600">Build trust with a verified profile</p>
+          <p className="mt-1">
+            Add your promoter or venue details so comedians know who is coordinating the gig.
+          </p>
+        </div>
+      );
+    }
+
+    if (profile.kind === "PROMOTER") {
+      return (
+        <div className="rounded-lg border border-slate-200 p-4">
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-sm font-semibold text-slate-700">{profile.organization}</p>
+            <Badge variant="secondary" className="bg-slate-100 text-slate-600">
+              {profile.verificationStatus}
+            </Badge>
+          </div>
+          <dl className="mt-3 space-y-2 text-sm text-slate-600">
+            <div>
+              <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Point of contact</dt>
+              <dd>{profile.contactName}</dd>
+            </div>
+            {profile.phone && (
+              <div>
+                <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Phone</dt>
+                <dd>{profile.phone}</dd>
+              </div>
+            )}
+            {profile.website && (
+              <div>
+                <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Website</dt>
+                <dd>
+                  <a className="text-brand" href={profile.website} target="_blank" rel="noreferrer">
+                    {profile.website}
+                  </a>
+                </dd>
+              </div>
+            )}
+          </dl>
+        </div>
+      );
+    }
+
+    return (
+      <div className="rounded-lg border border-slate-200 p-4">
+        <div className="flex items-center justify-between gap-2">
+          <p className="text-sm font-semibold text-slate-700">{profile.venueName}</p>
+          <Badge variant="secondary" className="bg-slate-100 text-slate-600">
+            {profile.verificationStatus}
+          </Badge>
+        </div>
+        <dl className="mt-3 space-y-2 text-sm text-slate-600">
+          <div>
+            <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Location</dt>
+            <dd>
+              {profile.address1}
+              <br />
+              {profile.city}, {profile.state}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Contact email</dt>
+            <dd>
+              <a className="text-brand" href={`mailto:${profile.contactEmail}`}>
+                {profile.contactEmail}
+              </a>
+            </dd>
+          </div>
+          {profile.phone && (
+            <div>
+              <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Phone</dt>
+              <dd>{profile.phone}</dd>
+            </div>
+          )}
+        </dl>
+      </div>
+    );
+  }
+
+  function renderOpportunityBody(message: BoardMessage) {
+    const address = formatGigAddress(message) || "Address shared after confirmation";
+    const contactName = message.gigContactName ?? message.authorName ?? "Booking contact";
+    const contactEmail = message.gigContactEmail;
+    return (
+      <div className="mt-3 space-y-4">
+        {message.gigTitle && <h4 className="text-base font-semibold text-slate-900">{message.gigTitle}</h4>}
+        <p className="text-sm text-slate-700 whitespace-pre-line">{message.content}</p>
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+          <div className="space-y-4">
+            <div className="rounded-lg border border-slate-200 p-4 space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Address</p>
+                  <p className="text-sm text-slate-700">{address}</p>
+                </div>
+                {typeof message.gigSlotsAvailable === "number" && (
+                  <Badge variant="secondary" className="bg-emerald-100 text-emerald-700">
+                    {message.gigSlotsAvailable} slots open
+                  </Badge>
+                )}
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Point of contact</p>
+                  <p className="text-sm text-slate-700">{contactName}</p>
+                  {contactEmail && (
+                    <a className="text-sm text-brand" href={`mailto:${contactEmail}`}>
+                      {contactEmail}
+                    </a>
+                  )}
+                </div>
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Posted</p>
+                  <p className="text-sm text-slate-700">{formatTimestamp(message.updatedAt)}</p>
+                </div>
+              </div>
+            </div>
+            {renderAuthorProfileCard(message.authorProfile)}
+          </div>
+          <OpportunityApplication
+            message={message}
+            applicantName={currentUser.name}
+            applicantEmail={currentUser.email}
+          />
+        </div>
+      </div>
+    );
+  }
+
   function renderMessageCard(
     message: BoardMessage,
     options: { highlight?: boolean; compact?: boolean } = {}
@@ -564,6 +791,8 @@ const ProfileWorkspace = ({ user, boardMessages }: ProfileWorkspaceProps) => {
               </Button>
             </div>
           </form>
+        ) : message.category === "OFFER" ? (
+          renderOpportunityBody(message)
         ) : (
           <p className="mt-3 whitespace-pre-line text-sm text-slate-700">{message.content}</p>
         )}
@@ -946,6 +1175,64 @@ const ProfileWorkspace = ({ user, boardMessages }: ProfileWorkspaceProps) => {
               placeholder="Post an update, ask for help, or announce an opportunity"
               rows={3}
             />
+            {isOpportunityCategory && (
+              <div className="space-y-4 rounded-md border border-slate-200 p-4">
+                <div className="flex flex-col gap-1">
+                  <span className="text-sm font-semibold text-slate-700">Gig application details</span>
+                  <span className="text-xs text-slate-500">
+                    These fields appear with the application form so comedians know how to apply.
+                  </span>
+                </div>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div>
+                    <label className="text-sm font-medium text-slate-700">Gig title</label>
+                    <Input value={gigTitle} onChange={(event) => setGigTitle(event.target.value)} />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-slate-700">Slots available</label>
+                    <Input
+                      type="number"
+                      min={1}
+                      value={gigSlotsAvailable}
+                      onChange={(event) => setGigSlotsAvailable(event.target.value)}
+                    />
+                  </div>
+                </div>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="md:col-span-2">
+                    <label className="text-sm font-medium text-slate-700">Street address</label>
+                    <Input value={gigAddress} onChange={(event) => setGigAddress(event.target.value)} />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-slate-700">City</label>
+                    <Input value={gigCity} onChange={(event) => setGigCity(event.target.value)} />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-slate-700">State</label>
+                    <Input
+                      value={gigState}
+                      onChange={(event) => setGigState(event.target.value)}
+                      maxLength={2}
+                    />
+                  </div>
+                </div>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div>
+                    <label className="text-sm font-medium text-slate-700">Main point of contact</label>
+                    <Input value={gigContactName} onChange={(event) => setGigContactName(event.target.value)} />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-slate-700">Contact email</label>
+                    <Input value={gigContactEmail} onChange={(event) => setGigContactEmail(event.target.value)} />
+                  </div>
+                </div>
+                {!opportunityFieldsComplete && (
+                  <p className="text-xs text-amber-600">
+                    Complete every field so comedians know how to reach you and where the show is located.
+                  </p>
+                )}
+              </div>
+            )}
             <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
               <div className="flex items-center gap-2">
                 <label className="text-sm font-medium text-slate-700">Category</label>
@@ -961,7 +1248,10 @@ const ProfileWorkspace = ({ user, boardMessages }: ProfileWorkspaceProps) => {
                   ))}
                 </select>
               </div>
-              <Button type="submit" disabled={messageSaving || !messageContent.trim()}>
+              <Button
+                type="submit"
+                disabled={messageSaving || !messageContent.trim() || !opportunityFieldsComplete}
+              >
                 {messageSaving ? "Posting..." : "Share with the community"}
               </Button>
             </div>
@@ -990,3 +1280,172 @@ const ProfileWorkspace = ({ user, boardMessages }: ProfileWorkspaceProps) => {
 };
 
 export default ProfileWorkspace;
+
+function OpportunityApplication({
+  message,
+  applicantName,
+  applicantEmail
+}: {
+  message: BoardMessage;
+  applicantName: string | null;
+  applicantEmail: string;
+}) {
+  const [form, setForm] = useState({
+    name: applicantName ?? "",
+    email: applicantEmail,
+    availability: "",
+    reelUrl: "",
+    highlights: "",
+    notes: ""
+  });
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  function updateField<Key extends keyof typeof form>(key: Key, value: string) {
+    setForm((prev) => ({ ...prev, [key]: value }));
+  }
+
+  const contactName = message.gigContactName ?? message.authorName ?? "the organizer";
+  const contactEmail =
+    message.gigContactEmail ??
+    (message.authorProfile?.kind === "VENUE" ? message.authorProfile.contactEmail : null);
+
+  const mailtoBody = `Hi ${contactName ?? "there"},\n\nI'm interested in ${
+    message.gigTitle ?? "the upcoming gig"
+  }.\n\nName: ${form.name}\nEmail: ${form.email}\nAvailability: ${form.availability || "N/A"}\nReel: ${
+    form.reelUrl || "N/A"
+  }\nHighlights: ${form.highlights || "N/A"}\nNotes: ${form.notes || "N/A"}\n\nThanks!`;
+  const mailtoHref = contactEmail
+    ? `mailto:${contactEmail}?subject=${encodeURIComponent(
+        `Application for ${message.gigTitle ?? "gig opportunity"}`
+      )}&body=${encodeURIComponent(mailtoBody)}`
+    : null;
+
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!form.name.trim() || !form.email.trim()) {
+      setError("Include your name and email so the booker can follow up.");
+      return;
+    }
+    setError(null);
+    setSubmitted(true);
+  }
+
+  if (submitted) {
+    return (
+      <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900">
+        <p className="text-sm font-semibold">Application prepared</p>
+        <p className="mt-1">
+          {contactEmail ? (
+            <>
+              Send these details to {contactName} at{' '}
+              <a className="underline" href={mailtoHref ?? `mailto:${contactEmail}`}>
+                {contactEmail}
+              </a>
+              .
+            </>
+          ) : (
+            <>Share these details with {contactName} to complete your submission.</>
+          )}
+        </p>
+        <div className="mt-3 rounded-md bg-white/70 p-3 text-slate-700 shadow-sm">
+          <dl className="space-y-2">
+            {[
+              ["Name", form.name],
+              ["Email", form.email],
+              ["Availability", form.availability || "Not provided"],
+              ["Reel", form.reelUrl || "Not provided"],
+              ["Highlights", form.highlights || "Not provided"],
+              ["Notes", form.notes || "Not provided"]
+            ].map(([label, value]) => (
+              <div key={label}>
+                <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">{label}</dt>
+                <dd className="text-sm">{value}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          {mailtoHref && (
+            <Button asChild size="sm">
+              <a href={mailtoHref}>Open email draft</a>
+            </Button>
+          )}
+          <Button type="button" size="sm" variant="outline" onClick={() => setSubmitted(false)}>
+            Edit response
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <form className="space-y-3 rounded-lg border border-slate-200 p-4" onSubmit={handleSubmit}>
+      <div className="space-y-1">
+        <p className="text-sm font-semibold text-slate-700">Apply to this gig</p>
+        <p className="text-xs text-slate-500">
+          Share a quick intro, your availability, and a clip. We will bundle everything into an email draft.
+        </p>
+        {contactEmail && (
+          <p className="text-xs text-slate-500">
+            Applications go to{' '}
+            <a className="text-brand" href={`mailto:${contactEmail}`}>
+              {contactEmail}
+            </a>
+            .
+          </p>
+        )}
+      </div>
+      <div className="grid gap-3">
+        <div>
+          <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">Name</label>
+          <Input value={form.name} onChange={(event) => updateField("name", event.target.value)} />
+        </div>
+        <div>
+          <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">Email</label>
+          <Input
+            type="email"
+            value={form.email}
+            onChange={(event) => updateField("email", event.target.value)}
+          />
+        </div>
+        <div>
+          <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">Availability</label>
+          <Input
+            value={form.availability}
+            onChange={(event) => updateField("availability", event.target.value)}
+            placeholder="e.g., Fridays after 7pm, June 12-14"
+          />
+        </div>
+        <div>
+          <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">Reel or clip link</label>
+          <Input
+            value={form.reelUrl}
+            onChange={(event) => updateField("reelUrl", event.target.value)}
+            placeholder="https://..."
+          />
+        </div>
+        <div>
+          <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">Highlights</label>
+          <Input
+            value={form.highlights}
+            onChange={(event) => updateField("highlights", event.target.value)}
+            placeholder="Credits or recent shows"
+          />
+        </div>
+        <div>
+          <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">Notes for the booker</label>
+          <Textarea
+            value={form.notes}
+            onChange={(event) => updateField("notes", event.target.value)}
+            rows={3}
+          />
+        </div>
+      </div>
+      {error && <p className="text-xs text-red-600">{error}</p>}
+      <Button type="submit" size="sm" className="w-full">
+        Prepare application
+      </Button>
+    </form>
+  );
+}

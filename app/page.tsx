@@ -1,7 +1,16 @@
 import { auth } from "@/lib/auth";
 import Link from "next/link";
 
-const guestHighlights = [
+interface Highlight {
+  title: string;
+  description: string;
+}
+
+interface SignedInSection extends Highlight {
+  items: string[];
+}
+
+const guestHighlights: Highlight[] = [
   {
     title: "Shared show pipeline",
     description:
@@ -19,13 +28,13 @@ const guestHighlights = [
   },
 ];
 
-const guestSteps = [
+const guestSteps: string[] = [
   "Sign in to unlock the collaborative workspace.",
   "Outline your upcoming shows and invite co-producers when you are ready.",
   "Iterate on tasks, assets, and analytics as you grow the operation.",
 ];
 
-const signedInSections = [
+const signedInSections: SignedInSection[] = [
   {
     title: "This week at a glance",
     description:
@@ -58,7 +67,7 @@ const signedInSections = [
   },
 ];
 
-const followUpCheckpoints = [
+const followUpCheckpoints: Highlight[] = [
   {
     title: "Tighten coordination",
     description:
@@ -80,67 +89,71 @@ export default async function LandingPage() {
   const session = await auth();
 
   if (!session) {
-    return (
-      <div className="space-y-16">
-        <section className="space-y-6">
-          <p className="text-xs uppercase tracking-[0.3em] text-slate-500">Workspace access required</p>
-          <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Plan every standup night together</h1>
-          <p className="max-w-2xl text-base text-slate-600">
-            This is the skeleton of the-funny workspace. Sign in to start from the essentials—lineups, venues, and promo
-            cadences—before layering on deeper tooling.
-          </p>
-          <div className="flex flex-wrap gap-3">
-            <Link
-              href="/auth/sign-in"
-              className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700"
-            >
-              Sign in to continue
-            </Link>
-            <Link
-              href="/auth/sign-up"
-              className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-400 hover:text-slate-900"
-            >
-              Need an account?
-            </Link>
-          </div>
-        </section>
-
-        <section className="grid gap-8 sm:grid-cols-2">
-          {guestHighlights.map((section) => (
-            <article key={section.title} className="space-y-3 rounded-lg border border-slate-200 p-6">
-              <h2 className="text-lg font-medium text-slate-900">{section.title}</h2>
-              <p className="text-sm text-slate-600">{section.description}</p>
-            </article>
-          ))}
-        </section>
-
-        <section className="space-y-4 rounded-lg border border-dashed border-slate-200 p-6">
-          <h2 className="text-base font-medium text-slate-900">How the skeleton comes to life</h2>
-          <ol className="space-y-3 text-sm text-slate-600">
-            {guestSteps.map((step, index) => (
-              <li key={step} className="flex gap-3">
-                <span className="mt-0.5 inline-flex h-6 w-6 flex-none items-center justify-center rounded-full border border-slate-300 text-xs font-semibold text-slate-500">
-                  {index + 1}
-                </span>
-                <span>{step}</span>
-              </li>
-            ))}
-          </ol>
-        </section>
-      </div>
-    );
+    return <GuestLanding />;
   }
 
-  const displayName = session.user.name ?? session.user.email;
+  return <SignedInLanding name={session.user.name ?? session.user.email} />;
+}
 
+function GuestLanding() {
+  return (
+    <div className="space-y-16">
+      <section className="space-y-6">
+        <p className="text-xs uppercase tracking-[0.3em] text-slate-500">Workspace access required</p>
+        <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Plan every standup night together</h1>
+        <p className="max-w-2xl text-base text-slate-600">
+          This is the skeleton of the-funny workspace. Sign in to start from the essentials—lineups, venues, and promo cadences—before layering on deeper tooling.
+        </p>
+        <div className="flex flex-wrap gap-3">
+          <Link
+            href="/auth/sign-in"
+            className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700"
+          >
+            Sign in to continue
+          </Link>
+          <Link
+            href="/auth/sign-up"
+            className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-400 hover:text-slate-900"
+          >
+            Need an account?
+          </Link>
+        </div>
+      </section>
+
+      <section className="grid gap-8 sm:grid-cols-2">
+        {guestHighlights.map((section) => (
+          <article key={section.title} className="space-y-3 rounded-lg border border-slate-200 p-6">
+            <h2 className="text-lg font-medium text-slate-900">{section.title}</h2>
+            <p className="text-sm text-slate-600">{section.description}</p>
+          </article>
+        ))}
+      </section>
+
+      <section className="space-y-4 rounded-lg border border-dashed border-slate-200 p-6">
+        <h2 className="text-base font-medium text-slate-900">How the skeleton comes to life</h2>
+        <ol className="space-y-3 text-sm text-slate-600">
+          {guestSteps.map((step, index) => (
+            <li key={step} className="flex gap-3">
+              <span className="mt-0.5 inline-flex h-6 w-6 flex-none items-center justify-center rounded-full border border-slate-300 text-xs font-semibold text-slate-500">
+                {index + 1}
+              </span>
+              <span>{step}</span>
+            </li>
+          ))}
+        </ol>
+      </section>
+    </div>
+  );
+}
+
+function SignedInLanding({ name }: { name: string }) {
   return (
     <div className="space-y-16">
       <section className="space-y-6">
         <p className="text-xs uppercase tracking-[0.3em] text-slate-500">Welcome back</p>
         <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Your standup command center</h1>
         <p className="max-w-3xl text-base text-slate-600">
-          Hey {displayName}, the skeleton is ready for new muscle. Use these quick-start lanes to keep bookings, show
-          logistics, and promo momentum moving in sync without adding noise.
+          Hey {name}, the skeleton is ready for new muscle. Use these quick-start lanes to keep bookings, show logistics, and promo momentum moving in sync without adding noise.
         </p>
         <div>
           <Link

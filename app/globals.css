@@ -7,13 +7,9 @@
 }
 
 body {
-  @apply min-h-screen bg-slate-100 text-slate-900 antialiased font-sans;
-  background-image: radial-gradient(circle at 20% 20%, rgba(15, 23, 42, 0.08), transparent 55%),
-    radial-gradient(circle at 80% 10%, rgba(252, 165, 165, 0.15), transparent 55%),
-    radial-gradient(circle at 50% 100%, rgba(199, 210, 254, 0.2), transparent 55%);
-  background-attachment: fixed;
+  @apply min-h-screen bg-white text-slate-900 antialiased;
 }
 
 a {
-  @apply text-brand hover:text-brand-dark;
+  @apply text-slate-900 underline-offset-4 transition hover:text-slate-600;
 }

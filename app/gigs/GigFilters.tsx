@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { type FormEvent, useEffect, useState, useTransition } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -17,27 +17,38 @@ const INITIAL_STATE: FormState = {
   state: ""
 };
 
-export function GigFilters() {
+interface GigFiltersProps {
+  initialSearch: string;
+  initialCity: string;
+  initialState: string;
+  searchParamsString: string;
+}
+
+export function GigFilters({ initialSearch, initialCity, initialState, searchParamsString }: GigFiltersProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const [formState, setFormState] = useState<FormState>(INITIAL_STATE);
+  const [formState, setFormState] = useState<FormState>(() => ({
+    search: initialSearch,
+    city: initialCity,
+    state: initialState
+  }));
+  const [currentSearchParams, setCurrentSearchParams] = useState(searchParamsString);
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
-    const currentSearch = searchParams.get("search") ?? "";
-    const currentCity = searchParams.get("city") ?? "";
-    const currentState = searchParams.get("state") ?? "";
-
     setFormState({
-      search: currentSearch,
-      city: currentCity,
-      state: currentState
+      search: initialSearch,
+      city: initialCity,
+      state: initialState
     });
-  }, [searchParams]);
+  }, [initialSearch, initialCity, initialState]);
+
+  useEffect(() => {
+    setCurrentSearchParams(searchParamsString);
+  }, [searchParamsString]);
 
   function updateQuery(params: FormState) {
-    const next = new URLSearchParams(searchParams.toString());
+    const next = new URLSearchParams(currentSearchParams);
     next.delete("page");
 
     const trimmedSearch = params.search.trim();
@@ -64,19 +75,21 @@ export function GigFilters() {
 
     const queryString = next.toString();
     const url = queryString ? `${pathname}?${queryString}` : pathname;
+    setCurrentSearchParams(queryString);
 
     startTransition(() => {
       router.push(url);
     });
   }
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     updateQuery(formState);
   }
 
   function handleReset() {
     setFormState(INITIAL_STATE);
+    setCurrentSearchParams("");
     startTransition(() => {
       router.push(pathname);
     });

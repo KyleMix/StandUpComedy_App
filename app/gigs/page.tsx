@@ -9,7 +9,29 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { HeroBackground } from "@/components/ui/HeroBackground";
 import { GigFilters } from "./GigFilters";
 
-async function GigsList({ searchParams }: { searchParams: Record<string, string | string[] | undefined> }) {
+type SearchParams = Record<string, string | string[] | undefined>;
+
+function stringifySearchParams(searchParams: SearchParams) {
+  const params = new URLSearchParams();
+
+  for (const [key, value] of Object.entries(searchParams)) {
+    if (typeof value === "undefined") {
+      continue;
+    }
+
+    if (Array.isArray(value)) {
+      for (const item of value) {
+        params.append(key, item);
+      }
+    } else {
+      params.set(key, value);
+    }
+  }
+
+  return params.toString();
+}
+
+async function GigsList({ searchParams }: { searchParams: SearchParams }) {
   const parsed = gigFiltersSchema.safeParse(searchParams);
   const page = parsed.success ? parsed.data.page : 1;
   const take = 10;
@@ -80,14 +102,25 @@ async function GigsList({ searchParams }: { searchParams: Record<string, string 
   );
 }
 
-export default function GigsPage({ searchParams }: { searchParams: Record<string, string | string[] | undefined> }) {
+export default function GigsPage({ searchParams }: { searchParams: SearchParams }) {
+  const parsed = gigFiltersSchema.safeParse(searchParams);
+  const initialSearch = parsed.success && parsed.data.search ? parsed.data.search : "";
+  const initialCity = parsed.success && parsed.data.city ? parsed.data.city : "";
+  const initialState = parsed.success && parsed.data.state ? parsed.data.state : "";
+  const searchParamsString = stringifySearchParams(searchParams);
+
   return (
     <section className="space-y-6">
       <div>
         <h1 className="text-3xl font-semibold">Browse gigs</h1>
         <p className="text-sm text-slate-600">Filter by location, compensation, and more.</p>
       </div>
-      <GigFilters />
+      <GigFilters
+        initialSearch={initialSearch}
+        initialCity={initialCity}
+        initialState={initialState}
+        searchParamsString={searchParamsString}
+      />
       <Suspense key={JSON.stringify(searchParams)} fallback={<p>Loading gigs...</p>}>
         <GigsList searchParams={searchParams} />
       </Suspense>

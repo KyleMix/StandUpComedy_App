@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { fetchCleanStandupJoke } from "@/lib/external-apis";
 
 async function getDashboardData(userId: string) {
   return prisma.user.findUnique({
@@ -57,6 +58,7 @@ export default async function DashboardPage() {
   const applications = user.applications ?? [];
   const gigs = user.gigs ?? [];
   const favorites = user.favorites ?? [];
+  const inspiration = user.role === "COMEDIAN" ? await fetchCleanStandupJoke() : null;
 
   return (
     <div className="space-y-6">
@@ -69,6 +71,20 @@ export default async function DashboardPage() {
         </div>
         <Badge>{user.role}</Badge>
       </div>
+
+      {inspiration && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Writing prompt of the day</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2 text-sm text-slate-600">
+            <p>{inspiration.text}</p>
+            <p className="text-xs text-slate-400">
+              Courtesy of {inspiration.source} • Category: {inspiration.category}
+            </p>
+          </CardContent>
+        </Card>
+      )}
 
       {user.role === "COMEDIAN" && (
         <Card>

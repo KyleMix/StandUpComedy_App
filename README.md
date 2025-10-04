@@ -89,9 +89,15 @@ Automated avatar fallbacks use DiceBear's `botttsNeutral` sprite with non-attrib
 
 DiceBear, OpenMoji, and other attribution-sensitive sources respect the global mode defined in [`lib/assets/config.ts`](./lib/assets/config.ts). Toggle to `always` if you prefer permanent credits.
 
+## Master testing account
+
+Always use the dedicated QA account when running manual checks:
+
+- Master tester (admin): `master@thefunny.local` / `TestingMaster!123`
+
 ## Default accounts
 
-Use the preloaded accounts from `data/database.json` to explore:
+Additional preloaded accounts from `data/database.json` are available for role-specific flows:
 
 - Admin: `admin@thefunny.local` / `password`
 - Promoter: `promoter@thefunny.local` / `password`

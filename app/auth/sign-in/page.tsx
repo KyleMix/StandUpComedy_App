@@ -38,6 +38,18 @@ export default async function SignInPage() {
             Continue
           </Button>
         </form>
+        <div className="mt-4 rounded-md border border-slate-200 bg-slate-50 p-3 text-xs text-slate-600">
+          <p className="font-medium text-slate-700">Testing credentials</p>
+          <p className="mt-1">
+            <span className="font-semibold">Email:</span> master@thefunny.local
+          </p>
+          <p>
+            <span className="font-semibold">Password:</span> TestingMaster!123
+          </p>
+          <p className="mt-2 text-[10px] uppercase tracking-wide text-slate-400">
+            Always use the master tester account during manual QA.
+          </p>
+        </div>
         <p className="mt-4 text-center text-sm text-slate-600">
           Need an account?{" "}
           <Link className="font-medium text-brand" href="/auth/sign-up/comedian">

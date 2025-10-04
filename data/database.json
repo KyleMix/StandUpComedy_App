@@ -1,6 +1,14 @@
 {
   "users": [
     {
+      "id": "user-master-tester",
+      "name": "Master Tester",
+      "email": "master@thefunny.local",
+      "hashedPassword": "$2a$10$qZJlGe9kkSdArfX1i7IRweYDRPQ7wrzAQU4F5Rj1b/jEnFsKqNIAG",
+      "role": "ADMIN",
+      "createdAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
       "id": "user-admin",
       "name": "Alex Admin",
       "email": "admin@thefunny.local",

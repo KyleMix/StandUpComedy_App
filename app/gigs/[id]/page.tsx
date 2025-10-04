@@ -5,6 +5,7 @@ import { canApplyToGig } from "@/lib/rbac";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { fetchGigWeatherSummary } from "@/lib/external-apis";
 
 async function applyToGig(formData: FormData) {
   "use server";
@@ -37,6 +38,7 @@ export default async function GigDetailPage({ params }: { params: { id: string }
   }
   const session = await auth();
   const canApply = session?.user ? canApplyToGig(session.user.role) : false;
+  const weather = await fetchGigWeatherSummary(gig.city, gig.state ?? null, gig.dateStart);
 
   return (
     <Card>
@@ -51,6 +53,22 @@ export default async function GigDetailPage({ params }: { params: { id: string }
       </CardHeader>
       <CardContent className="space-y-4 text-sm leading-relaxed text-slate-700">
         <p>{gig.description}</p>
+        {weather && (
+          <div className="rounded-md border border-slate-200 bg-slate-50 p-3 text-xs text-slate-600">
+            <p className="font-medium text-slate-700">
+              Local forecast ({new Date(weather.localDate).toLocaleDateString(undefined, { timeZone: weather.timezone })})
+            </p>
+            <p className="mt-1">
+              {weather.description} with highs near {Math.round(weather.maxTempC)}°C/
+              {Math.round(weather.maxTempC * (9 / 5) + 32)}°F and lows around {Math.round(weather.minTempC)}°C/
+              {Math.round(weather.minTempC * (9 / 5) + 32)}°F.
+            </p>
+            {typeof weather.precipitationChance === "number" && (
+              <p>Precipitation chance: {Math.round(weather.precipitationChance)}%.</p>
+            )}
+            <p className="mt-2 text-[10px] uppercase tracking-wide text-slate-400">Powered by Open-Meteo</p>
+          </div>
+        )}
         {canApply ? (
           <form action={applyToGig} className="space-y-3">
             <input type="hidden" name="gigId" value={gig.id} />

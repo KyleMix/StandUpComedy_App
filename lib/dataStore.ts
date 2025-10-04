@@ -8,6 +8,8 @@ import type {
   ComedianAppearanceRecord,
   ComedianProfileRecord,
   ComedianVideoRecord,
+  CommunityBoardMessageRecord,
+  CommunityBoardCategory,
   ConversationReviewRecord,
   DatabaseSnapshot,
   FavoriteRecord,
@@ -60,7 +62,8 @@ async function ensureDataStore() {
       bookings: [],
       conversationReviews: [],
       availability: [],
-      reports: []
+      reports: [],
+      communityBoardMessages: []
     };
     await fs.writeFile(DATABASE_PATH, JSON.stringify(emptySnapshot, null, 2));
   }
@@ -131,6 +134,15 @@ export interface Offer extends Omit<OfferRecord, "createdAt" | "eventDate" | "ex
   expiresAt: Date | null;
 }
 
+export interface CommunityBoardMessage
+  extends Omit<CommunityBoardMessageRecord, "createdAt" | "updatedAt" | "content"> {
+  content: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export const COMMUNITY_BOARD_CATEGORIES: CommunityBoardCategory[] = ["ASK", "OFFER", "ANNOUNCEMENT"];
+
 export interface Booking extends Omit<BookingRecord, "createdAt"> {
   createdAt: Date;
 }
@@ -166,7 +178,8 @@ function withDefaults(snapshot: Partial<DatabaseSnapshot>): DatabaseSnapshot {
     bookings: snapshot.bookings ?? [],
     conversationReviews: snapshot.conversationReviews ?? [],
     availability: snapshot.availability ?? [],
-    reports: snapshot.reports ?? []
+    reports: snapshot.reports ?? [],
+    communityBoardMessages: snapshot.communityBoardMessages ?? []
   };
 }
 
@@ -321,6 +334,15 @@ function mapOffer(record: OfferRecord): Offer {
   };
 }
 
+function mapCommunityBoardMessage(record: CommunityBoardMessageRecord): CommunityBoardMessage {
+  return {
+    ...record,
+    content: record.content,
+    createdAt: new Date(record.createdAt),
+    updatedAt: new Date(record.updatedAt)
+  };
+}
+
 function mapBooking(record: BookingRecord): Booking {
   return {
     ...record,
@@ -453,17 +475,17 @@ export async function createComedianProfile(input: CreateComedianProfileInput): 
   const now = nowIso();
   const record: ComedianProfileRecord = {
     userId: input.userId,
-    stageName: input.stageName,
-    bio: input.bio ?? null,
-    credits: input.credits ?? null,
-    website: input.website ?? null,
-    reelUrl: input.reelUrl ?? null,
-    instagram: input.instagram ?? null,
-    tiktokHandle: input.tiktokHandle ?? null,
-    youtubeChannel: input.youtubeChannel ?? null,
+    stageName: sanitizeHtml(input.stageName),
+    bio: input.bio ? sanitizeHtml(input.bio) : null,
+    credits: input.credits ? sanitizeHtml(input.credits) : null,
+    website: input.website ? sanitizeHtml(input.website) : null,
+    reelUrl: input.reelUrl ? sanitizeHtml(input.reelUrl) : null,
+    instagram: input.instagram ? sanitizeHtml(input.instagram) : null,
+    tiktokHandle: input.tiktokHandle ? sanitizeHtml(input.tiktokHandle) : null,
+    youtubeChannel: input.youtubeChannel ? sanitizeHtml(input.youtubeChannel) : null,
     travelRadiusMiles: input.travelRadiusMiles ?? null,
-    homeCity: input.homeCity ?? null,
-    homeState: input.homeState ?? null,
+    homeCity: input.homeCity ? sanitizeHtml(input.homeCity) : null,
+    homeState: input.homeState ? sanitizeHtml(input.homeState) : null,
     createdAt: now,
     updatedAt: now
   };
@@ -490,14 +512,51 @@ export async function updatePromoterProfile(
   const snapshot = await loadSnapshot();
   const record = snapshot.promoterProfiles.find((profile) => profile.userId === userId);
   if (!record) return null;
-  if (data.organization !== undefined) record.organization = data.organization;
-  if (data.contactName !== undefined) record.contactName = data.contactName;
-  if (data.phone !== undefined) record.phone = data.phone;
-  if (data.website !== undefined) record.website = data.website;
+  if (data.organization !== undefined) record.organization = sanitizeHtml(data.organization);
+  if (data.contactName !== undefined) record.contactName = sanitizeHtml(data.contactName);
+  if (data.phone !== undefined) record.phone = data.phone ? sanitizeHtml(data.phone) : null;
+  if (data.website !== undefined) record.website = data.website ? sanitizeHtml(data.website) : null;
   if (data.verificationStatus !== undefined) record.verificationStatus = data.verificationStatus;
   record.updatedAt = nowIso();
   await persist(snapshot);
   return mapPromoter(record);
+}
+
+interface UpsertPromoterProfileInput {
+  userId: string;
+  organization: string;
+  contactName: string;
+  phone?: string | null;
+  website?: string | null;
+}
+
+export async function upsertPromoterProfile(input: UpsertPromoterProfileInput): Promise<PromoterProfile> {
+  const snapshot = await loadSnapshot();
+  const record = snapshot.promoterProfiles.find((profile) => profile.userId === input.userId);
+  const now = nowIso();
+  if (record) {
+    record.organization = sanitizeHtml(input.organization);
+    record.contactName = sanitizeHtml(input.contactName);
+    record.phone = input.phone ? sanitizeHtml(input.phone) : null;
+    record.website = input.website ? sanitizeHtml(input.website) : null;
+    record.updatedAt = now;
+    await persist(snapshot);
+    return mapPromoter(record);
+  }
+
+  const created: PromoterProfileRecord = {
+    userId: input.userId,
+    organization: sanitizeHtml(input.organization),
+    contactName: sanitizeHtml(input.contactName),
+    phone: input.phone ? sanitizeHtml(input.phone) : null,
+    website: input.website ? sanitizeHtml(input.website) : null,
+    verificationStatus: "PENDING",
+    createdAt: now,
+    updatedAt: now
+  };
+  snapshot.promoterProfiles.push(created);
+  await persist(snapshot);
+  return mapPromoter(created);
 }
 
 export async function getVenueProfile(userId: string): Promise<VenueProfile | null> {
@@ -513,19 +572,71 @@ export async function updateVenueProfile(
   const snapshot = await loadSnapshot();
   const record = snapshot.venueProfiles.find((profile) => profile.userId === userId);
   if (!record) return null;
-  if (data.venueName !== undefined) record.venueName = data.venueName;
-  if (data.address1 !== undefined) record.address1 = data.address1;
-  if (data.address2 !== undefined) record.address2 = data.address2;
-  if (data.city !== undefined) record.city = data.city;
-  if (data.state !== undefined) record.state = data.state;
-  if (data.postalCode !== undefined) record.postalCode = data.postalCode;
+  if (data.venueName !== undefined) record.venueName = sanitizeHtml(data.venueName);
+  if (data.address1 !== undefined) record.address1 = sanitizeHtml(data.address1);
+  if (data.address2 !== undefined) record.address2 = data.address2 ? sanitizeHtml(data.address2) : null;
+  if (data.city !== undefined) record.city = sanitizeHtml(data.city);
+  if (data.state !== undefined) record.state = sanitizeHtml(data.state);
+  if (data.postalCode !== undefined) record.postalCode = sanitizeHtml(data.postalCode);
   if (data.capacity !== undefined) record.capacity = data.capacity;
-  if (data.contactEmail !== undefined) record.contactEmail = data.contactEmail;
-  if (data.phone !== undefined) record.phone = data.phone;
+  if (data.contactEmail !== undefined) record.contactEmail = sanitizeHtml(data.contactEmail);
+  if (data.phone !== undefined) record.phone = data.phone ? sanitizeHtml(data.phone) : null;
   if (data.verificationStatus !== undefined) record.verificationStatus = data.verificationStatus;
   record.updatedAt = nowIso();
   await persist(snapshot);
   return mapVenue(record);
+}
+
+interface UpsertVenueProfileInput {
+  userId: string;
+  venueName: string;
+  address1: string;
+  address2?: string | null;
+  city: string;
+  state: string;
+  postalCode: string;
+  capacity?: number | null;
+  contactEmail: string;
+  phone?: string | null;
+}
+
+export async function upsertVenueProfile(input: UpsertVenueProfileInput): Promise<VenueProfile> {
+  const snapshot = await loadSnapshot();
+  const record = snapshot.venueProfiles.find((profile) => profile.userId === input.userId);
+  const now = nowIso();
+  if (record) {
+    record.venueName = sanitizeHtml(input.venueName);
+    record.address1 = sanitizeHtml(input.address1);
+    record.address2 = input.address2 ? sanitizeHtml(input.address2) : null;
+    record.city = sanitizeHtml(input.city);
+    record.state = sanitizeHtml(input.state);
+    record.postalCode = sanitizeHtml(input.postalCode);
+    record.capacity = input.capacity ?? null;
+    record.contactEmail = sanitizeHtml(input.contactEmail);
+    record.phone = input.phone ? sanitizeHtml(input.phone) : null;
+    record.updatedAt = now;
+    await persist(snapshot);
+    return mapVenue(record);
+  }
+
+  const created: VenueProfileRecord = {
+    userId: input.userId,
+    venueName: sanitizeHtml(input.venueName),
+    address1: sanitizeHtml(input.address1),
+    address2: input.address2 ? sanitizeHtml(input.address2) : null,
+    city: sanitizeHtml(input.city),
+    state: sanitizeHtml(input.state),
+    postalCode: sanitizeHtml(input.postalCode),
+    capacity: input.capacity ?? null,
+    contactEmail: sanitizeHtml(input.contactEmail),
+    phone: input.phone ? sanitizeHtml(input.phone) : null,
+    verificationStatus: "PENDING",
+    createdAt: now,
+    updatedAt: now
+  };
+  snapshot.venueProfiles.push(created);
+  await persist(snapshot);
+  return mapVenue(created);
 }
 
 interface ListGigsOptions {
@@ -909,6 +1020,71 @@ export async function createMessage(input: CreateMessageInput): Promise<Message>
   thread.updatedAt = now;
   await persist(snapshot);
   return mapMessage(record);
+}
+
+export async function listCommunityBoardMessages(): Promise<CommunityBoardMessage[]> {
+  const snapshot = await loadSnapshot();
+  return snapshot.communityBoardMessages
+    .map(mapCommunityBoardMessage)
+    .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+}
+
+interface CreateCommunityBoardMessageInput {
+  authorId: string;
+  authorRole: Role;
+  content: string;
+  category: CommunityBoardCategory;
+}
+
+export async function createCommunityBoardMessage(
+  input: CreateCommunityBoardMessageInput
+): Promise<CommunityBoardMessage> {
+  const snapshot = await loadSnapshot();
+  const now = nowIso();
+  const record: CommunityBoardMessageRecord = {
+    id: randomUUID(),
+    authorId: input.authorId,
+    authorRole: input.authorRole,
+    content: sanitizeHtml(input.content),
+    category: input.category,
+    isPinned: false,
+    createdAt: now,
+    updatedAt: now
+  };
+  snapshot.communityBoardMessages.push(record);
+  await persist(snapshot);
+  return mapCommunityBoardMessage(record);
+}
+
+interface UpdateCommunityBoardMessageInput {
+  content?: string;
+  category?: CommunityBoardCategory;
+  isPinned?: boolean;
+}
+
+export async function updateCommunityBoardMessage(
+  id: string,
+  actorId: string,
+  data: UpdateCommunityBoardMessageInput
+): Promise<CommunityBoardMessage | null> {
+  const snapshot = await loadSnapshot();
+  const record = snapshot.communityBoardMessages.find((message) => message.id === id);
+  if (!record) return null;
+  if (record.authorId !== actorId) {
+    return null;
+  }
+  if (data.content !== undefined) {
+    record.content = sanitizeHtml(data.content);
+  }
+  if (data.category !== undefined) {
+    record.category = data.category;
+  }
+  if (data.isPinned !== undefined) {
+    record.isPinned = data.isPinned;
+  }
+  record.updatedAt = nowIso();
+  await persist(snapshot);
+  return mapCommunityBoardMessage(record);
 }
 
 interface CreateOfferInput {

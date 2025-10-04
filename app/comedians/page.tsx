@@ -35,12 +35,10 @@ export default async function ComediansPage() {
     }
   });
 
-  const enriched = await Promise.all(
-    comedians.map(async (comedian) => ({
-      ...comedian,
-      avatar: comedian.user?.image ?? (await avatarDataUrl(comedian.userId))
-    }))
-  );
+  const enriched = comedians.map((comedian) => ({
+    ...comedian,
+    avatar: comedian.user?.image ?? avatarDataUrl(comedian.userId)
+  }));
 
   return (
     <div className="space-y-10">

@@ -87,6 +87,19 @@ export interface VenueProfileRecord {
   updatedAt: string;
 }
 
+export type CommunityBoardCategory = "ASK" | "OFFER" | "ANNOUNCEMENT";
+
+export interface CommunityBoardMessageRecord {
+  id: string;
+  authorId: string;
+  authorRole: Role;
+  content: string;
+  category: CommunityBoardCategory;
+  isPinned: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface GigRecord {
   id: string;
   createdByUserId: string;
@@ -232,4 +245,5 @@ export interface DatabaseSnapshot {
   conversationReviews: ConversationReviewRecord[];
   availability: AvailabilityRecord[];
   reports: ReportRecord[];
+  communityBoardMessages: CommunityBoardMessageRecord[];
 }

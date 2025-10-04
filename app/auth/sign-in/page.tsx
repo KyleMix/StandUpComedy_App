@@ -1,8 +1,10 @@
-import { auth, signIn } from "@/lib/auth";
+import Link from "next/link";
 import { redirect } from "next/navigation";
+
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { auth, signIn } from "@/lib/auth";
 
 async function handleSignIn(formData: FormData) {
   "use server";
@@ -37,7 +39,10 @@ export default async function SignInPage() {
           </Button>
         </form>
         <p className="mt-4 text-center text-sm text-slate-600">
-          Need an account? <a className="text-brand" href="/auth/sign-up">Sign up</a>
+          Need an account?{" "}
+          <Link className="font-medium text-brand" href="/auth/sign-up/comedian">
+            Join as a comedian
+          </Link>
         </p>
       </CardContent>
     </Card>

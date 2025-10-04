@@ -436,6 +436,16 @@ export async function getComedianProfile(userId: string): Promise<ComedianProfil
 interface CreateComedianProfileInput {
   userId: string;
   stageName: string;
+  bio?: string | null;
+  credits?: string | null;
+  website?: string | null;
+  reelUrl?: string | null;
+  instagram?: string | null;
+  tiktokHandle?: string | null;
+  youtubeChannel?: string | null;
+  travelRadiusMiles?: number | null;
+  homeCity?: string | null;
+  homeState?: string | null;
 }
 
 export async function createComedianProfile(input: CreateComedianProfileInput): Promise<ComedianProfile> {
@@ -444,16 +454,16 @@ export async function createComedianProfile(input: CreateComedianProfileInput): 
   const record: ComedianProfileRecord = {
     userId: input.userId,
     stageName: input.stageName,
-    bio: null,
-    credits: null,
-    website: null,
-    reelUrl: null,
-    instagram: null,
-    tiktokHandle: null,
-    youtubeChannel: null,
-    travelRadiusMiles: null,
-    homeCity: null,
-    homeState: null,
+    bio: input.bio ?? null,
+    credits: input.credits ?? null,
+    website: input.website ?? null,
+    reelUrl: input.reelUrl ?? null,
+    instagram: input.instagram ?? null,
+    tiktokHandle: input.tiktokHandle ?? null,
+    youtubeChannel: input.youtubeChannel ?? null,
+    travelRadiusMiles: input.travelRadiusMiles ?? null,
+    homeCity: input.homeCity ?? null,
+    homeState: input.homeState ?? null,
     createdAt: now,
     updatedAt: now
   };

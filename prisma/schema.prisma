@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -234,4 +234,44 @@ model Message {
   createdAt DateTime @default(now())
   thread    MessageThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
   sender    User      @relation(fields: [senderId], references: [id], onDelete: Cascade)
+}
+
+model OpenMic {
+  id          String   @id @default(cuid())
+  source      String
+  sourceId    String?
+  title       String
+  description String?
+  url         String
+  signupUrl   String?
+  dayOfWeek   Int?
+  startUtc    DateTime?
+  endUtc      DateTime?
+  recurrence  String?
+  venueName   String?
+  address     String?
+  city        String?
+  state       String?
+  country     String?  @default("US")
+  lat         Float?
+  lng         Float?
+  isFree      Boolean? @default(true)
+  tags        String[]
+  imageUrl    String?
+  scrapedHash String?
+  status      String   @default("published")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([source, sourceId])
+  @@index([city, state, dayOfWeek])
+  @@index([startUtc, city, state])
+}
+
+model IngestLog {
+  id        String   @id @default(cuid())
+  source    String
+  succeeded Boolean
+  message   String?
+  createdAt DateTime @default(now())
 }

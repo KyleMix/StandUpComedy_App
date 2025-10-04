@@ -1,12 +1,79 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { communityBoardMessageUpdateSchema } from "@/lib/zodSchemas";
-import { updateCommunityBoardMessage, type CommunityBoardMessage } from "@/lib/dataStore";
+import {
+  updateCommunityBoardMessage,
+  getPromoterProfile,
+  getVenueProfile,
+  getUserById,
+  type CommunityBoardMessage
+} from "@/lib/dataStore";
 
-function serialize(message: CommunityBoardMessage, authorName: string | null) {
+type AuthorProfilePayload =
+  | {
+      kind: "PROMOTER";
+      organization: string;
+      contactName: string;
+      phone: string | null;
+      website: string | null;
+      verificationStatus: string;
+    }
+  | {
+      kind: "VENUE";
+      venueName: string;
+      address1: string;
+      city: string;
+      state: string;
+      contactEmail: string;
+      phone: string | null;
+      verificationStatus: string;
+    };
+
+async function resolveAuthorContext(authorId: string, role: string) {
+  const user = await getUserById(authorId);
+  let profile: AuthorProfilePayload | null = null;
+  if (role === "PROMOTER") {
+    const promoter = await getPromoterProfile(authorId);
+    if (promoter) {
+      profile = {
+        kind: "PROMOTER",
+        organization: promoter.organization,
+        contactName: promoter.contactName,
+        phone: promoter.phone,
+        website: promoter.website,
+        verificationStatus: promoter.verificationStatus,
+      };
+    }
+  } else if (role === "VENUE") {
+    const venue = await getVenueProfile(authorId);
+    if (venue) {
+      profile = {
+        kind: "VENUE",
+        venueName: venue.venueName,
+        address1: venue.address1,
+        city: venue.city,
+        state: venue.state,
+        contactEmail: venue.contactEmail,
+        phone: venue.phone,
+        verificationStatus: venue.verificationStatus,
+      };
+    }
+  }
+  return {
+    name: user?.name ?? user?.email ?? "Community member",
+    profile,
+  };
+}
+
+function serialize(
+  message: CommunityBoardMessage,
+  authorName: string | null,
+  authorProfile: AuthorProfilePayload | null
+) {
   return {
     ...message,
     authorName,
+    authorProfile,
     createdAt: message.createdAt.toISOString(),
     updatedAt: message.updatedAt.toISOString()
   };
@@ -56,7 +123,8 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     return NextResponse.json({ error: "Message not found" }, { status: 404 });
   }
 
+  const context = await resolveAuthorContext(session.user.id, session.user.role);
   return NextResponse.json({
-    message: serialize(updated, session.user.name ?? session.user.email ?? "You")
+    message: serialize(updated, context.name ?? "You", context.profile)
   });
 }

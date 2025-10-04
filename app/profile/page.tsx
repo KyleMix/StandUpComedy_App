@@ -5,15 +5,59 @@ import ProfileWorkspace, {
 } from "@/components/profile/ProfileWorkspace";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { getUserById, listCommunityBoardMessages } from "@/lib/dataStore";
+import {
+  getUserById,
+  listCommunityBoardMessages,
+  getPromoterProfile,
+  getVenueProfile
+} from "@/lib/dataStore";
 
 async function buildBoardMessages(): Promise<BoardMessagePayload[]> {
   const messages = await listCommunityBoardMessages();
-  const authorIds = Array.from(new Set(messages.map((message) => message.authorId)));
+  const authorRoles = new Map<string, string>();
+  messages.forEach((message) => {
+    if (!authorRoles.has(message.authorId)) {
+      authorRoles.set(message.authorId, message.authorRole);
+    }
+  });
   const authorEntries = await Promise.all(
-    authorIds.map(async (id) => {
+    Array.from(authorRoles.entries()).map(async ([id, role]) => {
       const author = await getUserById(id);
-      return [id, author?.name ?? author?.email ?? "Community member"] as const;
+      let profile: BoardMessagePayload["authorProfile"] = null;
+      if (role === "PROMOTER") {
+        const promoter = await getPromoterProfile(id);
+        if (promoter) {
+          profile = {
+            kind: "PROMOTER",
+            organization: promoter.organization,
+            contactName: promoter.contactName,
+            phone: promoter.phone,
+            website: promoter.website,
+            verificationStatus: promoter.verificationStatus,
+          };
+        }
+      } else if (role === "VENUE") {
+        const venue = await getVenueProfile(id);
+        if (venue) {
+          profile = {
+            kind: "VENUE",
+            venueName: venue.venueName,
+            address1: venue.address1,
+            city: venue.city,
+            state: venue.state,
+            contactEmail: venue.contactEmail,
+            phone: venue.phone,
+            verificationStatus: venue.verificationStatus,
+          };
+        }
+      }
+      return [
+        id,
+        {
+          name: author?.name ?? author?.email ?? "Community member",
+          profile,
+        },
+      ] as const;
     })
   );
   const authorMap = new Map(authorEntries);
@@ -21,10 +65,18 @@ async function buildBoardMessages(): Promise<BoardMessagePayload[]> {
     id: message.id,
     authorId: message.authorId,
     authorRole: message.authorRole,
-    authorName: authorMap.get(message.authorId) ?? "Community member",
+    authorName: authorMap.get(message.authorId)?.name ?? "Community member",
+    authorProfile: authorMap.get(message.authorId)?.profile ?? null,
     content: message.content,
     category: message.category,
     isPinned: message.isPinned,
+    gigTitle: message.gigTitle,
+    gigAddress: message.gigAddress,
+    gigCity: message.gigCity,
+    gigState: message.gigState,
+    gigContactName: message.gigContactName,
+    gigContactEmail: message.gigContactEmail,
+    gigSlotsAvailable: message.gigSlotsAvailable,
     createdAt: message.createdAt.toISOString(),
     updatedAt: message.updatedAt.toISOString()
   }));

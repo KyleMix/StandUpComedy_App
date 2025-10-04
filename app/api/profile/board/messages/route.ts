@@ -5,30 +5,98 @@ import {
   createCommunityBoardMessage,
   listCommunityBoardMessages,
   getUserById,
+  getPromoterProfile,
+  getVenueProfile,
   type CommunityBoardMessage
 } from "@/lib/dataStore";
 import type { CommunityBoardCategory } from "@/types/database";
 import { communityBoardMessageSchema } from "@/lib/zodSchemas";
 
-function serializeMessage(message: CommunityBoardMessage, authorName: string | null) {
+type AuthorProfilePayload =
+  | {
+      kind: "PROMOTER";
+      organization: string;
+      contactName: string;
+      phone: string | null;
+      website: string | null;
+      verificationStatus: string;
+    }
+  | {
+      kind: "VENUE";
+      venueName: string;
+      address1: string;
+      city: string;
+      state: string;
+      contactEmail: string;
+      phone: string | null;
+      verificationStatus: string;
+    };
+
+async function resolveAuthorContext(authorId: string, role: string) {
+  const user = await getUserById(authorId);
+  let profile: AuthorProfilePayload | null = null;
+  if (role === "PROMOTER") {
+    const promoter = await getPromoterProfile(authorId);
+    if (promoter) {
+      profile = {
+        kind: "PROMOTER",
+        organization: promoter.organization,
+        contactName: promoter.contactName,
+        phone: promoter.phone,
+        website: promoter.website,
+        verificationStatus: promoter.verificationStatus,
+      };
+    }
+  } else if (role === "VENUE") {
+    const venue = await getVenueProfile(authorId);
+    if (venue) {
+      profile = {
+        kind: "VENUE",
+        venueName: venue.venueName,
+        address1: venue.address1,
+        city: venue.city,
+        state: venue.state,
+        contactEmail: venue.contactEmail,
+        phone: venue.phone,
+        verificationStatus: venue.verificationStatus,
+      };
+    }
+  }
+  return {
+    name: user?.name ?? user?.email ?? "Community member",
+    profile,
+  };
+}
+
+function serializeMessage(
+  message: CommunityBoardMessage,
+  authorName: string | null,
+  authorProfile: AuthorProfilePayload | null
+) {
   return {
     ...message,
     authorName,
+    authorProfile,
     createdAt: message.createdAt.toISOString(),
     updatedAt: message.updatedAt.toISOString()
   };
 }
 
 async function attachAuthors(messages: CommunityBoardMessage[]) {
-  const uniqueIds = Array.from(new Set(messages.map((item) => item.authorId)));
-  const authorEntries = await Promise.all(
-    uniqueIds.map(async (id) => {
-      const user = await getUserById(id);
-      return [id, user?.name ?? user?.email ?? "Community member"] as const;
-    })
+  const uniqueAuthors = new Map<string, string>();
+  messages.forEach((message) => {
+    if (!uniqueAuthors.has(message.authorId)) {
+      uniqueAuthors.set(message.authorId, message.authorRole);
+    }
+  });
+  const contextEntries = await Promise.all(
+    Array.from(uniqueAuthors.entries()).map(async ([id, role]) => [id, await resolveAuthorContext(id, role)])
   );
-  const authorMap = new Map(authorEntries);
-  return messages.map((message) => serializeMessage(message, authorMap.get(message.authorId) ?? "Community member"));
+  const contextMap = new Map(contextEntries);
+  return messages.map((message) => {
+    const context = contextMap.get(message.authorId);
+    return serializeMessage(message, context?.name ?? "Community member", context?.profile ?? null);
+  });
 }
 
 function allowedCategoriesForRole(role: string): CommunityBoardCategory[] {
@@ -80,10 +148,18 @@ export async function POST(request: Request) {
     authorId: session.user.id,
     authorRole: session.user.role,
     content: parsed.data.content,
-    category: parsed.data.category
+    category: parsed.data.category,
+    gigTitle: parsed.data.gigTitle ?? null,
+    gigAddress: parsed.data.gigAddress ?? null,
+    gigCity: parsed.data.gigCity ?? null,
+    gigState: parsed.data.gigState ?? null,
+    gigContactName: parsed.data.gigContactName ?? null,
+    gigContactEmail: parsed.data.gigContactEmail ?? null,
+    gigSlotsAvailable: parsed.data.gigSlotsAvailable ?? null
   });
 
+  const context = await resolveAuthorContext(session.user.id, session.user.role);
   return NextResponse.json({
-    message: serializeMessage(message, session.user.name ?? session.user.email ?? "You")
+    message: serializeMessage(message, context.name ?? "You", context.profile)
   });
 }

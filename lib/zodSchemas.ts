@@ -94,6 +94,38 @@ export const venueProfileFormSchema = z.object({
 export const communityBoardMessageSchema = z.object({
   content: z.string().trim().min(1).max(1000),
   category: boardCategoryEnum,
+  gigTitle: z.string().trim().min(3).max(120).optional(),
+  gigAddress: z.string().trim().min(5).max(200).optional(),
+  gigCity: z.string().trim().min(2).max(80).optional(),
+  gigState: z
+    .string()
+    .trim()
+    .regex(/^[A-Z]{2}$/u, "State must be a 2-letter code")
+    .optional(),
+  gigContactName: z.string().trim().min(2).max(120).optional(),
+  gigContactEmail: z.string().trim().email().optional(),
+  gigSlotsAvailable: z.coerce.number().int().min(1).max(50).optional(),
+}).superRefine((data, ctx) => {
+  if (data.category === "OFFER") {
+    const requiredFields: Array<[keyof typeof data, unknown, string]> = [
+      ["gigTitle", data.gigTitle, "Provide a short gig title."],
+      ["gigAddress", data.gigAddress, "Include the street address for the gig."],
+      ["gigCity", data.gigCity, "Add the city where the show takes place."],
+      ["gigState", data.gigState, "Select the state or province for the gig."],
+      ["gigContactName", data.gigContactName, "Name the primary point of contact."],
+      ["gigContactEmail", data.gigContactEmail, "Add an email address for applications."],
+      ["gigSlotsAvailable", data.gigSlotsAvailable, "Share how many slots are open."],
+    ];
+    for (const [field, value, message] of requiredFields) {
+      if (value === undefined || value === null || value === "") {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: [field],
+          message,
+        });
+      }
+    }
+  }
 });
 
 export const communityBoardMessageUpdateSchema = z

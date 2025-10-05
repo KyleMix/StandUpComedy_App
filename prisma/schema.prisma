@@ -1,3 +1,5 @@
+// Prisma schema for The Funny production-ready MVP
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -8,270 +10,252 @@ datasource db {
 }
 
 enum Role {
-  COMEDIAN
+  ADMIN
   PROMOTER
   VENUE
-  ADMIN
+  COMEDIAN
+  FAN
+}
+
+enum GigType {
+  OPEN_MIC
+  BOOKED_SHOW
+  PAID_GIG
+}
+
+enum LeadStatus {
+  NEW
+  REVIEW
+  APPROVED
+  REJECTED
+  DUPLICATE
+}
+
+enum GigStatus {
+  DRAFT
+  PENDING
+  PUBLISHED
+  ARCHIVED
+}
+
+enum SignUpMethod {
+  WALKUP
+  ONLINE_FORM
+  DM
+  EMAIL
+  OTHER
 }
 
 enum ApplicationStatus {
-  PENDING
-  REVIEWING
-  ACCEPTED
+  APPLIED
+  SHORTLISTED
   REJECTED
-  WITHDRAWN
+  BOOKED
+  CANCELLED
 }
 
-enum ReviewTargetType {
-  USER
-  GIG
+enum PayoutStatus {
+  NONE
+  HELD
+  PAID
+  REFUNDED
+}
+
+enum VerificationStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }
 
 model User {
-  id                String                 @id @default(cuid())
-  name              String?
-  email             String?                @unique
-  emailVerified     DateTime?
-  image             String?
-  role              Role                   @default(COMEDIAN)
-  passwordHash      String?
-  createdAt         DateTime               @default(now())
-  updatedAt         DateTime               @updatedAt
-  accounts          Account[]
-  sessions          Session[]
-  comedianProfile   ComedianProfile?
-  venueProfile      VenueProfile?
-  promoterProfile   PromoterProfile?
-  gigs              Gig[]                  @relation("GigCreator")
-  applications      Application[]          @relation("ComedianApplications")
-  follows           Follow[]               @relation("UserFollowing")
-  followers         Follow[]               @relation("UserFollowers")
-  favorites         Favorite[]             @relation("UserFavorites")
-  favoriteOf        Favorite[]             @relation("TargetUserFavorites")
-  reviewsGiven      Review[]               @relation("ReviewsGiven")
-  reviewsReceived   Review[]               @relation("ReviewsReceived")
-  messageThreads    MessageThreadParticipant[]
-  messages          Message[]
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String
+  role         Role      @default(FAN)
+  createdAt    DateTime  @default(now())
+
+  profile              Profile?
+  ownedVenues          Venue[]       @relation("VenueOwner")
+  promoter             Promoter?
+  gigsCreated          Gig[]         @relation("GigPromoter")
+  applications         Application[] @relation("GigApplications")
+  bookings             Booking[]     @relation("GigBookings")
+  verificationRequests VerificationRequest[]
+  messagesSent         Message[]     @relation("MessageSender")
+  messagesReceived     Message[]     @relation("MessageRecipient")
+  reviewedRequests     VerificationRequest[] @relation("VerificationReviewer")
+  emailTokens          EmailVerificationToken[]
+
+  @@map("users")
 }
 
-model Account {
-  id                 String  @id @default(cuid())
-  userId             String
-  type               String
-  provider           String
-  providerAccountId  String
-  refresh_token      String? @map("refreshToken")
-  access_token       String? @map("accessToken")
-  expires_at         Int?    @map("expiresAt")
-  token_type         String? @map("tokenType")
-  scope              String?
-  id_token           String? @map("idToken")
-  session_state      String? @map("sessionState")
-  oauth_token_secret String? @map("oauthTokenSecret")
-  oauth_token        String? @map("oauthToken")
-  user               User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+model Profile {
+  id        String  @id @default(cuid())
+  userId    String  @unique
+  stageName String?
+  bio       String?
+  avatarUrl String?
+  city      String?
+  region    String?
+  country   String?
+  links     Json?
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([provider, providerAccountId])
+  @@map("profiles")
 }
 
-model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+model Venue {
+  id        String   @id @default(cuid())
+  ownerId   String
+  name      String
+  address   String?
+  lat       Float?
+  lng       Float?
+  phone     String?
+  website   String?
+  gigs      Gig[]
+  owner     User     @relation("VenueOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+
+  @@map("venues")
 }
 
-model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
+model Promoter {
+  id      String @id @default(cuid())
+  userId  String @unique
+  orgName String?
+  website String?
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  gigs    Gig[]
 
-  @@unique([identifier, token])
-}
-
-model ComedianProfile {
-  id          String   @id @default(cuid())
-  userId      String   @unique
-  stageName   String?
-  bio         String?
-  styles      Json     @default("[]")
-  socials     Json     @default("{}")
-  location    Json     @default("{}")
-  reelUrl     String?
-  media       Json     @default("[]")
-  rating      Float    @default(0)
-  ratingCount Int      @default(0)
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  // Ratings are derived from related reviews on the owning user
-}
-
-model VenueProfile {
-  id          String   @id @default(cuid())
-  userId      String   @unique
-  name        String?
-  bio         String?
-  socials     Json     @default("{}")
-  location    Json     @default("{}")
-  media       Json     @default("[]")
-  capacity    Int?
-  amenities   Json     @default("[]")
-  rating      Float    @default(0)
-  ratingCount Int      @default(0)
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  // Ratings are derived from related reviews on the owning user
-}
-
-model PromoterProfile {
-  id          String   @id @default(cuid())
-  userId      String   @unique
-  organization String?
-  bio         String?
-  socials     Json     @default("{}")
-  location    Json     @default("{}")
-  media       Json     @default("[]")
-  rating      Float    @default(0)
-  ratingCount Int      @default(0)
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  // Ratings are derived from related reviews on the owning user
+  @@map("promoters")
 }
 
 model Gig {
-  id              String        @id @default(cuid())
-  title           String
-  description     String
-  styles          Json          @default("[]")
-  city            String
-  state           String
-  payout          Decimal       @db.Decimal(10, 2)
-  setLengthMin    Int           @default(15)
-  ageRestriction  Int?
-  dateStart       DateTime
-  dateEnd         DateTime?
-  published       Boolean       @default(false)
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
-  createdByUserId String
-  createdBy       User          @relation("GigCreator", fields: [createdByUserId], references: [id], onDelete: Cascade)
-  applications    Application[]
-  favorites       Favorite[]
+  id             String    @id @default(cuid())
+  type           GigType   @default(OPEN_MIC)
+  title          String
+  description    String
+  venueId        String?
+  promoterId     String?
+  startsAt       DateTime
+  endsAt         DateTime?
+  isRecurring    Boolean   @default(false)
+  recurrenceRule String?
+  payMin         Int?
+  payMax         Int?
+  bringer        Boolean   @default(false)
+  signUpMethod   SignUpMethod @default(WALKUP)
+  externalUrl    String?
+  status         GigStatus @default(DRAFT)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  venue          Venue?    @relation(fields: [venueId], references: [id])
+  promoter       Promoter? @relation(fields: [promoterId], references: [id])
+  applications   Application[]
+  bookings       Booking[]
+  leads          Lead[]
+
+  @@map("gigs")
+  @@index([status])
+  @@index([type, status])
 }
 
 model Application {
-  id            String             @id @default(cuid())
-  gigId         String
-  comedianId    String
-  status        ApplicationStatus  @default(PENDING)
-  createdAt     DateTime           @default(now())
-  updatedAt     DateTime           @updatedAt
-  gig           Gig                @relation(fields: [gigId], references: [id], onDelete: Cascade)
-  comedian      User               @relation("ComedianApplications", fields: [comedianId], references: [id], onDelete: Cascade)
+  id          String            @id @default(cuid())
+  gigId       String
+  comedianId  String
+  status      ApplicationStatus @default(APPLIED)
+  notes       String?
+  createdAt   DateTime          @default(now())
 
-  @@unique([gigId, comedianId])
+  gig         Gig               @relation(fields: [gigId], references: [id], onDelete: Cascade)
+  comedian    User              @relation("GigApplications", fields: [comedianId], references: [id], onDelete: Cascade)
+
+  @@map("applications")
+  @@index([gigId, comedianId])
 }
 
-model Follow {
-  followerId String
-  followingId String
-  createdAt DateTime @default(now())
-  follower  User     @relation("UserFollowing", fields: [followerId], references: [id], onDelete: Cascade)
-  following User     @relation("UserFollowers", fields: [followingId], references: [id], onDelete: Cascade)
+model Booking {
+  id           String       @id @default(cuid())
+  gigId        String
+  comedianId   String
+  amountCents  Int?
+  currency     String?      @default("usd")
+  payoutStatus PayoutStatus @default(NONE)
 
-  @@id([followerId, followingId])
+  gig          Gig          @relation(fields: [gigId], references: [id], onDelete: Cascade)
+  comedian     User         @relation("GigBookings", fields: [comedianId], references: [id], onDelete: Cascade)
+
+  @@map("bookings")
 }
 
-model Favorite {
-  id            String   @id @default(cuid())
-  userId        String
-  gigId         String?
-  targetUserId  String?
-  createdAt     DateTime @default(now())
-  user          User     @relation("UserFavorites", fields: [userId], references: [id], onDelete: Cascade)
-  gig           Gig?     @relation(fields: [gigId], references: [id], onDelete: Cascade)
-  targetUser    User?    @relation("TargetUserFavorites", fields: [targetUserId], references: [id], onDelete: Cascade)
+model VerificationRequest {
+  id          String             @id @default(cuid())
+  userId      String
+  docUrl      String?
+  note        String?
+  status      VerificationStatus @default(PENDING)
+  reviewedBy  String?
+  reviewedAt  DateTime?
 
-  @@index([userId])
-  @@index([gigId])
-  @@index([targetUserId])
-}
+  user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reviewer    User?              @relation("VerificationReviewer", fields: [reviewedBy], references: [id])
 
-model Review {
-  id              String           @id @default(cuid())
-  targetUserId    String
-  targetType      ReviewTargetType @default(USER)
-  rating          Int
-  comment         String?
-  createdByUserId String
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
-  targetUser      User             @relation("ReviewsReceived", fields: [targetUserId], references: [id], onDelete: Cascade)
-  createdBy       User             @relation("ReviewsGiven", fields: [createdByUserId], references: [id], onDelete: Cascade)
-}
-
-model MessageThread {
-  id            String                        @id @default(cuid())
-  createdAt     DateTime                      @default(now())
-  updatedAt     DateTime                      @updatedAt
-  participants  MessageThreadParticipant[]
-  messages      Message[]
-}
-
-model MessageThreadParticipant {
-  id        String        @id @default(cuid())
-  threadId  String
-  userId    String
-  thread    MessageThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
-  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([threadId, userId])
+  @@map("verification_requests")
 }
 
 model Message {
-  id        String   @id @default(cuid())
-  threadId  String
-  senderId  String
-  body      String
-  createdAt DateTime @default(now())
-  thread    MessageThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
-  sender    User      @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  id           String   @id @default(cuid())
+  threadId     String
+  senderId     String
+  recipientId  String
+  body         String
+  createdAt    DateTime @default(now())
+
+  sender       User     @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+  recipient    User     @relation("MessageRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
+
+  @@map("messages")
+  @@index([threadId])
 }
 
-model OpenMic {
-  id          String   @id @default(cuid())
+model Lead {
+  id          String     @id @default(cuid())
   source      String
-  sourceId    String?
-  title       String
-  description String?
   url         String
-  signupUrl   String?
-  dayOfWeek   Int?
-  startUtc    DateTime?
-  endUtc      DateTime?
-  recurrence  String?
-  venueName   String?
-  address     String?
-  city        String?
-  state       String?
-  country     String?  @default("US")
-  lat         Float?
-  lng         Float?
-  isFree      Boolean? @default(true)
-  tags        String[]
-  imageUrl    String?
-  scrapedHash String?
-  status      String   @default("published")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  title       String?
+  raw         Json?
+  normalized  Json?
+  seenHash    String?
+  status      LeadStatus @default(NEW)
+  gigId       String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
 
-  @@unique([source, sourceId])
-  @@index([city, state, dayOfWeek])
-  @@index([startUtc, city, state])
+  gig         Gig?       @relation(fields: [gigId], references: [id])
+
+  @@unique([url])
+  @@map("leads")
 }
 
-model IngestLog {
+model AllowlistSource {
+  id            String  @id @default(cuid())
+  domain        String  @unique
+  label         String
+  enabled       Boolean @default(true)
+  lastCheckedAt DateTime?
+
+  @@map("allowlist_sources")
+}
+
+model EmailVerificationToken {
   id        String   @id @default(cuid())
-  source    String
-  succeeded Boolean
-  message   String?
-  createdAt DateTime @default(now())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("email_verification_tokens")
 }

@@ -1,129 +1,100 @@
-import { prisma } from "@/lib/prisma";
-import { gigFiltersSchema } from "@/lib/zodSchemas";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { Suspense } from "react";
-import { EmptyState } from "@/components/ui/EmptyState";
-import { HeroBackground } from "@/components/ui/HeroBackground";
-import { GigFilters } from "./GigFilters";
+"use client";
 
-type SearchParams = Record<string, string | string[] | undefined>;
+import { useMemo, useState } from "react";
+import { GigCard } from "@/components/GigCard";
+import { gigs } from "@/lib/sample";
 
-function stringifySearchParams(searchParams: SearchParams) {
-  const params = new URLSearchParams();
+const typeOptions = [
+  { value: "all", label: "All" },
+  { value: "open", label: "Open Mic" },
+  { value: "booked", label: "Booked" }
+] as const;
 
-  for (const [key, value] of Object.entries(searchParams)) {
-    if (typeof value === "undefined") {
-      continue;
-    }
+export default function GigsPage() {
+  const [cityFilter, setCityFilter] = useState("");
+  const [dateFilter, setDateFilter] = useState("");
+  const [typeFilter, setTypeFilter] = useState<(typeof typeOptions)[number]["value"]>("all");
 
-    if (Array.isArray(value)) {
-      for (const item of value) {
-        params.append(key, item);
-      }
-    } else {
-      params.set(key, value);
-    }
-  }
+  const filteredGigs = useMemo(() => {
+    return gigs.filter((gig) => {
+      const matchesCity = cityFilter
+        ? gig.city.toLowerCase().includes(cityFilter.trim().toLowerCase())
+        : true;
+      const matchesDate = dateFilter ? new Date(gig.dateISO) >= new Date(dateFilter) : true;
+      const matchesType =
+        typeFilter === "all" ? true : typeFilter === "open" ? gig.isOpenMic : !gig.isOpenMic;
 
-  return params.toString();
-}
-
-async function GigsList({ searchParams }: { searchParams: SearchParams }) {
-  const parsed = gigFiltersSchema.safeParse(searchParams);
-  const page = parsed.success ? parsed.data.page : 1;
-  const take = 10;
-  const skip = (page - 1) * take;
-
-  const gigs = await prisma.gig.findMany({
-    where: {
-      isPublished: true,
-      title: parsed.success && parsed.data.search ? { contains: parsed.data.search, mode: "insensitive" } : undefined,
-      city: parsed.success && parsed.data.city ? { contains: parsed.data.city, mode: "insensitive" } : undefined,
-      state: parsed.success && parsed.data.state ? parsed.data.state : undefined,
-      compensationType: parsed.success ? parsed.data.compensationType ?? undefined : undefined,
-      status: parsed.success ? parsed.data.status ?? undefined : undefined
-    },
-    orderBy: { dateStart: "asc" },
-    skip,
-    take
-  });
-
-  if (gigs.length === 0) {
-    return (
-      <div className="relative overflow-hidden rounded-3xl border border-slate-200/80 bg-slate-50/80">
-        <HeroBackground pattern="jigsaw" />
-        <EmptyState
-          title="No gigs match yet"
-          message="Adjust your filters or check back soon—new shows are posted every week."
-          illustration="events-placeholder.svg"
-          className="border-none bg-white/70 backdrop-blur-sm"
-          actions={
-            <div className="flex flex-wrap gap-3">
-              <Button asChild>
-                <Link href="/post-gig">Post a gig</Link>
-              </Button>
-              <Button asChild variant="outline">
-                <Link href="/gigs">Reset filters</Link>
-              </Button>
-            </div>
-          }
-        />
-      </div>
-    );
-  }
+      return matchesCity && matchesDate && matchesType;
+    });
+  }, [cityFilter, dateFilter, typeFilter]);
 
   return (
-    <div className="grid gap-4">
-      {gigs.map((gig) => (
-        <Card key={gig.id}>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-lg">
-              <Link href={`/gigs/${gig.id}`} className="hover:underline">
-                {gig.title}
-              </Link>
-            </CardTitle>
-            <Badge variant="outline">{gig.compensationType}</Badge>
-          </CardHeader>
-          <CardContent className="space-y-2 text-sm text-slate-600">
-            <p>{gig.description.slice(0, 140)}...</p>
-            <p className="flex gap-2 text-xs uppercase tracking-wide text-slate-500">
-              <span>
-                {gig.city}, {gig.state}
-              </span>
-              <span>Starts {gig.dateStart.toLocaleDateString()}</span>
-            </p>
-          </CardContent>
-        </Card>
-      ))}
+    <div className="space-y-10">
+      <header className="space-y-3 text-center lg:text-left">
+        <h1 className="text-4xl font-manrope">Find the next mic or showcase</h1>
+        <p className="text-base text-base-content/70">
+          Search by city, filter by vibe, and land the perfect stage time across the Pacific Northwest.
+        </p>
+      </header>
+
+      <section className="card border border-base-300 bg-base-200/40">
+        <div className="card-body">
+          <form className="grid gap-4 md:grid-cols-4" aria-label="Gig search filters">
+            <label className="form-control w-full md:col-span-2">
+              <span className="label-text text-sm">City</span>
+              <input
+                type="text"
+                value={cityFilter}
+                onChange={(event) => setCityFilter(event.target.value)}
+                placeholder="Olympia, Seattle, Tacoma..."
+                className="input input-bordered focus:outline-none focus-visible:ring focus-visible:ring-primary/60"
+                aria-label="Filter gigs by city"
+              />
+            </label>
+            <label className="form-control w-full">
+              <span className="label-text text-sm">Date</span>
+              <input
+                type="date"
+                value={dateFilter}
+                onChange={(event) => setDateFilter(event.target.value)}
+                className="input input-bordered focus:outline-none focus-visible:ring focus-visible:ring-primary/60"
+                aria-label="Filter gigs by date"
+              />
+            </label>
+            <label className="form-control w-full">
+              <span className="label-text text-sm">Type</span>
+              <select
+                value={typeFilter}
+                onChange={(event) => setTypeFilter(event.target.value as (typeof typeOptions)[number]["value"])}
+                className="select select-bordered focus:outline-none focus-visible:ring focus-visible:ring-primary/60"
+                aria-label="Filter gigs by type"
+              >
+                {typeOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </form>
+        </div>
+      </section>
+
+      <section aria-live="polite" className="space-y-4">
+        <p className="text-sm text-base-content/70">
+          Showing {filteredGigs.length} {filteredGigs.length === 1 ? "gig" : "gigs"}.
+        </p>
+        <div className="grid gap-6 lg:grid-cols-2">
+          {filteredGigs.map((gig) => (
+            <GigCard key={gig.id} {...gig} />
+          ))}
+        </div>
+        {filteredGigs.length === 0 && (
+          <div className="alert alert-info">
+            <span>No gigs match those filters yet—try adjusting your search.</span>
+          </div>
+        )}
+      </section>
     </div>
-  );
-}
-
-export default function GigsPage({ searchParams }: { searchParams: SearchParams }) {
-  const parsed = gigFiltersSchema.safeParse(searchParams);
-  const initialSearch = parsed.success && parsed.data.search ? parsed.data.search : "";
-  const initialCity = parsed.success && parsed.data.city ? parsed.data.city : "";
-  const initialState = parsed.success && parsed.data.state ? parsed.data.state : "";
-  const searchParamsString = stringifySearchParams(searchParams);
-
-  return (
-    <section className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-semibold">Browse gigs</h1>
-        <p className="text-sm text-slate-600">Filter by location, compensation, and more.</p>
-      </div>
-      <GigFilters
-        initialSearch={initialSearch}
-        initialCity={initialCity}
-        initialState={initialState}
-        searchParamsString={searchParamsString}
-      />
-      <Suspense key={JSON.stringify(searchParams)} fallback={<p>Loading gigs...</p>}>
-        <GigsList searchParams={searchParams} />
-      </Suspense>
-    </section>
   );
 }

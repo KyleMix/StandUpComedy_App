@@ -2,14 +2,32 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  color-scheme: light;
-}
+@layer base {
+  :root {
+    color-scheme: dark;
+    --font-inter: "Inter Variable", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --font-manrope: "Manrope Variable", "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
 
-body {
-  @apply min-h-screen bg-white text-slate-900 antialiased;
-}
+  body {
+    @apply min-h-screen bg-base-100 font-inter text-base-content antialiased;
+  }
 
-a {
-  @apply text-slate-900 underline-offset-4 transition hover:text-slate-600;
+  h1,
+  h2,
+  h3 {
+    @apply font-manrope font-semibold tracking-tight;
+  }
+
+  a {
+    @apply text-primary underline-offset-4 transition hover:text-secondary;
+  }
+
+  .font-inter {
+    font-family: var(--font-inter);
+  }
+
+  .font-manrope {
+    font-family: var(--font-manrope);
+  }
 }

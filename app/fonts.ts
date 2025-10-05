@@ -1,10 +1,5 @@
-import { Inter } from "next/font/google";
-import { Bricolage_Grotesque } from "next/font/google";
+import "@fontsource-variable/inter";
+import "@fontsource-variable/manrope";
 
-export const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
-export const display = Bricolage_Grotesque({
-  subsets: ["latin"],
-  variable: "--font-display",
-  display: "swap",
-  adjustFontFallback: false
-});
+export const interFontClass = "font-inter" as const;
+export const manropeFontClass = "font-manrope" as const;

@@ -271,6 +271,11 @@ function mapGig(record: GigRecord): Gig {
     ...record,
     payoutUsd: record.payoutUsd ?? null,
     minAge: record.minAge ?? null,
+    format: record.format ?? null,
+    setLengthMinutes: record.setLengthMinutes ?? null,
+    audienceDescription: record.audienceDescription ?? null,
+    totalSpots: record.totalSpots ?? null,
+    perks: record.perks ?? [],
     dateStart: new Date(record.dateStart),
     dateEnd: toDate(record.dateEnd),
     createdAt: new Date(record.createdAt),
@@ -722,6 +727,11 @@ export async function createGig(input: CreateGigInput): Promise<Gig> {
     minAge: input.minAge ?? null,
     isPublished: input.isPublished ?? false,
     status: input.status,
+    format: input.format ? sanitizeHtml(input.format) : null,
+    setLengthMinutes: input.setLengthMinutes ?? null,
+    audienceDescription: input.audienceDescription ? sanitizeHtml(input.audienceDescription) : null,
+    totalSpots: input.totalSpots ?? null,
+    perks: Array.isArray(input.perks) ? input.perks.map((perk) => sanitizeHtml(perk)) : [],
     createdAt: now,
     updatedAt: now
   };
@@ -748,6 +758,13 @@ export async function updateGig(id: string, data: Partial<Omit<GigRecord, "id" |
   if (data.minAge !== undefined) record.minAge = data.minAge;
   if (data.isPublished !== undefined) record.isPublished = data.isPublished;
   if (data.status !== undefined) record.status = data.status;
+  if (data.format !== undefined) record.format = data.format ? sanitizeHtml(data.format) : null;
+  if (data.setLengthMinutes !== undefined) record.setLengthMinutes = data.setLengthMinutes ?? null;
+  if (data.audienceDescription !== undefined)
+    record.audienceDescription = data.audienceDescription ? sanitizeHtml(data.audienceDescription) : null;
+  if (data.totalSpots !== undefined) record.totalSpots = data.totalSpots ?? null;
+  if (data.perks !== undefined)
+    record.perks = Array.isArray(data.perks) ? data.perks.map((perk) => sanitizeHtml(perk)) : [];
   record.updatedAt = nowIso();
   await persist(snapshot);
   return mapGig(record);
@@ -764,6 +781,14 @@ export async function listApplicationsForUser(userId: string): Promise<Applicati
   return snapshot.applications
     .filter((application) => application.comedianUserId === userId)
     .map(mapApplication);
+}
+
+export async function countActiveApplicationsForGig(gigId: string): Promise<number> {
+  const snapshot = await loadSnapshot();
+  const activeStatuses: ApplicationStatus[] = ["SUBMITTED", "SHORTLISTED", "ACCEPTED"];
+  return snapshot.applications.filter(
+    (application) => application.gigId === gigId && activeStatuses.includes(application.status)
+  ).length;
 }
 
 export async function listGigsForUser(userId: string): Promise<Gig[]> {

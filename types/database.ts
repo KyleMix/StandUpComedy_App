@@ -122,6 +122,11 @@ export interface GigRecord {
   minAge: number | null;
   isPublished: boolean;
   status: GigStatus;
+  format: string | null;
+  setLengthMinutes: number | null;
+  audienceDescription: string | null;
+  totalSpots: number | null;
+  perks: string[];
   createdAt: string;
   updatedAt: string;
 }

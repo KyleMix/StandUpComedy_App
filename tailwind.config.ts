@@ -4,55 +4,56 @@ import animatePlugin from "tailwindcss-animate";
 import daisyui from "daisyui";
 
 const config: Config = {
-  content: ["./app/**/*.{js,ts,jsx,tsx}", "./components/**/*.{js,ts,jsx,tsx}"],
+  darkMode: ["class"],
+  content: [
+    "./app/**/*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}",
+    "./pages/**/*.{ts,tsx}",
+    "./src/**/*.{ts,tsx}"
+  ],
   theme: {
     extend: {
       fontFamily: {
-        sans: ["var(--font-inter)", ...defaultTheme.fontFamily.sans],
-        display: ["var(--font-display)", ...defaultTheme.fontFamily.sans]
+        inter: ["var(--font-inter)", ...defaultTheme.fontFamily.sans],
+        manrope: ["var(--font-manrope)", ...defaultTheme.fontFamily.sans],
+        sans: ["var(--font-inter)", ...defaultTheme.fontFamily.sans]
       },
-      colors: {
-        brand: {
-          DEFAULT: "#0f172a",
-          dark: "#0b1120",
-          light: "#1e293b"
+      container: {
+        center: true,
+        padding: {
+          DEFAULT: "1rem",
+          sm: "1.5rem",
+          lg: "2rem",
+          xl: "3rem"
         }
       },
-      keyframes: {
-        "accordion-down": {
-          from: { height: "0" },
-          to: { height: "var(--radix-accordion-content-height)" }
-        },
-        "accordion-up": {
-          from: { height: "var(--radix-accordion-content-height)" },
-          to: { height: "0" }
-        }
-      },
-      animation: {
-        "accordion-down": "accordion-down 0.2s ease-out",
-        "accordion-up": "accordion-up 0.2s ease-out"
+      backgroundImage: {
+        "grid-dots": "radial-gradient(currentColor 1px, transparent 1px)"
       }
     }
   },
   daisyui: {
     themes: [
       {
-        standup: {
-          primary: "#0f172a",
-          "primary-content": "#f8fafc",
-          secondary: "#1e293b",
-          accent: "#f97316",
-          neutral: "#0b1120",
-          "base-100": "#ffffff",
-          "base-200": "#f1f5f9",
-          "base-300": "#e2e8f0",
-          info: "#0ea5e9",
-          success: "#22c55e",
-          warning: "#facc15",
-          error: "#ef4444"
+        thefunny: {
+          primary: "#FFD166",
+          "primary-content": "#1F2937",
+          secondary: "#6C63FF",
+          "secondary-content": "#F9FAFB",
+          accent: "#06D6A0",
+          "accent-content": "#0B0F15",
+          neutral: "#1F2937",
+          "neutral-content": "#F9FAFB",
+          "base-100": "#0B0F15",
+          "base-200": "#131A24",
+          "base-300": "#1B2430",
+          "base-content": "#E5E7EB",
+          info: "#38BDF8",
+          success: "#22C55E",
+          warning: "#F59E0B",
+          error: "#EF4444"
         }
       },
-      "light",
       "dark"
     ]
   },

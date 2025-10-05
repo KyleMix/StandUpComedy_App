@@ -1,20 +1,35 @@
+import type { Metadata } from "next";
 import "./globals.css";
-import { Navbar } from "@/components/navbar";
-import { ReactNode } from "react";
-import { inter } from "./fonts";
+import { Footer } from "@/components/Footer";
+import { Navbar } from "@/components/Navbar";
+import { interFontClass } from "./fonts";
+import type { ReactNode } from "react";
 
-export const metadata = {
-  title: "the-funny",
-  description: "A simple workspace for planning comedy shows.",
+export const metadata: Metadata = {
+  title: "The Funny — Find Gigs, Book Comics, Pack Rooms",
+  description: "Discover stand-up comedy gigs, connect with comedians, and keep every room packed with laughs.",
+  openGraph: {
+    title: "The Funny — Find Gigs, Book Comics, Pack Rooms",
+    description: "Discover stand-up comedy gigs, connect with comedians, and keep every room packed with laughs.",
+    type: "website"
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "The Funny — Find Gigs, Book Comics, Pack Rooms",
+    description: "Discover stand-up comedy gigs, connect with comedians, and keep every room packed with laughs."
+  }
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className={inter.variable}>
-      <body className="bg-white text-slate-900 antialiased">
+    <html lang="en" suppressHydrationWarning>
+      <body data-theme="thefunny" className={`min-h-screen bg-base-100 text-base-content ${interFontClass}`}>
         <div className="flex min-h-screen flex-col">
           <Navbar />
-          <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-12 sm:px-6 lg:px-8">{children}</main>
+          <main className="flex-1">
+            <div className="container py-12 md:py-16">{children}</div>
+          </main>
+          <Footer />
         </div>
       </body>
     </html>

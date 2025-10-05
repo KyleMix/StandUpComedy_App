@@ -29,7 +29,7 @@ import {
   updateVenueProfile,
   deleteGig
 } from "@/lib/dataStore";
-import { PrismaClient } from "@prisma/client";
+import { getPrismaClient, isDatabaseEnabled } from "@/lib/db/client";
 import type {
   Application,
   ComedianAppearance,
@@ -43,6 +43,44 @@ import type {
   VenueProfile
 } from "@/lib/dataStore";
 import type { ApplicationStatus, GigCompensationType, GigStatus, Role, VerificationStatus } from "@/lib/prismaEnums";
+import type { PrismaClient } from "@prisma/client";
+
+type DatabaseClient = Pick<
+  PrismaClient,
+  "openMic" | "ingestLog" | "$transaction" | "$disconnect" | "$connect"
+>;
+
+const databaseUnavailableMessage =
+  "Prisma database access is not available because DATABASE_URL is not configured.";
+
+function createMissingDelegateProxy<T extends object>(name: string): T {
+  return new Proxy(
+    {},
+    {
+      get() {
+        return () => {
+          throw new Error(`${databaseUnavailableMessage} (Attempted to use prisma.${name})`);
+        };
+      }
+    }
+  ) as T;
+}
+
+const missingDatabaseClient: DatabaseClient = {
+  openMic: createMissingDelegateProxy<PrismaClient["openMic"]>("openMic"),
+  ingestLog: createMissingDelegateProxy<PrismaClient["ingestLog"]>("ingestLog"),
+  $transaction: async () => {
+    throw new Error(databaseUnavailableMessage);
+  },
+  $disconnect: async () => {
+    // No database connection to close when running in JSON datastore mode.
+  },
+  $connect: async () => {
+    throw new Error(databaseUnavailableMessage);
+  }
+};
+
+const prismaClient: DatabaseClient = isDatabaseEnabled() ? getPrismaClient() : missingDatabaseClient;
 
 type VerificationUserInclude = true | { include?: { promoter?: boolean; venue?: boolean } };
 
@@ -235,11 +273,6 @@ async function hydrateComedianProfile(
     result.appearances = appearances;
   }
   return result;
-}
-
-const prismaClient: PrismaClient & { __patched?: true } = (globalThis as any).__prismaClient ?? new PrismaClient();
-if (process.env.NODE_ENV !== "production") {
-  (globalThis as any).__prismaClient = prismaClient;
 }
 
 export const prisma = {

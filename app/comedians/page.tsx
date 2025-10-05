@@ -84,7 +84,7 @@ export default async function ComediansPage() {
                 </div>
                 {location && (
                   <p className="flex items-center gap-1 text-xs text-slate-500">
-                    <Icon name="MapPin" className="h-3.5 w-3.5 text-brand" />
+                    <Icon name="MapPinIcon" set="hero-outline" className="h-3.5 w-3.5 text-brand" />
                     {location}
                     {comedian.travelRadiusMiles ? ` • Travels ${comedian.travelRadiusMiles} mi` : null}
                   </p>
@@ -133,7 +133,7 @@ export default async function ComediansPage() {
                           >
                             <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-brand/10 text-brand">
                               {video.platform === "YOUTUBE" ? (
-                                <Icon name="Play" className="h-3.5 w-3.5" />
+                                <Icon name="PlayCircleIcon" set="hero-solid" className="h-3.5 w-3.5" />
                               ) : (
                                 <Icon name="Video" className="h-3.5 w-3.5" />
                               )}

@@ -1,4 +1,6 @@
-import { auth } from "@/lib/auth";
+import { redirect } from "next/navigation";
+import { auth, signOut } from "@/lib/auth";
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 const links = [
@@ -6,6 +8,12 @@ const links = [
   { href: "/gigs", label: "Gigs" },
   { href: "/comedians", label: "Comedians" },
 ];
+
+async function handleSignOut() {
+  "use server";
+  await signOut();
+  redirect("/");
+}
 
 export async function Navbar() {
   const session = await auth();
@@ -34,6 +42,11 @@ export async function Navbar() {
               <Link href="/dashboard" className="font-medium text-slate-900 transition hover:text-slate-600">
                 Open workspace
               </Link>
+              <form action={handleSignOut}>
+                <Button type="submit" variant="outline" size="sm">
+                  Sign out
+                </Button>
+              </form>
             </>
           ) : (
             <Link href="/auth/sign-in" className="font-medium text-slate-900 transition hover:text-slate-600">

@@ -1,6 +1,7 @@
 import type { Config } from "tailwindcss";
 import defaultTheme from "tailwindcss/defaultTheme";
 import animatePlugin from "tailwindcss-animate";
+import daisyui from "daisyui";
 
 const config: Config = {
   content: ["./app/**/*.{js,ts,jsx,tsx}", "./components/**/*.{js,ts,jsx,tsx}"],
@@ -33,7 +34,29 @@ const config: Config = {
       }
     }
   },
-  plugins: [animatePlugin]
+  daisyui: {
+    themes: [
+      {
+        standup: {
+          primary: "#0f172a",
+          "primary-content": "#f8fafc",
+          secondary: "#1e293b",
+          accent: "#f97316",
+          neutral: "#0b1120",
+          "base-100": "#ffffff",
+          "base-200": "#f1f5f9",
+          "base-300": "#e2e8f0",
+          info: "#0ea5e9",
+          success: "#22c55e",
+          warning: "#facc15",
+          error: "#ef4444"
+        }
+      },
+      "light",
+      "dark"
+    ]
+  },
+  plugins: [animatePlugin, daisyui]
 };
 
 export default config;

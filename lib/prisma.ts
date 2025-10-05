@@ -29,7 +29,6 @@ import {
   updateVenueProfile,
   deleteGig
 } from "@/lib/dataStore";
-import { PrismaClient } from "@prisma/client";
 import type {
   Application,
   ComedianAppearance,
@@ -235,11 +234,6 @@ async function hydrateComedianProfile(
     result.appearances = appearances;
   }
   return result;
-}
-
-const prismaClient: PrismaClient & { __patched?: true } = (globalThis as any).__prismaClient ?? new PrismaClient();
-if (process.env.NODE_ENV !== "production") {
-  (globalThis as any).__prismaClient = prismaClient;
 }
 
 export const prisma = {

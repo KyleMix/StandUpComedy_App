@@ -27,7 +27,8 @@ import {
   updatePromoterProfile,
   updateVerificationRequest,
   updateVenueProfile,
-  deleteGig
+  deleteGig,
+  countActiveApplicationsForGig
 } from "@/lib/dataStore";
 import { getPrismaClient, isDatabaseEnabled } from "@/lib/db/client";
 import type {
@@ -167,6 +168,11 @@ interface CreateGigArgs {
     minAge: number | null;
     isPublished: boolean;
     status: GigStatus;
+    format: string | null;
+    setLengthMinutes: number | null;
+    audienceDescription: string | null;
+    totalSpots: number | null;
+    perks: string[] | null;
   };
 }
 
@@ -468,6 +474,12 @@ export const prisma = {
         message: args.data.message,
         status: args.data.status
       });
+    },
+    async count(args: { where?: { gigId?: string } } = {}) {
+      if (args.where?.gigId) {
+        return countActiveApplicationsForGig(args.where.gigId);
+      }
+      throw new Error("Application.count requires a gigId filter when using the JSON datastore.");
     },
     async findUnique<IncludeGig extends boolean | undefined = undefined>(
       args: { where: { id: string }; include?: { gig?: IncludeGig } }

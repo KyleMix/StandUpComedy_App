@@ -209,12 +209,21 @@
       "timezone": "America/Chicago",
       "city": "Chicago",
       "state": "IL",
-      "minAge": 21,
-      "isPublished": true,
-      "status": "OPEN",
-      "createdAt": "2024-03-15T12:00:00.000Z",
-      "updatedAt": "2024-03-15T12:00:00.000Z"
-    },
+    "minAge": 21,
+    "isPublished": true,
+    "status": "OPEN",
+    "format": "Booker-curated showcase with host and closer.",
+    "setLengthMinutes": 10,
+    "audienceDescription": "120-seat River North club with a lively, comedy-savvy crowd.",
+    "totalSpots": 6,
+    "perks": [
+      "Professional photos from our staff photographer",
+      "Drink ticket for you and a guest",
+      "Private green room stocked with snacks"
+    ],
+    "createdAt": "2024-03-15T12:00:00.000Z",
+    "updatedAt": "2024-03-15T12:00:00.000Z"
+  },
     {
       "id": "gig-2",
       "createdByUserId": "user-promoter",
@@ -227,12 +236,21 @@
       "timezone": "America/Chicago",
       "city": "Chicago",
       "state": "IL",
-      "minAge": 18,
-      "isPublished": true,
-      "status": "OPEN",
-      "createdAt": "2024-03-18T12:00:00.000Z",
-      "updatedAt": "2024-03-18T12:00:00.000Z"
-    },
+    "minAge": 18,
+    "isPublished": true,
+    "status": "OPEN",
+    "format": "45-minute happy hour spot before a keynote speaker.",
+    "setLengthMinutes": 20,
+    "audienceDescription": "Corporate professionals unwinding with cocktails at the client's downtown office.",
+    "totalSpots": 1,
+    "perks": [
+      "On-site AV tech and wireless mic provided",
+      "Private parking voucher",
+      "Post-show meet and greet with executives"
+    ],
+    "createdAt": "2024-03-18T12:00:00.000Z",
+    "updatedAt": "2024-03-18T12:00:00.000Z"
+  },
     {
       "id": "gig-3",
       "createdByUserId": "user-venue",
@@ -245,12 +263,21 @@
       "timezone": "America/Denver",
       "city": "Denver",
       "state": "CO",
-      "minAge": 21,
-      "isPublished": false,
-      "status": "OPEN",
-      "createdAt": "2024-03-20T12:00:00.000Z",
-      "updatedAt": "2024-03-20T12:00:00.000Z"
-    }
+    "minAge": 21,
+    "isPublished": false,
+    "status": "OPEN",
+    "format": "Weekly bucket-draw open mic hosted by the venue team.",
+    "setLengthMinutes": 5,
+    "audienceDescription": "Chill neighborhood crowd of comics and locals grabbing late-night drinks.",
+    "totalSpots": 25,
+    "perks": [
+      "Half-price appetizers for performers",
+      "Sign-up starts 30 minutes before showtime",
+      "Priority re-draw if you bring two guests"
+    ],
+    "createdAt": "2024-03-20T12:00:00.000Z",
+    "updatedAt": "2024-03-20T12:00:00.000Z"
+  }
   ],
   "applications": [
     {

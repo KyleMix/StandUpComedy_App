@@ -68,23 +68,26 @@ enum VerificationStatus {
 }
 
 model User {
-  id           String    @id @default(cuid())
-  email        String    @unique
+  id           String   @id @default(cuid())
+  email        String   @unique
   passwordHash String
-  role         Role      @default(FAN)
-  createdAt    DateTime  @default(now())
+  role         Role     @default(FAN)
+  createdAt    DateTime @default(now())
 
   profile              Profile?
-  ownedVenues          Venue[]       @relation("VenueOwner")
+  ownedVenues          Venue[]                  @relation("VenueOwner")
   promoter             Promoter?
-  gigsCreated          Gig[]         @relation("GigPromoter")
-  applications         Application[] @relation("GigApplications")
-  bookings             Booking[]     @relation("GigBookings")
+  gigsCreated          Gig[]                    @relation("GigPromoter")
+  applications         Application[]            @relation("GigApplications")
+  bookings             Booking[]                @relation("GigBookings")
   verificationRequests VerificationRequest[]
-  messagesSent         Message[]     @relation("MessageSender")
-  messagesReceived     Message[]     @relation("MessageRecipient")
-  reviewedRequests     VerificationRequest[] @relation("VerificationReviewer")
+  messagesSent         Message[]                @relation("MessageSender")
+  messagesReceived     Message[]                @relation("MessageRecipient")
+  reviewedRequests     VerificationRequest[]    @relation("VerificationReviewer")
   emailTokens          EmailVerificationToken[]
+  communityPosts       CommunityPost[]
+  communityReplies     CommunityReply[]
+  communityVotes       CommunityVote[]
 
   @@map("users")
 }
@@ -105,75 +108,77 @@ model Profile {
 }
 
 model Venue {
-  id        String   @id @default(cuid())
-  ownerId   String
-  name      String
-  address   String?
-  lat       Float?
-  lng       Float?
-  phone     String?
-  website   String?
-  gigs      Gig[]
-  owner     User     @relation("VenueOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  id      String  @id @default(cuid())
+  ownerId String
+  name    String
+  address String?
+  lat     Float?
+  lng     Float?
+  phone   String?
+  website String?
+  gigs    Gig[]
+  owner   User    @relation("VenueOwner", fields: [ownerId], references: [id], onDelete: Cascade)
 
   @@map("venues")
 }
 
 model Promoter {
-  id      String @id @default(cuid())
-  userId  String @unique
+  id      String  @id @default(cuid())
+  userId  String  @unique
   orgName String?
   website String?
-  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   gigs    Gig[]
 
   @@map("promoters")
 }
 
 model Gig {
-  id             String    @id @default(cuid())
-  type           GigType   @default(OPEN_MIC)
+  id             String       @id @default(cuid())
+  type           GigType      @default(OPEN_MIC)
   title          String
   description    String
   venueId        String?
   promoterId     String?
+  creatorId      String?
   startsAt       DateTime
   endsAt         DateTime?
-  isRecurring    Boolean   @default(false)
+  isRecurring    Boolean      @default(false)
   recurrenceRule String?
   payMin         Int?
   payMax         Int?
-  bringer        Boolean   @default(false)
+  bringer        Boolean      @default(false)
   signUpMethod   SignUpMethod @default(WALKUP)
   externalUrl    String?
-  status         GigStatus @default(DRAFT)
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  status         GigStatus    @default(DRAFT)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
 
-  venue          Venue?    @relation(fields: [venueId], references: [id])
-  promoter       Promoter? @relation(fields: [promoterId], references: [id])
-  applications   Application[]
-  bookings       Booking[]
-  leads          Lead[]
+  venue        Venue?        @relation(fields: [venueId], references: [id])
+  promoter     Promoter?     @relation(fields: [promoterId], references: [id])
+  creator      User?         @relation("GigPromoter", fields: [creatorId], references: [id])
+  applications Application[]
+  bookings     Booking[]
+  leads        Lead[]
 
-  @@map("gigs")
   @@index([status])
   @@index([type, status])
+  @@map("gigs")
 }
 
 model Application {
-  id          String            @id @default(cuid())
-  gigId       String
-  comedianId  String
-  status      ApplicationStatus @default(APPLIED)
-  notes       String?
-  createdAt   DateTime          @default(now())
+  id         String            @id @default(cuid())
+  gigId      String
+  comedianId String
+  status     ApplicationStatus @default(APPLIED)
+  notes      String?
+  createdAt  DateTime          @default(now())
 
-  gig         Gig               @relation(fields: [gigId], references: [id], onDelete: Cascade)
-  comedian    User              @relation("GigApplications", fields: [comedianId], references: [id], onDelete: Cascade)
+  gig      Gig  @relation(fields: [gigId], references: [id], onDelete: Cascade)
+  comedian User @relation("GigApplications", fields: [comedianId], references: [id], onDelete: Cascade)
 
-  @@map("applications")
   @@index([gigId, comedianId])
+  @@map("applications")
 }
 
 model Booking {
@@ -184,66 +189,66 @@ model Booking {
   currency     String?      @default("usd")
   payoutStatus PayoutStatus @default(NONE)
 
-  gig          Gig          @relation(fields: [gigId], references: [id], onDelete: Cascade)
-  comedian     User         @relation("GigBookings", fields: [comedianId], references: [id], onDelete: Cascade)
+  gig      Gig  @relation(fields: [gigId], references: [id], onDelete: Cascade)
+  comedian User @relation("GigBookings", fields: [comedianId], references: [id], onDelete: Cascade)
 
   @@map("bookings")
 }
 
 model VerificationRequest {
-  id          String             @id @default(cuid())
-  userId      String
-  docUrl      String?
-  note        String?
-  status      VerificationStatus @default(PENDING)
-  reviewedBy  String?
-  reviewedAt  DateTime?
+  id         String             @id @default(cuid())
+  userId     String
+  docUrl     String?
+  note       String?
+  status     VerificationStatus @default(PENDING)
+  reviewedBy String?
+  reviewedAt DateTime?
 
-  user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  reviewer    User?              @relation("VerificationReviewer", fields: [reviewedBy], references: [id])
+  user     User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reviewer User? @relation("VerificationReviewer", fields: [reviewedBy], references: [id])
 
   @@map("verification_requests")
 }
 
 model Message {
-  id           String   @id @default(cuid())
-  threadId     String
-  senderId     String
-  recipientId  String
-  body         String
-  createdAt    DateTime @default(now())
+  id          String   @id @default(cuid())
+  threadId    String
+  senderId    String
+  recipientId String
+  body        String
+  createdAt   DateTime @default(now())
 
-  sender       User     @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
-  recipient    User     @relation("MessageRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
+  sender    User @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+  recipient User @relation("MessageRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
 
-  @@map("messages")
   @@index([threadId])
+  @@map("messages")
 }
 
 model Lead {
-  id          String     @id @default(cuid())
-  source      String
-  url         String
-  title       String?
-  raw         Json?
-  normalized  Json?
-  seenHash    String?
-  status      LeadStatus @default(NEW)
-  gigId       String?
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  id         String     @id @default(cuid())
+  source     String
+  url        String
+  title      String?
+  raw        Json?
+  normalized Json?
+  seenHash   String?
+  status     LeadStatus @default(NEW)
+  gigId      String?
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
 
-  gig         Gig?       @relation(fields: [gigId], references: [id])
+  gig Gig? @relation(fields: [gigId], references: [id])
 
   @@unique([url])
   @@map("leads")
 }
 
 model AllowlistSource {
-  id            String  @id @default(cuid())
-  domain        String  @unique
+  id            String    @id @default(cuid())
+  domain        String    @unique
   label         String
-  enabled       Boolean @default(true)
+  enabled       Boolean   @default(true)
   lastCheckedAt DateTime?
 
   @@map("allowlist_sources")
@@ -255,7 +260,7 @@ model EmailVerificationToken {
   token     String   @unique
   expiresAt DateTime
 
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("email_verification_tokens")
 }
@@ -274,4 +279,64 @@ model AdSlot {
 
   @@index([page, placement, active])
   @@map("ad_slots")
+}
+
+enum CommunityVoteValue {
+  DOWN
+  NEUTRAL
+  UP
+}
+
+model CommunityPost {
+  id        String   @id @default(cuid())
+  authorId  String
+  title     String
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  score     Int      @default(0)
+
+  author  User             @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  replies CommunityReply[]
+  votes   CommunityVote[]
+
+  @@index([createdAt])
+  @@map("community_posts")
+}
+
+model CommunityReply {
+  id        String   @id @default(cuid())
+  postId    String
+  authorId  String
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  score     Int      @default(0)
+
+  post   CommunityPost   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  author User            @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  votes  CommunityVote[]
+
+  @@index([postId, createdAt])
+  @@map("community_replies")
+}
+
+model CommunityVote {
+  id            String             @id @default(cuid())
+  targetPostId  String?
+  targetReplyId String?
+  userId        String
+  value         CommunityVoteValue @default(NEUTRAL)
+  createdAt     DateTime           @default(now())
+
+  post  CommunityPost?  @relation(fields: [targetPostId], references: [id], onDelete: Cascade)
+  reply CommunityReply? @relation(fields: [targetReplyId], references: [id], onDelete: Cascade)
+  user  User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, targetPostId], map: "uniq_vote_post")
+  @@unique([userId, targetReplyId], map: "uniq_vote_reply")
+  @@index([userId])
+  @@index([targetPostId])
+  @@index([targetReplyId])
+  @@map("community_votes")
 }

@@ -1,6 +1,8 @@
 import { z } from "zod";
 import {
   ApplicationStatus,
+  BookingStatus,
+  CancellationPolicy,
   GigCompensationType,
   GigStatus,
   Role,
@@ -136,6 +138,44 @@ export const communityBoardMessageUpdateSchema = z
     isPinned: z.boolean().optional(),
   })
   .refine((value) => Object.keys(value).length > 0, { message: "Provide at least one field to update" });
+
+export const offerCreateSchema = z.object({
+  threadId: z.string().trim().min(1),
+  amount: z.number().int().positive(),
+  currency: z
+    .string()
+    .trim()
+    .length(3)
+    .transform((value) => value.toUpperCase())
+    .optional(),
+  terms: z.string().trim().min(1),
+  eventDateISO: z.string().datetime(),
+  expiresAtISO: z.string().datetime().optional(),
+});
+
+export const offerStatusSchema = z.object({
+  status: z.enum(["PENDING", "ACCEPTED", "DECLINED", "EXPIRED"] as const),
+  gigId: z.string().trim().min(1).optional(),
+  comedianId: z.string().trim().min(1).optional(),
+  promoterId: z.string().trim().min(1).optional(),
+});
+
+export const bookingCreateSchema = z.object({
+  gigId: z.string().trim().min(1),
+  comedianId: z.string().trim().min(1),
+  promoterId: z.string().trim().min(1),
+  offerId: z.string().trim().min(1),
+});
+
+export const bookingUpdateSchema = z
+  .object({
+    status: z.nativeEnum(BookingStatus).optional(),
+    payoutProtection: z.boolean().optional(),
+    cancellationPolicy: z.nativeEnum(CancellationPolicy).optional(),
+  })
+  .refine((value) => Object.keys(value).length > 0, {
+    message: "Provide at least one field to update",
+  });
 
 export const loginSchema = z.object({
   email: z.string().email(),

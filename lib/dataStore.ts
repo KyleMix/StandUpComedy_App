@@ -1510,6 +1510,14 @@ export async function listBookingsForComedian(userId: string): Promise<Booking[]
     .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
 }
 
+export async function listBookingsForPromoter(userId: string): Promise<Booking[]> {
+  const snapshot = await loadSnapshot();
+  return snapshot.bookings
+    .filter((booking) => booking.promoterId === userId)
+    .map(mapBooking)
+    .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+}
+
 export async function updateBooking(
   bookingId: string,
   data: Partial<Omit<BookingRecord, "id" | "gigId" | "comedianId" | "promoterId" | "offerId" | "createdAt">>

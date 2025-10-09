@@ -184,7 +184,7 @@
       "city": "Portland",
       "state": "OR",
       "performedAt": "2024-03-05T21:00:00.000Z",
-      "gigId": "gig-portland-past"
+      "gigId": null
     }
   ],
   "promoterProfiles": [
@@ -216,230 +216,16 @@
       "updatedAt": "2024-04-01T10:00:00.000Z"
     }
   ],
-  "gigs": [
-    {
-      "id": "gig-seattle-showcase",
-      "createdByUserId": "user-promoter",
-      "title": "Waterfront Weekend Showcase",
-      "description": "Book a headliner for a high-energy Saturday night showcase in Seattle.",
-      "compensationType": "FLAT",
-      "payoutUsd": 500,
-      "dateStart": "2024-06-15T03:00:00.000Z",
-      "dateEnd": null,
-      "timezone": "America/Los_Angeles",
-      "city": "Seattle",
-      "state": "WA",
-      "minAge": 21,
-      "isPublished": true,
-      "status": "OPEN",
-      "format": "Club Showcase",
-      "setLengthMinutes": 25,
-      "audienceDescription": "200-seat club audience looking for polished acts.",
-      "totalSpots": 1,
-      "perks": [
-        "Hotel provided",
-        "Ground transportation"
-      ],
-      "createdAt": "2024-04-10T09:00:00.000Z",
-      "updatedAt": "2024-04-25T09:00:00.000Z"
-    },
-    {
-      "id": "gig-portland-open",
-      "createdByUserId": "user-venue",
-      "title": "Portland Brewery Comedy Night",
-      "description": "Seeking a clean comic for a Friday brewery crowd with family-friendly vibes.",
-      "compensationType": "FLAT",
-      "payoutUsd": 350,
-      "dateStart": "2024-06-21T02:00:00.000Z",
-      "dateEnd": null,
-      "timezone": "America/Los_Angeles",
-      "city": "Portland",
-      "state": "OR",
-      "minAge": 18,
-      "isPublished": true,
-      "status": "OPEN",
-      "format": "Brewery Show",
-      "setLengthMinutes": 20,
-      "audienceDescription": "Cozy brewery audience who love music and storytelling.",
-      "totalSpots": 1,
-      "perks": [
-        "Meal voucher"
-      ],
-      "createdAt": "2024-04-12T09:00:00.000Z",
-      "updatedAt": "2024-04-24T10:00:00.000Z"
-    },
-    {
-      "id": "gig-portland-past",
-      "createdByUserId": "user-promoter",
-      "title": "Rooftop Spring Finale",
-      "description": "Completed rooftop series closer featuring acoustic comedy and clean sets.",
-      "compensationType": "FLAT",
-      "payoutUsd": 400,
-      "dateStart": "2024-03-05T02:00:00.000Z",
-      "dateEnd": null,
-      "timezone": "America/Los_Angeles",
-      "city": "Portland",
-      "state": "OR",
-      "minAge": 21,
-      "isPublished": true,
-      "status": "CLOSED",
-      "format": "Rooftop Show",
-      "setLengthMinutes": 30,
-      "audienceDescription": "Outdoor rooftop crowd with curated seating.",
-      "totalSpots": 1,
-      "perks": [
-        "Green room snacks"
-      ],
-      "createdAt": "2024-01-25T09:00:00.000Z",
-      "updatedAt": "2024-03-06T09:00:00.000Z"
-    }
-  ],
+  "gigs": [],
   "applications": [],
   "verificationRequests": [],
-  "favorites": [
-    {
-      "id": "favorite-fan-seattle",
-      "userId": "user-fan",
-      "gigId": "gig-seattle-showcase",
-      "venueId": null,
-      "createdAt": "2024-04-22T09:00:00.000Z",
-      "updatedAt": "2024-04-22T09:00:00.000Z"
-    }
-  ],
-  "threads": [
-    {
-      "id": "thread-seattle-offer",
-      "gigId": "gig-seattle-showcase",
-      "createdById": "user-promoter",
-      "participantIds": [
-        "user-promoter",
-        "user-comic1"
-      ],
-      "state": "INQUIRY",
-      "lastMessageAt": "2024-04-28T16:00:00.000Z",
-      "createdAt": "2024-04-20T15:00:00.000Z",
-      "updatedAt": "2024-04-28T16:00:00.000Z"
-    },
-    {
-      "id": "thread-portland-booked",
-      "gigId": "gig-portland-past",
-      "createdById": "user-promoter",
-      "participantIds": [
-        "user-promoter",
-        "user-comic2"
-      ],
-      "state": "BOOKED",
-      "lastMessageAt": "2024-03-06T17:00:00.000Z",
-      "createdAt": "2024-02-20T14:00:00.000Z",
-      "updatedAt": "2024-03-06T17:00:00.000Z"
-    }
-  ],
-  "messages": [
-    {
-      "id": "message-seattle-intro",
-      "threadId": "thread-seattle-offer",
-      "senderId": "user-promoter",
-      "kind": "TEXT",
-      "body": "Hey Casey! We'd love to have you headline our waterfront showcase.",
-      "fileUrl": null,
-      "offerId": null,
-      "createdAt": "2024-04-20T15:00:00.000Z"
-    },
-    {
-      "id": "message-seattle-details",
-      "threadId": "thread-seattle-offer",
-      "senderId": "user-promoter",
-      "kind": "TEXT",
-      "body": "Offer sent with set length and budget details.",
-      "fileUrl": null,
-      "offerId": "offer-seattle-casey",
-      "createdAt": "2024-04-20T15:00:00.000Z"
-    },
-    {
-      "id": "message-portland-confirm",
-      "threadId": "thread-portland-booked",
-      "senderId": "user-comic2",
-      "kind": "TEXT",
-      "body": "Excited for the rooftop finale! I'll bring the guitar for a closer.",
-      "fileUrl": null,
-      "offerId": "offer-portland-riley",
-      "createdAt": "2024-02-22T10:00:00.000Z"
-    }
-  ],
-  "offers": [
-    {
-      "id": "offer-seattle-casey",
-      "threadId": "thread-seattle-offer",
-      "fromUserId": "user-promoter",
-      "amount": 500,
-      "currency": "USD",
-      "terms": "25 minute featured set plus meet and greet",
-      "eventDate": "2024-06-15T03:00:00.000Z",
-      "expiresAt": "2024-05-05T12:00:00.000Z",
-      "status": "PENDING",
-      "createdAt": "2024-04-20T15:00:00.000Z"
-    },
-    {
-      "id": "offer-portland-riley",
-      "threadId": "thread-portland-booked",
-      "fromUserId": "user-promoter",
-      "amount": 400,
-      "currency": "USD",
-      "terms": "30 minute rooftop closer, includes travel stipend",
-      "eventDate": "2024-03-05T02:00:00.000Z",
-      "expiresAt": null,
-      "status": "ACCEPTED",
-      "createdAt": "2024-02-20T14:00:00.000Z"
-    }
-  ],
-  "bookings": [
-    {
-      "id": "booking-portland-riley",
-      "gigId": "gig-portland-past",
-      "comedianId": "user-comic2",
-      "promoterId": "user-promoter",
-      "offerId": "offer-portland-riley",
-      "status": "COMPLETED",
-      "payoutProtection": true,
-      "cancellationPolicy": "STANDARD",
-      "paymentIntentId": "pi_demo_portland_riley",
-      "createdAt": "2024-02-22T11:00:00.000Z"
-    }
-  ],
-  "conversationReviews": [
-    {
-      "id": "conversation-review-promoter",
-      "bookingId": "booking-portland-riley",
-      "fromUserId": "user-promoter",
-      "toUserId": "user-comic2",
-      "rating": 5,
-      "body": "Fantastic communication and quick to confirm tech needs.",
-      "visible": true,
-      "createdAt": "2024-03-06T18:00:00.000Z"
-    }
-  ],
-  "reviews": [
-    {
-      "id": "review-promoter-riley",
-      "authorUserId": "user-promoter",
-      "subjectUserId": "user-comic2",
-      "gigId": "gig-portland-past",
-      "rating": 5,
-      "comment": "Riley crushed the rooftop closer with hilarious original songs.",
-      "visible": true,
-      "createdAt": "2024-03-07T12:00:00.000Z"
-    },
-    {
-      "id": "review-fan-riley",
-      "authorUserId": "user-fan",
-      "subjectUserId": "user-comic2",
-      "gigId": "gig-portland-past",
-      "rating": 4,
-      "comment": "Loved the musical closer—can't wait to catch another show!",
-      "visible": true,
-      "createdAt": "2024-03-08T19:00:00.000Z"
-    }
-  ],
+  "favorites": [],
+  "threads": [],
+  "messages": [],
+  "offers": [],
+  "bookings": [],
+  "conversationReviews": [],
+  "reviews": [],
   "reviewReminders": [],
   "availability": [
     {

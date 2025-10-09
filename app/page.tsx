@@ -13,16 +13,15 @@ import { format, formatDistanceToNow } from "date-fns";
 
 import AdSlot from "@/components/ads/AdSlot";
 import { GigCard } from "@/components/GigCard";
+import type { GigCardProps } from "@/components/GigCard";
 import { ComedianAvailabilityCalendar } from "@/components/dashboard/ComedianAvailabilityCalendar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { auth } from "@/lib/auth";
 import { getComedianAvailabilityData } from "@/lib/availability";
+import { listGigMetrics } from "@/lib/dataStore";
 import { prisma } from "@/lib/prisma";
 import { Role } from "@/lib/prismaEnums";
 import { roleLabelMap } from "@/lib/rbac";
-import { gigs } from "@/lib/sample";
-
-const trendingGigs = gigs.slice(0, 4);
 
 type HomeUser = NonNullable<Awaited<ReturnType<typeof prisma.user.findUnique>>>;
 
@@ -51,6 +50,75 @@ type ActivityContent = {
   empty: string;
   items: ActivityItem[];
 };
+
+function formatGigLocation(city: string | null | undefined, state: string | null | undefined): string {
+  const parts = [city, state].filter((value): value is string => Boolean(value && value.trim().length > 0));
+  return parts.join(", ");
+}
+
+function summariseGigDescription(description: string | null | undefined, format: string | null | undefined): string | null {
+  if (format && format.trim().length > 0) {
+    return format.trim();
+  }
+  if (!description) {
+    return null;
+  }
+  const trimmed = description.trim();
+  if (trimmed.length === 0) {
+    return null;
+  }
+  if (trimmed.length <= 140) {
+    return trimmed;
+  }
+  return `${trimmed.slice(0, 137)}...`;
+}
+
+async function loadTrendingGigCards(): Promise<GigCardProps[]> {
+  const [gigRecords, metrics] = await Promise.all([
+    prisma.gig.findMany({
+      where: { isPublished: true },
+      orderBy: { dateStart: "asc" },
+      take: 4
+    }),
+    listGigMetrics()
+  ]);
+
+  const metricsByGigId = new Map(metrics.map((metric) => [metric.gigId, metric]));
+
+  return gigRecords.map((gig) => {
+    const metric = metricsByGigId.get(gig.id);
+    const tags: string[] = [];
+    if (!gig.isPublished) {
+      tags.push("draft");
+    }
+    if (gig.status) {
+      tags.push(gig.status.toLowerCase());
+    }
+    if (metric?.bookings) {
+      tags.push("booked");
+    }
+    if (metric?.pendingApplications) {
+      tags.push("pending");
+    }
+
+    return {
+      id: gig.id,
+      title: gig.title,
+      location: formatGigLocation(gig.city, gig.state),
+      dateISO: gig.dateStart.toISOString(),
+      timezone: gig.timezone,
+      summary: summariseGigDescription(gig.description, gig.format),
+      status: gig.status,
+      isPublished: gig.isPublished,
+      compensationType: gig.compensationType,
+      payoutUsd: gig.payoutUsd,
+      totalSpots: gig.totalSpots,
+      applicationsCount: metric?.totalApplications ?? null,
+      favoritesCount: metric?.favorites ?? null,
+      tags,
+    } satisfies GigCardProps;
+  });
+}
 
 const roleMessages: Record<Role, string> = {
   [Role.COMEDIAN]: "Your applications, saved shows, and open mics are all in one place.",
@@ -483,23 +551,37 @@ function HeroShell({ children }: { children: React.ReactNode }) {
   );
 }
 
-function TrendingSection({ heading, description }: { heading: string; description: string }) {
+function TrendingSection({
+  heading,
+  description,
+  gigs
+}: {
+  heading: string;
+  description: string;
+  gigs: GigCardProps[];
+}) {
   return (
     <section className="space-y-6">
       <div className="flex flex-col gap-3 text-center lg:text-left">
         <h2 className="text-3xl font-manrope">{heading}</h2>
         <p className="text-base text-base-content/70">{description}</p>
       </div>
-      <div className="grid gap-6 md:grid-cols-2">
-        {trendingGigs.map((gig) => (
-          <GigCard key={gig.id} {...gig} />
-        ))}
-      </div>
+      {gigs.length === 0 ? (
+        <div className="rounded-lg border border-base-300 bg-base-200/60 p-6 text-center text-sm text-base-content/70">
+          No gigs are published yet. Post a show to populate trends.
+        </div>
+      ) : (
+        <div className="grid gap-6 md:grid-cols-2">
+          {gigs.map((gig) => (
+            <GigCard key={gig.id} {...gig} />
+          ))}
+        </div>
+      )}
     </section>
   );
 }
 
-function PublicHome() {
+function PublicHome({ trendingGigs }: { trendingGigs: GigCardProps[] }) {
   return (
     <div className="space-y-16">
       <AdSlot page="home" placement="top" />
@@ -535,6 +617,7 @@ function PublicHome() {
       <TrendingSection
         heading="Trending Gigs"
         description="Fresh shows from Olympia, Tacoma, Seattle, and Portland to keep your calendar hot."
+        gigs={trendingGigs}
       />
     </div>
   );
@@ -542,9 +625,10 @@ function PublicHome() {
 
 export default async function HomePage() {
   const session = await auth();
+  const trendingGigCards = await loadTrendingGigCards();
 
   if (!session?.user) {
-    return <PublicHome />;
+    return <PublicHome trendingGigs={trendingGigCards} />;
   }
 
   const user = await prisma.user.findUnique({
@@ -560,7 +644,7 @@ export default async function HomePage() {
   });
 
   if (!user) {
-    return <PublicHome />;
+    return <PublicHome trendingGigs={trendingGigCards} />;
   }
 
   const firstName = getFirstName(user.name ?? null, user.email);
@@ -600,7 +684,11 @@ export default async function HomePage() {
 
       <ActivitySection data={content.activity} />
 
-      <TrendingSection heading={content.trendingHeading} description={content.trendingDescription} />
+      <TrendingSection
+        heading={content.trendingHeading}
+        description={content.trendingDescription}
+        gigs={trendingGigCards}
+      />
     </div>
   );
 }

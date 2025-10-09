@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { listGigMetrics } from "@/lib/dataStore";
 import { canPublishGig } from "@/lib/rbac";
 import { gigFiltersSchema, gigFormSchema } from "@/lib/zodSchemas";
 import { rateLimit } from "@/lib/rateLimit";
@@ -34,8 +35,27 @@ export async function GET(request: Request) {
     orderBy: { dateStart: "asc" }
   });
   const items = matching.slice(skip, skip + take);
+  const metrics = await listGigMetrics();
+  const metricsByGig = new Map(metrics.map((metric) => [metric.gigId, metric]));
+  const itemsWithMetrics = items.map((gig) => ({
+    ...gig,
+    metrics: metricsByGig.get(gig.id) ?? null
+  }));
   return NextResponse.json({
-    items,
+    items: itemsWithMetrics.map((gig) => ({
+      ...gig,
+      metrics: gig.metrics
+        ? {
+            totalApplications: gig.metrics.totalApplications,
+            pendingApplications: gig.metrics.pendingApplications,
+            favorites: gig.metrics.favorites,
+            bookings: gig.metrics.bookings,
+            threads: gig.metrics.threads,
+            messages: gig.metrics.messages,
+            lastActivityAt: gig.metrics.lastActivityAt
+          }
+        : null
+    })),
     page,
     pageSize: take,
     total: matching.length

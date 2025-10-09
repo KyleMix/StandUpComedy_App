@@ -91,6 +91,26 @@ const urlArraySchema = z
   .max(20)
   .optional();
 
+const dataImageRegex = /^data:image\/[a-z0-9.+-]+;base64,[a-z0-9+/=\s]+$/iu;
+const httpImageRegex = /^https?:\/\//iu;
+
+export const profileAvatarSchema = z.object({
+  avatar: z
+    .union([
+      z
+        .string()
+        .trim()
+        .min(1, "Upload an image or paste an image URL.")
+        .max(2_500_000, "Avatar images must be smaller than 2.5MB.")
+        .refine(
+          (value) => httpImageRegex.test(value) || dataImageRegex.test(value),
+          "Provide an https image URL or upload an image file."
+        ),
+      z.literal(null),
+    ])
+    .optional(),
+});
+
 const availabilityEntrySchema = z.object({
   id: z
     .string()

@@ -114,7 +114,7 @@ export function ProfileDetails({ profile, allProfiles }: ProfileDetailsProps) {
             <img
               src={displayAvatar}
               alt={profile.displayName}
-              className="h-24 w-24 rounded-full border border-base-300/60 bg-base-100 object-cover"
+              className="h-24 w-24 rounded-xl border border-base-300/60 bg-base-100 object-cover"
             />
             <div className="space-y-2">
               <div>

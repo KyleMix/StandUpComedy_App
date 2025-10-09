@@ -120,7 +120,7 @@ export default async function ProfileDetailPage({ params }: ProfileDetailPagePro
   const latestReviews = reviews.slice(0, 3);
   const reels = [profile.reelUrl, ...profile.reelUrls].filter((url): url is string => Boolean(url));
   const locationParts = [profile.homeCity, profile.homeState].filter((part) => part && part.length > 0);
-  const avatarSrc = avatarFor(profile.stageName, undefined);
+  const avatarSrc = avatarFor(profile.stageName, user?.avatarUrl ?? undefined);
   const upcomingAvailability = profile.availability
     .filter((entry) => entry.date.getTime() >= Date.now())
     .sort((a, b) => a.date.getTime() - b.date.getTime())
@@ -134,7 +134,7 @@ export default async function ProfileDetailPage({ params }: ProfileDetailPagePro
             <img
               src={avatarSrc}
               alt={profile.stageName}
-              className="h-24 w-24 rounded-full border border-slate-200 object-cover"
+              className="h-24 w-24 rounded-xl border border-slate-200 object-cover"
             />
             <div className="space-y-3">
               <div>

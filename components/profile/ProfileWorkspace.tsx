@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { avatarFor } from "@/utils/avatar";
 
 export type ProfileRoleTab = "COMEDIAN" | "PROMOTER" | "VENUE";
 
@@ -112,6 +113,7 @@ export interface ProfileWorkspaceProps {
     name: string | null;
     email: string;
     role: Role;
+    avatarUrl: string | null;
     comedian: ComedianProfilePayload | null;
     promoter: PromoterProfilePayload | null;
     venue: VenueProfilePayload | null;
@@ -233,6 +235,11 @@ function formatTimestamp(date: Date) {
 
 const ProfileWorkspace = ({ user, boardMessages }: ProfileWorkspaceProps) => {
   const [currentUser, setCurrentUser] = useState(user);
+  const [avatarPreview, setAvatarPreview] = useState(user.avatarUrl ?? "");
+  const [avatarDirty, setAvatarDirty] = useState(false);
+  const [avatarSaving, setAvatarSaving] = useState(false);
+  const [avatarFeedback, setAvatarFeedback] = useState<string | null>(null);
+  const [avatarError, setAvatarError] = useState<string | null>(null);
   const initialRoleTab: ProfileRoleTab =
     user.role === "PROMOTER" ? "PROMOTER" : user.role === "VENUE" ? "VENUE" : "COMEDIAN";
   const [activeRole, setActiveRole] = useState<ProfileRoleTab>(initialRoleTab);
@@ -240,6 +247,20 @@ const ProfileWorkspace = ({ user, boardMessages }: ProfileWorkspaceProps) => {
   const allowedRoleTabs = useMemo<ProfileRoleTab[]>(() => {
     return isAdmin ? ROLE_TABS : [initialRoleTab];
   }, [initialRoleTab, isAdmin]);
+
+  useEffect(() => {
+    setAvatarPreview(currentUser.avatarUrl ?? "");
+    setAvatarDirty(false);
+  }, [currentUser.avatarUrl]);
+
+  const fallbackName = currentUser.comedian?.stageName ?? currentUser.name ?? currentUser.email;
+  const hasAvatarPreview = avatarPreview.length > 0;
+  const hasStoredAvatar = Boolean(currentUser.avatarUrl && currentUser.avatarUrl.length > 0);
+  const displayedAvatar = hasAvatarPreview
+    ? avatarPreview
+    : hasStoredAvatar && !avatarDirty
+      ? (currentUser.avatarUrl as string)
+      : avatarFor(fallbackName, undefined);
 
   const [comedianForm, setComedianForm] = useState({
     legalName: user.name ?? "",
@@ -369,6 +390,86 @@ const ProfileWorkspace = ({ user, boardMessages }: ProfileWorkspaceProps) => {
       ...prev,
       notableClubs: prev.notableClubs.filter((club) => club !== value),
     }));
+  }
+
+  function handleAvatarReset() {
+    setAvatarPreview(currentUser.avatarUrl ?? "");
+    setAvatarDirty(false);
+    setAvatarError(null);
+    setAvatarFeedback(null);
+  }
+
+  async function handleAvatarFileChange(event: ChangeEvent<HTMLInputElement>) {
+    if (!canEditActiveTab) {
+      event.target.value = "";
+      return;
+    }
+    const file = event.target.files?.[0];
+    if (!file) {
+      return;
+    }
+    try {
+      const dataUrl = await readFileAsDataUrl(file);
+      if (!dataUrl) {
+        setAvatarError("We couldn't read that file. Try another image.");
+        return;
+      }
+      setAvatarPreview(dataUrl);
+      setAvatarDirty(true);
+      setAvatarError(null);
+      setAvatarFeedback(null);
+    } catch (error) {
+      setAvatarError("We couldn't read that file. Try another image.");
+    } finally {
+      event.target.value = "";
+    }
+  }
+
+  function handleAvatarRemove() {
+    if (!canEditActiveTab) {
+      return;
+    }
+    setAvatarPreview("");
+    setAvatarDirty(true);
+    setAvatarError(null);
+    setAvatarFeedback(null);
+  }
+
+  async function handleAvatarSave() {
+    if (!avatarDirty || !canEditActiveTab) {
+      return;
+    }
+    setAvatarSaving(true);
+    setAvatarError(null);
+    setAvatarFeedback(null);
+    try {
+      const response = await fetch("/api/profile/avatar", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ avatar: avatarPreview && avatarPreview.length > 0 ? avatarPreview : null }),
+      });
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(
+          result.error?.formErrors?.join(" ") ??
+            result.error?.fieldErrors?.avatar?.join(" ") ??
+            result.error?.message ??
+            "Failed to update photo"
+        );
+      }
+      setCurrentUser((prev) => ({
+        ...prev,
+        avatarUrl: result.user?.avatarUrl ?? null,
+        name: result.user?.name ?? prev.name,
+      }));
+      setAvatarPreview(result.user?.avatarUrl ?? "");
+      setAvatarDirty(false);
+      setAvatarFeedback(result.user?.avatarUrl ? "Profile photo updated." : "Profile photo removed.");
+    } catch (error) {
+      setAvatarError(error instanceof Error ? error.message : "Failed to update profile photo");
+    } finally {
+      setAvatarSaving(false);
+    }
   }
 
   async function handlePhotoUpload(event: ChangeEvent<HTMLInputElement>) {
@@ -629,6 +730,7 @@ const ProfileWorkspace = ({ user, boardMessages }: ProfileWorkspaceProps) => {
       setCurrentUser((prev) => ({
         ...prev,
         name: result.user?.name ?? prev.name,
+        avatarUrl: result.user?.avatarUrl ?? prev.avatarUrl,
         comedian: result.profile
           ? {
               ...result.profile,
@@ -705,6 +807,7 @@ const ProfileWorkspace = ({ user, boardMessages }: ProfileWorkspaceProps) => {
       setCurrentUser((prev) => ({
         ...prev,
         name: result.user?.name ?? prev.name,
+        avatarUrl: result.user?.avatarUrl ?? prev.avatarUrl,
         promoter: result.profile
           ? {
               ...result.profile,
@@ -763,6 +866,7 @@ const ProfileWorkspace = ({ user, boardMessages }: ProfileWorkspaceProps) => {
       setCurrentUser((prev) => ({
         ...prev,
         name: result.user?.name ?? prev.name,
+        avatarUrl: result.user?.avatarUrl ?? prev.avatarUrl,
         venue: result.profile
           ? {
               ...result.profile,
@@ -1215,6 +1319,74 @@ const ProfileWorkspace = ({ user, boardMessages }: ProfileWorkspaceProps) => {
           </p>
         </CardHeader>
         <CardContent className="space-y-6">
+          <div className="flex flex-col gap-4 rounded-lg border border-slate-200 bg-slate-50/60 p-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-4">
+              <div className="relative h-20 w-20 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm sm:h-24 sm:w-24">
+                <img src={displayedAvatar} alt={`${fallbackName}'s profile photo`} className="h-full w-full object-cover" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-sm font-medium text-slate-700">Profile photo</h3>
+                <p className="text-xs text-slate-500">Square images work best. Upload JPG or PNG up to 2.5MB.</p>
+              </div>
+            </div>
+            <div className="flex flex-col items-start gap-2 sm:items-end">
+              <div className="flex flex-wrap gap-2">
+                <label
+                  className={cn(
+                    "inline-flex cursor-pointer items-center gap-2 text-sm",
+                    (!canEditActiveTab || avatarSaving) && "cursor-not-allowed opacity-70"
+                  )}
+                >
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleAvatarFileChange}
+                    disabled={!canEditActiveTab || avatarSaving}
+                  />
+                  <span className="rounded-md border border-slate-200 px-3 py-1 text-xs text-slate-600">Upload photo</span>
+                </label>
+                {avatarPreview.length > 0 && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleAvatarRemove}
+                    disabled={!canEditActiveTab || avatarSaving}
+                  >
+                    Remove
+                  </Button>
+                )}
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleAvatarReset}
+                  disabled={!canEditActiveTab || avatarSaving || !avatarDirty}
+                >
+                  Reset
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={handleAvatarSave}
+                  disabled={!canEditActiveTab || avatarSaving || !avatarDirty}
+                >
+                  {avatarSaving ? "Saving..." : "Save photo"}
+                </Button>
+              </div>
+              {avatarError && (
+                <p className="text-xs text-rose-600" aria-live="polite">
+                  {avatarError}
+                </p>
+              )}
+              {avatarFeedback && (
+                <p className="text-xs text-emerald-600" aria-live="polite">
+                  {avatarFeedback}
+                </p>
+              )}
+            </div>
+          </div>
           {allowedRoleTabs.length > 1 ? (
             <div className="flex flex-wrap gap-2">
               {allowedRoleTabs.map((role) => (

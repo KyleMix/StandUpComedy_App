@@ -88,9 +88,11 @@ async function ensureDataStore() {
   }
 }
 
-export interface User extends Omit<UserRecord, "createdAt" | "premiumSince"> {
+export interface User
+  extends Omit<UserRecord, "createdAt" | "premiumSince" | "avatarUrl"> {
   createdAt: Date;
   premiumSince: Date | null;
+  avatarUrl: string | null;
 }
 
 export interface ComedianProfile
@@ -325,7 +327,11 @@ function mapUser(record: UserRecord): User {
     role: record.role,
     createdAt: new Date(record.createdAt),
     isPremium: record.isPremium ?? false,
-    premiumSince: record.premiumSince ? new Date(record.premiumSince) : null
+    premiumSince: record.premiumSince ? new Date(record.premiumSince) : null,
+    avatarUrl:
+      ("avatarUrl" in record && record.avatarUrl != null && record.avatarUrl !== "")
+        ? record.avatarUrl
+        : null
   };
 }
 
@@ -930,6 +936,7 @@ interface CreateUserInput {
   role: Role;
   isPremium?: boolean;
   premiumSince?: Date | string | null;
+  avatarUrl?: string | null;
 }
 
 export async function createUser(input: CreateUserInput): Promise<User> {
@@ -944,7 +951,8 @@ export async function createUser(input: CreateUserInput): Promise<User> {
     role: input.role,
     createdAt: now,
     isPremium,
-    premiumSince: isPremium ? toIsoString(input.premiumSince ?? now) : null
+    premiumSince: isPremium ? toIsoString(input.premiumSince ?? now) : null,
+    avatarUrl: input.avatarUrl ?? null
   };
   snapshot.users.push(user);
   await persist(snapshot);
@@ -962,6 +970,9 @@ export async function updateUser(id: string, data: Partial<Omit<UserRecord, "id"
   if (data.isPremium !== undefined) record.isPremium = data.isPremium;
   if (data.premiumSince !== undefined) {
     record.premiumSince = data.premiumSince ? toIsoString(data.premiumSince) : null;
+  }
+  if (data.avatarUrl !== undefined) {
+    record.avatarUrl = data.avatarUrl && data.avatarUrl.length > 0 ? data.avatarUrl : null;
   }
   await persist(snapshot);
   return mapUser(record);

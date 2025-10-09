@@ -23,6 +23,7 @@ export interface UserRecord {
   createdAt: string;
   isPremium: boolean;
   premiumSince: string | null;
+  avatarUrl?: string | null;
 }
 
 export interface ComedianProfileRecord {

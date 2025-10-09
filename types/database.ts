@@ -243,6 +243,15 @@ export interface ReviewRecord {
   createdAt: string;
 }
 
+export interface ReviewReminderRecord {
+  id: string;
+  bookingId: string;
+  recipientUserId: string;
+  sendAt: string;
+  sentAt: string | null;
+  createdAt: string;
+}
+
 export type AdSlotPage = "home" | "search" | "profile";
 export type AdSlotPlacement = "top" | "inline" | "sidebar";
 
@@ -293,6 +302,7 @@ export interface DatabaseSnapshot {
   bookings: BookingRecord[];
   conversationReviews: ConversationReviewRecord[];
   reviews: ReviewRecord[];
+  reviewReminders: ReviewReminderRecord[];
   availability: AvailabilityRecord[];
   reports: ReportRecord[];
   communityBoardMessages: CommunityBoardMessageRecord[];

@@ -79,6 +79,8 @@ export async function ensureIngestionQueue(): Promise<void> {
     queue = new Queue(queueName, config);
     scheduler = new QueueScheduler(queueName, config);
     worker = new Worker(queueName, runJob, config);
+    void scheduler;
+    void worker;
     const repeat: JobsOptions["repeat"] = {
       every: 10 * 60 * 1000,
     };

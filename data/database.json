@@ -11,273 +11,82 @@
       "premiumSince": null
     },
     {
-      "id": "user-promoter-seattle",
-      "name": "Sasha Showcase",
-      "email": "seattle.promoter@thefunny.local",
+      "id": "user-promoter",
+      "name": "Paula Promoter",
+      "email": "promoter@thefunny.local",
       "hashedPassword": "$2a$10$NSAXdlvRg.IVwMnoneGfMOmzMDy3JWta4qTJPUJWtfNK14Zj.NfLa",
       "role": "PROMOTER",
-      "createdAt": "2024-01-03T10:00:00.000Z",
+      "createdAt": "2024-01-02T10:00:00.000Z",
       "isPremium": false,
       "premiumSince": null
     },
     {
-      "id": "user-promoter-portland",
-      "name": "Parker PDX",
-      "email": "portland.promoter@thefunny.local",
-      "hashedPassword": "$2a$10$NSAXdlvRg.IVwMnoneGfMOmzMDy3JWta4qTJPUJWtfNK14Zj.NfLa",
-      "role": "PROMOTER",
-      "createdAt": "2024-01-04T11:00:00.000Z",
-      "isPremium": false,
-      "premiumSince": null
-    },
-    {
-      "id": "user-promoter-tacoma",
-      "name": "Taylor Tacoma",
-      "email": "tacoma.promoter@thefunny.local",
-      "hashedPassword": "$2a$10$NSAXdlvRg.IVwMnoneGfMOmzMDy3JWta4qTJPUJWtfNK14Zj.NfLa",
-      "role": "PROMOTER",
-      "createdAt": "2024-01-05T12:00:00.000Z",
-      "isPremium": false,
-      "premiumSince": null
-    },
-    {
-      "id": "user-promoter-olympia",
-      "name": "Oakley Olympia",
-      "email": "olympia.promoter@thefunny.local",
-      "hashedPassword": "$2a$10$NSAXdlvRg.IVwMnoneGfMOmzMDy3JWta4qTJPUJWtfNK14Zj.NfLa",
-      "role": "PROMOTER",
-      "createdAt": "2024-01-06T13:00:00.000Z",
-      "isPremium": false,
-      "premiumSince": null
-    },
-    {
-      "id": "user-venue-seattle-laugh-lodge",
-      "name": "Laugh Lodge",
-      "email": "laugh.lodge@thefunny.local",
+      "id": "user-venue",
+      "name": "Harbor Lights",
+      "email": "venue@thefunny.local",
       "hashedPassword": "$2a$10$NSAXdlvRg.IVwMnoneGfMOmzMDy3JWta4qTJPUJWtfNK14Zj.NfLa",
       "role": "VENUE",
-      "createdAt": "2024-01-07T14:00:00.000Z",
+      "createdAt": "2024-01-02T11:00:00.000Z",
       "isPremium": false,
       "premiumSince": null
     },
     {
-      "id": "user-venue-seattle-bay",
-      "name": "Bayfront Comedy",
-      "email": "bayfront@thefunny.local",
-      "hashedPassword": "$2a$10$NSAXdlvRg.IVwMnoneGfMOmzMDy3JWta4qTJPUJWtfNK14Zj.NfLa",
-      "role": "VENUE",
-      "createdAt": "2024-01-07T16:00:00.000Z",
-      "isPremium": false,
-      "premiumSince": null
-    },
-    {
-      "id": "user-venue-portland-stumptown",
-      "name": "Stumptown Laugh Lab",
-      "email": "stumptown@thefunny.local",
-      "hashedPassword": "$2a$10$NSAXdlvRg.IVwMnoneGfMOmzMDy3JWta4qTJPUJWtfNK14Zj.NfLa",
-      "role": "VENUE",
-      "createdAt": "2024-01-08T09:00:00.000Z",
-      "isPremium": false,
-      "premiumSince": null
-    },
-    {
-      "id": "user-venue-portland-bridge",
-      "name": "Bridge City Comedy",
-      "email": "bridgecity@thefunny.local",
-      "hashedPassword": "$2a$10$NSAXdlvRg.IVwMnoneGfMOmzMDy3JWta4qTJPUJWtfNK14Zj.NfLa",
-      "role": "VENUE",
-      "createdAt": "2024-01-08T11:00:00.000Z",
-      "isPremium": false,
-      "premiumSince": null
-    },
-    {
-      "id": "user-venue-tacoma-grit",
-      "name": "Grit City Stage",
-      "email": "gritcity@thefunny.local",
-      "hashedPassword": "$2a$10$NSAXdlvRg.IVwMnoneGfMOmzMDy3JWta4qTJPUJWtfNK14Zj.NfLa",
-      "role": "VENUE",
-      "createdAt": "2024-01-09T10:00:00.000Z",
-      "isPremium": false,
-      "premiumSince": null
-    },
-    {
-      "id": "user-venue-tacoma-waterfront",
-      "name": "Waterfront Comedy Loft",
-      "email": "waterfront@thefunny.local",
-      "hashedPassword": "$2a$10$NSAXdlvRg.IVwMnoneGfMOmzMDy3JWta4qTJPUJWtfNK14Zj.NfLa",
-      "role": "VENUE",
-      "createdAt": "2024-01-09T12:00:00.000Z",
-      "isPremium": false,
-      "premiumSince": null
-    },
-    {
-      "id": "user-venue-olympia-capitol",
-      "name": "Capitol City Club",
-      "email": "capitolcity@thefunny.local",
-      "hashedPassword": "$2a$10$NSAXdlvRg.IVwMnoneGfMOmzMDy3JWta4qTJPUJWtfNK14Zj.NfLa",
-      "role": "VENUE",
-      "createdAt": "2024-01-10T10:00:00.000Z",
-      "isPremium": false,
-      "premiumSince": null
-    },
-    {
-      "id": "user-venue-olympia-brew",
-      "name": "Brew HaHa Hall",
-      "email": "brewhaha@thefunny.local",
-      "hashedPassword": "$2a$10$NSAXdlvRg.IVwMnoneGfMOmzMDy3JWta4qTJPUJWtfNK14Zj.NfLa",
-      "role": "VENUE",
-      "createdAt": "2024-01-10T12:00:00.000Z",
-      "isPremium": false,
-      "premiumSince": null
-    },
-    {
-      "id": "user-comedian-ava",
-      "name": "Ava Ashland",
-      "email": "ava@thefunny.local",
+      "id": "user-comic1",
+      "name": "Casey Quick",
+      "email": "comic1@thefunny.local",
       "hashedPassword": "$2a$10$NSAXdlvRg.IVwMnoneGfMOmzMDy3JWta4qTJPUJWtfNK14Zj.NfLa",
       "role": "COMEDIAN",
-      "createdAt": "2024-01-11T09:00:00.000Z",
+      "createdAt": "2024-01-03T09:00:00.000Z",
+      "isPremium": false,
+      "premiumSince": null
+    },
+    {
+      "id": "user-comic2",
+      "name": "Riley Riff",
+      "email": "comic2@thefunny.local",
+      "hashedPassword": "$2a$10$NSAXdlvRg.IVwMnoneGfMOmzMDy3JWta4qTJPUJWtfNK14Zj.NfLa",
+      "role": "COMEDIAN",
+      "createdAt": "2024-01-04T09:00:00.000Z",
       "isPremium": true,
-      "premiumSince": "2024-02-01T09:00:00.000Z"
+      "premiumSince": "2024-02-01T08:00:00.000Z"
     },
     {
-      "id": "user-comedian-ben",
-      "name": "Ben Beacon",
-      "email": "ben@thefunny.local",
+      "id": "user-fan",
+      "name": "Frankie Fan",
+      "email": "fan@thefunny.local",
       "hashedPassword": "$2a$10$NSAXdlvRg.IVwMnoneGfMOmzMDy3JWta4qTJPUJWtfNK14Zj.NfLa",
-      "role": "COMEDIAN",
-      "createdAt": "2024-01-11T09:00:00.000Z",
-      "isPremium": false,
-      "premiumSince": null
-    },
-    {
-      "id": "user-comedian-cara",
-      "name": "Cara Cascade",
-      "email": "cara@thefunny.local",
-      "hashedPassword": "$2a$10$NSAXdlvRg.IVwMnoneGfMOmzMDy3JWta4qTJPUJWtfNK14Zj.NfLa",
-      "role": "COMEDIAN",
-      "createdAt": "2024-01-11T09:00:00.000Z",
-      "isPremium": false,
-      "premiumSince": null
-    },
-    {
-      "id": "user-comedian-diego",
-      "name": "Diego Drift",
-      "email": "diego@thefunny.local",
-      "hashedPassword": "$2a$10$NSAXdlvRg.IVwMnoneGfMOmzMDy3JWta4qTJPUJWtfNK14Zj.NfLa",
-      "role": "COMEDIAN",
-      "createdAt": "2024-01-11T09:00:00.000Z",
-      "isPremium": false,
-      "premiumSince": null
-    },
-    {
-      "id": "user-comedian-ella",
-      "name": "Ella Evergreen",
-      "email": "ella@thefunny.local",
-      "hashedPassword": "$2a$10$NSAXdlvRg.IVwMnoneGfMOmzMDy3JWta4qTJPUJWtfNK14Zj.NfLa",
-      "role": "COMEDIAN",
-      "createdAt": "2024-01-11T09:00:00.000Z",
-      "isPremium": true,
-      "premiumSince": "2024-02-01T09:00:00.000Z"
-    },
-    {
-      "id": "user-comedian-fern",
-      "name": "Fern Fox",
-      "email": "fern@thefunny.local",
-      "hashedPassword": "$2a$10$NSAXdlvRg.IVwMnoneGfMOmzMDy3JWta4qTJPUJWtfNK14Zj.NfLa",
-      "role": "COMEDIAN",
-      "createdAt": "2024-01-11T09:00:00.000Z",
-      "isPremium": false,
-      "premiumSince": null
-    },
-    {
-      "id": "user-comedian-gabe",
-      "name": "Gabe Glacier",
-      "email": "gabe@thefunny.local",
-      "hashedPassword": "$2a$10$NSAXdlvRg.IVwMnoneGfMOmzMDy3JWta4qTJPUJWtfNK14Zj.NfLa",
-      "role": "COMEDIAN",
-      "createdAt": "2024-01-11T09:00:00.000Z",
-      "isPremium": false,
-      "premiumSince": null
-    },
-    {
-      "id": "user-comedian-hana",
-      "name": "Hana Harbor",
-      "email": "hana@thefunny.local",
-      "hashedPassword": "$2a$10$NSAXdlvRg.IVwMnoneGfMOmzMDy3JWta4qTJPUJWtfNK14Zj.NfLa",
-      "role": "COMEDIAN",
-      "createdAt": "2024-01-11T09:00:00.000Z",
-      "isPremium": true,
-      "premiumSince": "2024-02-01T09:00:00.000Z"
-    },
-    {
-      "id": "user-comedian-isa",
-      "name": "Isa Inland",
-      "email": "isa@thefunny.local",
-      "hashedPassword": "$2a$10$NSAXdlvRg.IVwMnoneGfMOmzMDy3JWta4qTJPUJWtfNK14Zj.NfLa",
-      "role": "COMEDIAN",
-      "createdAt": "2024-01-11T09:00:00.000Z",
-      "isPremium": false,
-      "premiumSince": null
-    },
-    {
-      "id": "user-comedian-jules",
-      "name": "Jules Jetty",
-      "email": "jules@thefunny.local",
-      "hashedPassword": "$2a$10$NSAXdlvRg.IVwMnoneGfMOmzMDy3JWta4qTJPUJWtfNK14Zj.NfLa",
-      "role": "COMEDIAN",
-      "createdAt": "2024-01-11T09:00:00.000Z",
-      "isPremium": false,
-      "premiumSince": null
-    },
-    {
-      "id": "user-comedian-kai",
-      "name": "Kai Kettle",
-      "email": "kai@thefunny.local",
-      "hashedPassword": "$2a$10$NSAXdlvRg.IVwMnoneGfMOmzMDy3JWta4qTJPUJWtfNK14Zj.NfLa",
-      "role": "COMEDIAN",
-      "createdAt": "2024-01-11T09:00:00.000Z",
-      "isPremium": false,
-      "premiumSince": null
-    },
-    {
-      "id": "user-comedian-lena",
-      "name": "Lena Lighthouse",
-      "email": "lena@thefunny.local",
-      "hashedPassword": "$2a$10$NSAXdlvRg.IVwMnoneGfMOmzMDy3JWta4qTJPUJWtfNK14Zj.NfLa",
-      "role": "COMEDIAN",
-      "createdAt": "2024-01-11T09:00:00.000Z",
+      "role": "FAN",
+      "createdAt": "2024-01-05T10:00:00.000Z",
       "isPremium": false,
       "premiumSince": null
     }
   ],
   "comedianProfiles": [
     {
-      "userId": "user-comedian-ava",
-      "stageName": "Ava Ashland",
-      "bio": "Seattle-based storyteller blending outdoor adventures with sharp punchlines.",
-      "credits": "SketchFest Seattle, Timber Comedy Festival",
-      "website": "https://www.ava-ashland.com",
-      "reelUrl": "https://youtu.be/ava-ashland-reel",
-      "instagram": "@avaashland",
-      "tiktokHandle": "@avaashlandcomedy",
-      "youtubeChannel": "https://www.youtube.com/@avaashland",
-      "travelRadiusMiles": 200,
+      "userId": "user-comic1",
+      "stageName": "Casey Quick",
+      "bio": "High-energy comic delivering quick punchlines about tech, transit, and PNW rainstorms.",
+      "credits": "Seattle International Comedy Competition",
+      "website": "https://caseyquick.live",
+      "reelUrl": "https://youtu.be/casey-quick-reel",
+      "instagram": "@caseyquickcomedy",
+      "tiktokHandle": "@caseyquick",
+      "youtubeChannel": "https://www.youtube.com/@caseyquick",
+      "travelRadiusMiles": 150,
       "homeCity": "Seattle",
       "homeState": "WA",
       "styles": [
-        "Storytelling",
         "Observational",
-        "PNW references"
+        "Storytelling"
       ],
       "cleanRating": "PG13",
-      "rateMin": 350,
+      "rateMin": 300,
       "rateMax": 600,
       "reelUrls": [
-        "https://youtu.be/ava-ashland-reel"
+        "https://youtu.be/casey-quick-reel"
       ],
       "photoUrls": [
-        "https://images.unsplash.com/photo-1524504388940-b1c1722653e1"
+        "https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=800&q=80"
       ],
       "notableClubs": [
         "Laughs Comedy Club",
@@ -285,2148 +94,377 @@
       ],
       "availability": [
         {
-          "id": "avail-user-comedian-ava-fri",
-          "userId": "user-comedian-ava",
-          "date": "2024-04-05T00:00:00.000Z",
+          "id": "avail-comic1-weekend",
+          "userId": "user-comic1",
+          "date": "2024-05-18T12:00:00.000Z",
           "status": "free"
         },
         {
-          "id": "avail-user-comedian-ava-sat",
-          "userId": "user-comedian-ava",
-          "date": "2024-04-06T00:00:00.000Z",
+          "id": "avail-comic1-weeknight",
+          "userId": "user-comic1",
+          "date": "2024-05-22T12:00:00.000Z",
           "status": "busy"
         }
       ],
-      "createdAt": "2024-01-12T09:00:00.000Z",
-      "updatedAt": "2024-03-01T10:00:00.000Z"
+      "createdAt": "2024-02-01T12:00:00.000Z",
+      "updatedAt": "2024-04-20T11:00:00.000Z"
     },
     {
-      "userId": "user-comedian-ben",
-      "stageName": "Ben Beacon",
-      "bio": "Portland barista-turned-comic known for dry takes on tech and tiny homes.",
-      "credits": "Bridgetown Comedy Festival, Keep Portland Funny",
-      "website": "https://www.ben-beacon.com",
-      "reelUrl": "https://youtu.be/ben-beacon-reel",
-      "instagram": "@benbeacon",
-      "tiktokHandle": null,
-      "youtubeChannel": "https://www.youtube.com/@benbeacon",
+      "userId": "user-comic2",
+      "stageName": "Riley Riff",
+      "bio": "Clean-meets-clever comic mixing guitar bits with heartfelt storytelling.",
+      "credits": "Helium Portland Showcase",
+      "website": "https://rileyriff.live",
+      "reelUrl": "https://youtu.be/riley-riff-reel",
+      "instagram": "@rileyriff",
+      "tiktokHandle": "@rileyriff",
+      "youtubeChannel": "https://www.youtube.com/@rileyriff",
       "travelRadiusMiles": 200,
       "homeCity": "Portland",
       "homeState": "OR",
       "styles": [
-        "Alt",
-        "Deadpan"
+        "Musical",
+        "Clean"
       ],
-      "cleanRating": "PG13",
-      "rateMin": 300,
-      "rateMax": 550,
+      "cleanRating": "CLEAN",
+      "rateMin": 350,
+      "rateMax": 650,
       "reelUrls": [
-        "https://youtu.be/ben-beacon-reel"
+        "https://youtu.be/riley-riff-reel"
       ],
       "photoUrls": [
-        "https://images.unsplash.com/photo-1551122101-0d21b06ae8b9"
+        "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=800&q=80"
       ],
       "notableClubs": [
         "Helium Portland",
-        "Funhouse Lounge"
+        "Alberta Street Pub"
       ],
       "availability": [
         {
-          "id": "avail-user-comedian-ben-fri",
-          "userId": "user-comedian-ben",
-          "date": "2024-04-08T00:00:00.000Z",
+          "id": "avail-comic2-weekend",
+          "userId": "user-comic2",
+          "date": "2024-05-25T12:00:00.000Z",
           "status": "free"
         },
         {
-          "id": "avail-user-comedian-ben-sat",
-          "userId": "user-comedian-ben",
-          "date": "2024-04-09T00:00:00.000Z",
-          "status": "busy"
-        }
-      ],
-      "createdAt": "2024-01-13T09:00:00.000Z",
-      "updatedAt": "2024-03-02T10:00:00.000Z"
-    },
-    {
-      "userId": "user-comedian-cara",
-      "stageName": "Cara Cascade",
-      "bio": "Tacoma club favorite bringing contagious energy and sharp crowd work skills.",
-      "credits": "Seattle International Comedy Competition",
-      "website": "https://www.cara-cascade.com",
-      "reelUrl": "https://youtu.be/cara-cascade-reel",
-      "instagram": "@caracascade",
-      "tiktokHandle": "@caracascade",
-      "youtubeChannel": null,
-      "travelRadiusMiles": 200,
-      "homeCity": "Tacoma",
-      "homeState": "WA",
-      "styles": [
-        "High energy",
-        "Crowd work"
-      ],
-      "cleanRating": "R",
-      "rateMin": 400,
-      "rateMax": 750,
-      "reelUrls": [
-        "https://youtu.be/cara-cascade-reel"
-      ],
-      "photoUrls": [
-        "https://images.unsplash.com/photo-1545239351-1141bd82e8a6"
-      ],
-      "notableClubs": [
-        "Tacoma Comedy Club",
-        "Jazzbones"
-      ],
-      "availability": [
-        {
-          "id": "avail-user-comedian-cara-fri",
-          "userId": "user-comedian-cara",
-          "date": "2024-04-11T00:00:00.000Z",
+          "id": "avail-comic2-weeknight",
+          "userId": "user-comic2",
+          "date": "2024-05-29T12:00:00.000Z",
           "status": "free"
-        },
-        {
-          "id": "avail-user-comedian-cara-sat",
-          "userId": "user-comedian-cara",
-          "date": "2024-04-12T00:00:00.000Z",
-          "status": "busy"
         }
       ],
-      "createdAt": "2024-01-14T09:00:00.000Z",
-      "updatedAt": "2024-03-03T10:00:00.000Z"
-    },
-    {
-      "userId": "user-comedian-diego",
-      "stageName": "Diego Drift",
-      "bio": "Olympia improv pro mixing quirky characters with heartfelt stories.",
-      "credits": "Northwest Black Comedy Festival",
-      "website": "https://www.diego-drift.com",
-      "reelUrl": "https://youtu.be/diego-drift-reel",
-      "instagram": null,
-      "tiktokHandle": null,
-      "youtubeChannel": null,
-      "travelRadiusMiles": 200,
-      "homeCity": "Olympia",
-      "homeState": "WA",
-      "styles": [
-        "Improvisational",
-        "Character"
-      ],
-      "cleanRating": "PG13",
-      "rateMin": 250,
-      "rateMax": 500,
-      "reelUrls": [
-        "https://youtu.be/diego-drift-reel"
-      ],
-      "photoUrls": [
-        "https://images.unsplash.com/photo-1544723795-3fb6469f5b39"
-      ],
-      "notableClubs": [
-        "Capitol City Club",
-        "The Brotherhood Lounge"
-      ],
-      "availability": [
-        {
-          "id": "avail-user-comedian-diego-fri",
-          "userId": "user-comedian-diego",
-          "date": "2024-04-14T00:00:00.000Z",
-          "status": "free"
-        },
-        {
-          "id": "avail-user-comedian-diego-sat",
-          "userId": "user-comedian-diego",
-          "date": "2024-04-15T00:00:00.000Z",
-          "status": "busy"
-        }
-      ],
-      "createdAt": "2024-01-15T09:00:00.000Z",
-      "updatedAt": "2024-03-04T10:00:00.000Z"
-    },
-    {
-      "userId": "user-comedian-ella",
-      "stageName": "Ella Evergreen",
-      "bio": "Corporate-friendly comic with razor sharp crowd insights and musical tags.",
-      "credits": "Microsoft Corporate Events, Bumbershoot",
-      "website": "https://www.ella-evergreen.com",
-      "reelUrl": "https://youtu.be/ella-evergreen-reel",
-      "instagram": "@ellaevergreen",
-      "tiktokHandle": "@ellaevergreen",
-      "youtubeChannel": null,
-      "travelRadiusMiles": 200,
-      "homeCity": "Seattle",
-      "homeState": "WA",
-      "styles": [
-        "Clean",
-        "Corporate"
-      ],
-      "cleanRating": "CLEAN",
-      "rateMin": 500,
-      "rateMax": 900,
-      "reelUrls": [
-        "https://youtu.be/ella-evergreen-reel"
-      ],
-      "photoUrls": [
-        "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4"
-      ],
-      "notableClubs": [
-        "Laughs Comedy Club",
-        "Unexpected Productions"
-      ],
-      "availability": [
-        {
-          "id": "avail-user-comedian-ella-fri",
-          "userId": "user-comedian-ella",
-          "date": "2024-04-17T00:00:00.000Z",
-          "status": "free"
-        },
-        {
-          "id": "avail-user-comedian-ella-sat",
-          "userId": "user-comedian-ella",
-          "date": "2024-04-18T00:00:00.000Z",
-          "status": "busy"
-        }
-      ],
-      "createdAt": "2024-01-16T09:00:00.000Z",
-      "updatedAt": "2024-03-05T10:00:00.000Z"
-    },
-    {
-      "userId": "user-comedian-fern",
-      "stageName": "Fern Fox",
-      "bio": "Story-driven comic weaving activism with whimsical PNW tales.",
-      "credits": "Portland's Queer Comedy Fest",
-      "website": "https://www.fern-fox.com",
-      "reelUrl": "https://youtu.be/fern-fox-reel",
-      "instagram": null,
-      "tiktokHandle": null,
-      "youtubeChannel": null,
-      "travelRadiusMiles": 200,
-      "homeCity": "Portland",
-      "homeState": "OR",
-      "styles": [
-        "Storytelling",
-        "Alternative"
-      ],
-      "cleanRating": "PG13",
-      "rateMin": 280,
-      "rateMax": 520,
-      "reelUrls": [
-        "https://youtu.be/fern-fox-reel"
-      ],
-      "photoUrls": [
-        "https://images.unsplash.com/photo-1517841905240-472988babdf9"
-      ],
-      "notableClubs": [
-        "Helium Portland",
-        "Kelly's Olympian"
-      ],
-      "availability": [
-        {
-          "id": "avail-user-comedian-fern-fri",
-          "userId": "user-comedian-fern",
-          "date": "2024-04-05T00:00:00.000Z",
-          "status": "free"
-        },
-        {
-          "id": "avail-user-comedian-fern-sat",
-          "userId": "user-comedian-fern",
-          "date": "2024-04-06T00:00:00.000Z",
-          "status": "busy"
-        }
-      ],
-      "createdAt": "2024-01-17T09:00:00.000Z",
-      "updatedAt": "2024-03-06T10:00:00.000Z"
-    },
-    {
-      "userId": "user-comedian-gabe",
-      "stageName": "Gabe Glacier",
-      "bio": "Bellingham weirdo comic exploring cryptids, co-ops, and climate anxieties.",
-      "credits": "Subdued Stringband Jamboree, NW Fresh Faces",
-      "website": "https://www.gabe-glacier.com",
-      "reelUrl": "https://youtu.be/gabe-glacier-reel",
-      "instagram": null,
-      "tiktokHandle": null,
-      "youtubeChannel": null,
-      "travelRadiusMiles": 200,
-      "homeCity": "Bellingham",
-      "homeState": "WA",
-      "styles": [
-        "Deadpan",
-        "Surreal"
-      ],
-      "cleanRating": "PG13",
-      "rateMin": 220,
-      "rateMax": 450,
-      "reelUrls": [
-        "https://youtu.be/gabe-glacier-reel"
-      ],
-      "photoUrls": [
-        "https://images.unsplash.com/photo-1525134479668-1bee5c7c6845"
-      ],
-      "notableClubs": [
-        "Upfront Theatre",
-        "Make.Shift"
-      ],
-      "availability": [
-        {
-          "id": "avail-user-comedian-gabe-fri",
-          "userId": "user-comedian-gabe",
-          "date": "2024-04-08T00:00:00.000Z",
-          "status": "free"
-        },
-        {
-          "id": "avail-user-comedian-gabe-sat",
-          "userId": "user-comedian-gabe",
-          "date": "2024-04-09T00:00:00.000Z",
-          "status": "busy"
-        }
-      ],
-      "createdAt": "2024-01-18T09:00:00.000Z",
-      "updatedAt": "2024-03-07T10:00:00.000Z"
-    },
-    {
-      "userId": "user-comedian-hana",
-      "stageName": "Hana Harbor",
-      "bio": "Music-forward comic blending ukulele songs with heartfelt jokes.",
-      "credits": "SketchFest Seattle, Seattle Symphony Late Night",
-      "website": "https://www.hana-harbor.com",
-      "reelUrl": "https://youtu.be/hana-harbor-reel",
-      "instagram": "@hanaharbor",
-      "tiktokHandle": null,
-      "youtubeChannel": null,
-      "travelRadiusMiles": 200,
-      "homeCity": "Seattle",
-      "homeState": "WA",
-      "styles": [
-        "Clean",
-        "Musical"
-      ],
-      "cleanRating": "CLEAN",
-      "rateMin": 450,
-      "rateMax": 850,
-      "reelUrls": [
-        "https://youtu.be/hana-harbor-reel"
-      ],
-      "photoUrls": [
-        "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2"
-      ],
-      "notableClubs": [
-        "Comedy/Bar Seattle",
-        "The Crocodile"
-      ],
-      "availability": [
-        {
-          "id": "avail-user-comedian-hana-fri",
-          "userId": "user-comedian-hana",
-          "date": "2024-04-11T00:00:00.000Z",
-          "status": "free"
-        },
-        {
-          "id": "avail-user-comedian-hana-sat",
-          "userId": "user-comedian-hana",
-          "date": "2024-04-12T00:00:00.000Z",
-          "status": "busy"
-        }
-      ],
-      "createdAt": "2024-01-19T09:00:00.000Z",
-      "updatedAt": "2024-03-08T10:00:00.000Z"
-    },
-    {
-      "userId": "user-comedian-isa",
-      "stageName": "Isa Inland",
-      "bio": "Road-tested Spokane comic who shines at casinos and breweries alike.",
-      "credits": "Spokane Comedy Club, Nate Jackson's Super Funny",
-      "website": "https://www.isa-inland.com",
-      "reelUrl": "https://youtu.be/isa-inland-reel",
-      "instagram": null,
-      "tiktokHandle": null,
-      "youtubeChannel": null,
-      "travelRadiusMiles": 200,
-      "homeCity": "Spokane",
-      "homeState": "WA",
-      "styles": [
-        "Crowd work",
-        "Storytelling"
-      ],
-      "cleanRating": "PG13",
-      "rateMin": 260,
-      "rateMax": 480,
-      "reelUrls": [
-        "https://youtu.be/isa-inland-reel"
-      ],
-      "photoUrls": [
-        "https://images.unsplash.com/photo-1517976487492-5750f3195933"
-      ],
-      "notableClubs": [
-        "Spokane Comedy Club",
-        "Tacoma Comedy Club"
-      ],
-      "availability": [
-        {
-          "id": "avail-user-comedian-isa-fri",
-          "userId": "user-comedian-isa",
-          "date": "2024-04-14T00:00:00.000Z",
-          "status": "free"
-        },
-        {
-          "id": "avail-user-comedian-isa-sat",
-          "userId": "user-comedian-isa",
-          "date": "2024-04-15T00:00:00.000Z",
-          "status": "busy"
-        }
-      ],
-      "createdAt": "2024-01-20T09:00:00.000Z",
-      "updatedAt": "2024-03-09T10:00:00.000Z"
-    },
-    {
-      "userId": "user-comedian-jules",
-      "stageName": "Jules Jetty",
-      "bio": "Sharp satire on sustainability and cycling culture, perfect for club weekends.",
-      "credits": "Pickathon Laugh Stage",
-      "website": "https://www.jules-jetty.com",
-      "reelUrl": "https://youtu.be/jules-jetty-reel",
-      "instagram": null,
-      "tiktokHandle": null,
-      "youtubeChannel": null,
-      "travelRadiusMiles": 200,
-      "homeCity": "Portland",
-      "homeState": "OR",
-      "styles": [
-        "Riffing",
-        "Satire"
-      ],
-      "cleanRating": "R",
-      "rateMin": 320,
-      "rateMax": 600,
-      "reelUrls": [
-        "https://youtu.be/jules-jetty-reel"
-      ],
-      "photoUrls": [
-        "https://images.unsplash.com/photo-1521572267360-ee0c2909d518"
-      ],
-      "notableClubs": [
-        "Helium Portland",
-        "Curious Comedy"
-      ],
-      "availability": [
-        {
-          "id": "avail-user-comedian-jules-fri",
-          "userId": "user-comedian-jules",
-          "date": "2024-04-17T00:00:00.000Z",
-          "status": "free"
-        },
-        {
-          "id": "avail-user-comedian-jules-sat",
-          "userId": "user-comedian-jules",
-          "date": "2024-04-18T00:00:00.000Z",
-          "status": "busy"
-        }
-      ],
-      "createdAt": "2024-01-21T09:00:00.000Z",
-      "updatedAt": "2024-03-10T10:00:00.000Z"
-    },
-    {
-      "userId": "user-comedian-kai",
-      "stageName": "Kai Kettle",
-      "bio": "Improviser and emcee bringing welcoming vibes to breweries and fundraisers.",
-      "credits": "OlyComedy Fest",
-      "website": "https://www.kai-kettle.com",
-      "reelUrl": "https://youtu.be/kai-kettle-reel",
-      "instagram": null,
-      "tiktokHandle": null,
-      "youtubeChannel": null,
-      "travelRadiusMiles": 200,
-      "homeCity": "Olympia",
-      "homeState": "WA",
-      "styles": [
-        "Clean",
-        "Improvisational"
-      ],
-      "cleanRating": "CLEAN",
-      "rateMin": 240,
-      "rateMax": 420,
-      "reelUrls": [
-        "https://youtu.be/kai-kettle-reel"
-      ],
-      "photoUrls": [
-        "https://images.unsplash.com/photo-1489515217757-5fd1be406fef"
-      ],
-      "notableClubs": [
-        "Capitol City Club",
-        "Rhythms Coffee"
-      ],
-      "availability": [
-        {
-          "id": "avail-user-comedian-kai-fri",
-          "userId": "user-comedian-kai",
-          "date": "2024-04-05T00:00:00.000Z",
-          "status": "free"
-        },
-        {
-          "id": "avail-user-comedian-kai-sat",
-          "userId": "user-comedian-kai",
-          "date": "2024-04-06T00:00:00.000Z",
-          "status": "busy"
-        }
-      ],
-      "createdAt": "2024-01-22T09:00:00.000Z",
-      "updatedAt": "2024-03-11T10:00:00.000Z"
-    },
-    {
-      "userId": "user-comedian-lena",
-      "stageName": "Lena Lighthouse",
-      "bio": "Former tech lead delivering clean, clever keynotes and comedy for corporate crowds.",
-      "credits": "GeekWire Gala, Seattle Startup Week",
-      "website": "https://www.lena-lighthouse.com",
-      "reelUrl": "https://youtu.be/lena-lighthouse-reel",
-      "instagram": "@lenalighthouse",
-      "tiktokHandle": null,
-      "youtubeChannel": null,
-      "travelRadiusMiles": 200,
-      "homeCity": "Seattle",
-      "homeState": "WA",
-      "styles": [
-        "Clean",
-        "Corporate",
-        "Storytelling"
-      ],
-      "cleanRating": "CLEAN",
-      "rateMin": 550,
-      "rateMax": 950,
-      "reelUrls": [
-        "https://youtu.be/lena-lighthouse-reel"
-      ],
-      "photoUrls": [
-        "https://images.unsplash.com/photo-1529665253569-6d01c0eaf7b6"
-      ],
-      "notableClubs": [
-        "Laughs Comedy Club",
-        "Unexpected Productions"
-      ],
-      "availability": [
-        {
-          "id": "avail-user-comedian-lena-fri",
-          "userId": "user-comedian-lena",
-          "date": "2024-04-08T00:00:00.000Z",
-          "status": "free"
-        },
-        {
-          "id": "avail-user-comedian-lena-sat",
-          "userId": "user-comedian-lena",
-          "date": "2024-04-09T00:00:00.000Z",
-          "status": "busy"
-        }
-      ],
-      "createdAt": "2024-01-23T09:00:00.000Z",
-      "updatedAt": "2024-03-12T10:00:00.000Z"
+      "createdAt": "2024-02-15T12:00:00.000Z",
+      "updatedAt": "2024-04-22T10:00:00.000Z"
     }
   ],
   "comedianVideos": [
     {
-      "id": "video-user-comedian-ava-reel",
-      "comedianUserId": "user-comedian-ava",
-      "title": "Ava Ashland showcase reel",
+      "id": "video-casey-quick",
+      "comedianUserId": "user-comic1",
+      "title": "Casey Quick - Five Minutes",
       "platform": "YOUTUBE",
-      "url": "https://youtu.be/ava-ashland-reel",
+      "url": "https://youtu.be/casey-quick-reel",
       "postedAt": "2024-02-10T18:00:00.000Z"
     },
     {
-      "id": "video-user-comedian-ava-clip",
-      "comedianUserId": "user-comedian-ava",
-      "title": "Ava Ashland quick clip",
-      "platform": "TIKTOK",
-      "url": "https://www.tiktok.com/@avaashland/video/100000",
-      "postedAt": "2024-03-05T20:00:00.000Z"
-    },
-    {
-      "id": "video-user-comedian-ben-reel",
-      "comedianUserId": "user-comedian-ben",
-      "title": "Ben Beacon showcase reel",
+      "id": "video-riley-riff",
+      "comedianUserId": "user-comic2",
+      "title": "Riley Riff - Live at Harbor Lights",
       "platform": "YOUTUBE",
-      "url": "https://youtu.be/ben-beacon-reel",
-      "postedAt": "2024-02-11T18:00:00.000Z"
-    },
-    {
-      "id": "video-user-comedian-ben-clip",
-      "comedianUserId": "user-comedian-ben",
-      "title": "Ben Beacon quick clip",
-      "platform": "TIKTOK",
-      "url": "https://www.tiktok.com/@benbeacon/video/101379",
-      "postedAt": "2024-03-06T20:00:00.000Z"
-    },
-    {
-      "id": "video-user-comedian-cara-reel",
-      "comedianUserId": "user-comedian-cara",
-      "title": "Cara Cascade showcase reel",
-      "platform": "YOUTUBE",
-      "url": "https://youtu.be/cara-cascade-reel",
-      "postedAt": "2024-02-12T18:00:00.000Z"
-    },
-    {
-      "id": "video-user-comedian-cara-clip",
-      "comedianUserId": "user-comedian-cara",
-      "title": "Cara Cascade quick clip",
-      "platform": "TIKTOK",
-      "url": "https://www.tiktok.com/@caracascade/video/102758",
+      "url": "https://youtu.be/riley-riff-reel",
       "postedAt": "2024-03-07T20:00:00.000Z"
-    },
-    {
-      "id": "video-user-comedian-diego-reel",
-      "comedianUserId": "user-comedian-diego",
-      "title": "Diego Drift showcase reel",
-      "platform": "YOUTUBE",
-      "url": "https://youtu.be/diego-drift-reel",
-      "postedAt": "2024-02-13T18:00:00.000Z"
-    },
-    {
-      "id": "video-user-comedian-diego-clip",
-      "comedianUserId": "user-comedian-diego",
-      "title": "Diego Drift quick clip",
-      "platform": "TIKTOK",
-      "url": "https://www.tiktok.com/@diegodrift/video/104137",
-      "postedAt": "2024-03-08T20:00:00.000Z"
-    },
-    {
-      "id": "video-user-comedian-ella-reel",
-      "comedianUserId": "user-comedian-ella",
-      "title": "Ella Evergreen showcase reel",
-      "platform": "YOUTUBE",
-      "url": "https://youtu.be/ella-evergreen-reel",
-      "postedAt": "2024-02-14T18:00:00.000Z"
-    },
-    {
-      "id": "video-user-comedian-ella-clip",
-      "comedianUserId": "user-comedian-ella",
-      "title": "Ella Evergreen quick clip",
-      "platform": "TIKTOK",
-      "url": "https://www.tiktok.com/@ellaevergreen/video/105516",
-      "postedAt": "2024-03-05T20:00:00.000Z"
-    },
-    {
-      "id": "video-user-comedian-fern-reel",
-      "comedianUserId": "user-comedian-fern",
-      "title": "Fern Fox showcase reel",
-      "platform": "YOUTUBE",
-      "url": "https://youtu.be/fern-fox-reel",
-      "postedAt": "2024-02-10T18:00:00.000Z"
-    },
-    {
-      "id": "video-user-comedian-fern-clip",
-      "comedianUserId": "user-comedian-fern",
-      "title": "Fern Fox quick clip",
-      "platform": "TIKTOK",
-      "url": "https://www.tiktok.com/@fernfox/video/106895",
-      "postedAt": "2024-03-06T20:00:00.000Z"
-    },
-    {
-      "id": "video-user-comedian-gabe-reel",
-      "comedianUserId": "user-comedian-gabe",
-      "title": "Gabe Glacier showcase reel",
-      "platform": "YOUTUBE",
-      "url": "https://youtu.be/gabe-glacier-reel",
-      "postedAt": "2024-02-11T18:00:00.000Z"
-    },
-    {
-      "id": "video-user-comedian-gabe-clip",
-      "comedianUserId": "user-comedian-gabe",
-      "title": "Gabe Glacier quick clip",
-      "platform": "TIKTOK",
-      "url": "https://www.tiktok.com/@gabeglacier/video/108274",
-      "postedAt": "2024-03-07T20:00:00.000Z"
-    },
-    {
-      "id": "video-user-comedian-hana-reel",
-      "comedianUserId": "user-comedian-hana",
-      "title": "Hana Harbor showcase reel",
-      "platform": "YOUTUBE",
-      "url": "https://youtu.be/hana-harbor-reel",
-      "postedAt": "2024-02-12T18:00:00.000Z"
-    },
-    {
-      "id": "video-user-comedian-hana-clip",
-      "comedianUserId": "user-comedian-hana",
-      "title": "Hana Harbor quick clip",
-      "platform": "TIKTOK",
-      "url": "https://www.tiktok.com/@hanaharbor/video/109653",
-      "postedAt": "2024-03-08T20:00:00.000Z"
-    },
-    {
-      "id": "video-user-comedian-isa-reel",
-      "comedianUserId": "user-comedian-isa",
-      "title": "Isa Inland showcase reel",
-      "platform": "YOUTUBE",
-      "url": "https://youtu.be/isa-inland-reel",
-      "postedAt": "2024-02-13T18:00:00.000Z"
-    },
-    {
-      "id": "video-user-comedian-isa-clip",
-      "comedianUserId": "user-comedian-isa",
-      "title": "Isa Inland quick clip",
-      "platform": "TIKTOK",
-      "url": "https://www.tiktok.com/@isainland/video/111032",
-      "postedAt": "2024-03-05T20:00:00.000Z"
-    },
-    {
-      "id": "video-user-comedian-jules-reel",
-      "comedianUserId": "user-comedian-jules",
-      "title": "Jules Jetty showcase reel",
-      "platform": "YOUTUBE",
-      "url": "https://youtu.be/jules-jetty-reel",
-      "postedAt": "2024-02-14T18:00:00.000Z"
-    },
-    {
-      "id": "video-user-comedian-jules-clip",
-      "comedianUserId": "user-comedian-jules",
-      "title": "Jules Jetty quick clip",
-      "platform": "TIKTOK",
-      "url": "https://www.tiktok.com/@julesjetty/video/112411",
-      "postedAt": "2024-03-06T20:00:00.000Z"
-    },
-    {
-      "id": "video-user-comedian-kai-reel",
-      "comedianUserId": "user-comedian-kai",
-      "title": "Kai Kettle showcase reel",
-      "platform": "YOUTUBE",
-      "url": "https://youtu.be/kai-kettle-reel",
-      "postedAt": "2024-02-10T18:00:00.000Z"
-    },
-    {
-      "id": "video-user-comedian-kai-clip",
-      "comedianUserId": "user-comedian-kai",
-      "title": "Kai Kettle quick clip",
-      "platform": "TIKTOK",
-      "url": "https://www.tiktok.com/@kaikettle/video/113790",
-      "postedAt": "2024-03-07T20:00:00.000Z"
-    },
-    {
-      "id": "video-user-comedian-lena-reel",
-      "comedianUserId": "user-comedian-lena",
-      "title": "Lena Lighthouse showcase reel",
-      "platform": "YOUTUBE",
-      "url": "https://youtu.be/lena-lighthouse-reel",
-      "postedAt": "2024-02-11T18:00:00.000Z"
-    },
-    {
-      "id": "video-user-comedian-lena-clip",
-      "comedianUserId": "user-comedian-lena",
-      "title": "Lena Lighthouse quick clip",
-      "platform": "TIKTOK",
-      "url": "https://www.tiktok.com/@lenalighthouse/video/115169",
-      "postedAt": "2024-03-08T20:00:00.000Z"
     }
   ],
   "comedianAppearances": [
     {
-      "id": "appearance-user-comedian-ava-club",
-      "comedianUserId": "user-comedian-ava",
-      "showName": "Ava Ashland Weekend Feature",
-      "venueName": "Laughs Comedy Club",
-      "city": "Seattle",
-      "state": "WA",
-      "performedAt": "2023-09-15T03:00:00.000Z",
-      "gigId": null
-    },
-    {
-      "id": "appearance-user-comedian-ava-festival",
-      "comedianUserId": "user-comedian-ava",
-      "showName": "Ava Ashland Festival Set",
-      "venueName": "Capitol Cider",
-      "city": "Seattle",
-      "state": "WA",
-      "performedAt": "2023-10-20T04:00:00.000Z",
-      "gigId": null
-    },
-    {
-      "id": "appearance-user-comedian-ben-club",
-      "comedianUserId": "user-comedian-ben",
-      "showName": "Ben Beacon Weekend Feature",
-      "venueName": "Helium Portland",
+      "id": "appearance-riley-harbor",
+      "comedianUserId": "user-comic2",
+      "showName": "Harbor Lights Late Show",
+      "venueName": "Harbor Lights Comedy Club",
       "city": "Portland",
       "state": "OR",
-      "performedAt": "2023-10-15T03:00:00.000Z",
-      "gigId": null
-    },
-    {
-      "id": "appearance-user-comedian-ben-festival",
-      "comedianUserId": "user-comedian-ben",
-      "showName": "Ben Beacon Festival Set",
-      "venueName": "Funhouse Lounge",
-      "city": "Portland",
-      "state": "OR",
-      "performedAt": "2023-11-20T04:00:00.000Z",
-      "gigId": null
-    },
-    {
-      "id": "appearance-user-comedian-cara-club",
-      "comedianUserId": "user-comedian-cara",
-      "showName": "Cara Cascade Weekend Feature",
-      "venueName": "Tacoma Comedy Club",
-      "city": "Tacoma",
-      "state": "WA",
-      "performedAt": "2023-11-15T03:00:00.000Z",
-      "gigId": null
-    },
-    {
-      "id": "appearance-user-comedian-cara-festival",
-      "comedianUserId": "user-comedian-cara",
-      "showName": "Cara Cascade Festival Set",
-      "venueName": "Jazzbones",
-      "city": "Tacoma",
-      "state": "WA",
-      "performedAt": "2023-12-20T04:00:00.000Z",
-      "gigId": null
-    },
-    {
-      "id": "appearance-user-comedian-diego-club",
-      "comedianUserId": "user-comedian-diego",
-      "showName": "Diego Drift Weekend Feature",
-      "venueName": "Capitol City Club",
-      "city": "Olympia",
-      "state": "WA",
-      "performedAt": "2023-09-15T03:00:00.000Z",
-      "gigId": null
-    },
-    {
-      "id": "appearance-user-comedian-diego-festival",
-      "comedianUserId": "user-comedian-diego",
-      "showName": "Diego Drift Festival Set",
-      "venueName": "The Brotherhood Lounge",
-      "city": "Olympia",
-      "state": "WA",
-      "performedAt": "2023-10-20T04:00:00.000Z",
-      "gigId": null
-    },
-    {
-      "id": "appearance-user-comedian-ella-club",
-      "comedianUserId": "user-comedian-ella",
-      "showName": "Ella Evergreen Weekend Feature",
-      "venueName": "Laughs Comedy Club",
-      "city": "Seattle",
-      "state": "WA",
-      "performedAt": "2023-10-15T03:00:00.000Z",
-      "gigId": null
-    },
-    {
-      "id": "appearance-user-comedian-ella-festival",
-      "comedianUserId": "user-comedian-ella",
-      "showName": "Ella Evergreen Festival Set",
-      "venueName": "Unexpected Productions",
-      "city": "Seattle",
-      "state": "WA",
-      "performedAt": "2023-11-20T04:00:00.000Z",
-      "gigId": null
-    },
-    {
-      "id": "appearance-user-comedian-fern-club",
-      "comedianUserId": "user-comedian-fern",
-      "showName": "Fern Fox Weekend Feature",
-      "venueName": "Helium Portland",
-      "city": "Portland",
-      "state": "OR",
-      "performedAt": "2023-11-15T03:00:00.000Z",
-      "gigId": null
-    },
-    {
-      "id": "appearance-user-comedian-fern-festival",
-      "comedianUserId": "user-comedian-fern",
-      "showName": "Fern Fox Festival Set",
-      "venueName": "Kelly's Olympian",
-      "city": "Portland",
-      "state": "OR",
-      "performedAt": "2023-12-20T04:00:00.000Z",
-      "gigId": null
-    },
-    {
-      "id": "appearance-user-comedian-gabe-club",
-      "comedianUserId": "user-comedian-gabe",
-      "showName": "Gabe Glacier Weekend Feature",
-      "venueName": "Upfront Theatre",
-      "city": "Bellingham",
-      "state": "WA",
-      "performedAt": "2023-09-15T03:00:00.000Z",
-      "gigId": null
-    },
-    {
-      "id": "appearance-user-comedian-gabe-festival",
-      "comedianUserId": "user-comedian-gabe",
-      "showName": "Gabe Glacier Festival Set",
-      "venueName": "Make.Shift",
-      "city": "Bellingham",
-      "state": "WA",
-      "performedAt": "2023-10-20T04:00:00.000Z",
-      "gigId": null
-    },
-    {
-      "id": "appearance-user-comedian-hana-club",
-      "comedianUserId": "user-comedian-hana",
-      "showName": "Hana Harbor Weekend Feature",
-      "venueName": "Comedy/Bar Seattle",
-      "city": "Seattle",
-      "state": "WA",
-      "performedAt": "2023-10-15T03:00:00.000Z",
-      "gigId": null
-    },
-    {
-      "id": "appearance-user-comedian-hana-festival",
-      "comedianUserId": "user-comedian-hana",
-      "showName": "Hana Harbor Festival Set",
-      "venueName": "The Crocodile",
-      "city": "Seattle",
-      "state": "WA",
-      "performedAt": "2023-11-20T04:00:00.000Z",
-      "gigId": null
-    },
-    {
-      "id": "appearance-user-comedian-isa-club",
-      "comedianUserId": "user-comedian-isa",
-      "showName": "Isa Inland Weekend Feature",
-      "venueName": "Spokane Comedy Club",
-      "city": "Spokane",
-      "state": "WA",
-      "performedAt": "2023-11-15T03:00:00.000Z",
-      "gigId": null
-    },
-    {
-      "id": "appearance-user-comedian-isa-festival",
-      "comedianUserId": "user-comedian-isa",
-      "showName": "Isa Inland Festival Set",
-      "venueName": "Tacoma Comedy Club",
-      "city": "Spokane",
-      "state": "WA",
-      "performedAt": "2023-12-20T04:00:00.000Z",
-      "gigId": null
-    },
-    {
-      "id": "appearance-user-comedian-jules-club",
-      "comedianUserId": "user-comedian-jules",
-      "showName": "Jules Jetty Weekend Feature",
-      "venueName": "Helium Portland",
-      "city": "Portland",
-      "state": "OR",
-      "performedAt": "2023-09-15T03:00:00.000Z",
-      "gigId": null
-    },
-    {
-      "id": "appearance-user-comedian-jules-festival",
-      "comedianUserId": "user-comedian-jules",
-      "showName": "Jules Jetty Festival Set",
-      "venueName": "Curious Comedy",
-      "city": "Portland",
-      "state": "OR",
-      "performedAt": "2023-10-20T04:00:00.000Z",
-      "gigId": null
-    },
-    {
-      "id": "appearance-user-comedian-kai-club",
-      "comedianUserId": "user-comedian-kai",
-      "showName": "Kai Kettle Weekend Feature",
-      "venueName": "Capitol City Club",
-      "city": "Olympia",
-      "state": "WA",
-      "performedAt": "2023-10-15T03:00:00.000Z",
-      "gigId": null
-    },
-    {
-      "id": "appearance-user-comedian-kai-festival",
-      "comedianUserId": "user-comedian-kai",
-      "showName": "Kai Kettle Festival Set",
-      "venueName": "Rhythms Coffee",
-      "city": "Olympia",
-      "state": "WA",
-      "performedAt": "2023-11-20T04:00:00.000Z",
-      "gigId": null
-    },
-    {
-      "id": "appearance-user-comedian-lena-club",
-      "comedianUserId": "user-comedian-lena",
-      "showName": "Lena Lighthouse Weekend Feature",
-      "venueName": "Laughs Comedy Club",
-      "city": "Seattle",
-      "state": "WA",
-      "performedAt": "2023-11-15T03:00:00.000Z",
-      "gigId": null
-    },
-    {
-      "id": "appearance-user-comedian-lena-festival",
-      "comedianUserId": "user-comedian-lena",
-      "showName": "Lena Lighthouse Festival Set",
-      "venueName": "Unexpected Productions",
-      "city": "Seattle",
-      "state": "WA",
-      "performedAt": "2023-12-20T04:00:00.000Z",
-      "gigId": null
+      "performedAt": "2024-03-05T21:00:00.000Z",
+      "gigId": "gig-portland-past"
     }
   ],
   "promoterProfiles": [
     {
-      "userId": "user-promoter-seattle",
-      "organization": "Soundstage Productions",
-      "contactName": "Sasha Showcase",
-      "phone": "206-555-0100",
-      "website": "https://soundstageproductions.example.com",
+      "userId": "user-promoter",
+      "organization": "Northwest Laugh Co.",
+      "contactName": "Paula Promoter",
+      "phone": "206-555-1212",
+      "website": "https://northwestlaughs.example.com",
       "verificationStatus": "APPROVED",
-      "createdAt": "2024-01-03T10:00:00.000Z",
-      "updatedAt": "2024-03-02T09:00:00.000Z"
-    },
-    {
-      "userId": "user-promoter-portland",
-      "organization": "Rose City Comedy",
-      "contactName": "Parker PDX",
-      "phone": "503-555-0133",
-      "website": "https://rosecitycomedy.example.com",
-      "verificationStatus": "APPROVED",
-      "createdAt": "2024-01-04T11:00:00.000Z",
-      "updatedAt": "2024-03-04T09:00:00.000Z"
-    },
-    {
-      "userId": "user-promoter-tacoma",
-      "organization": "Grit City Laughs",
-      "contactName": "Taylor Tacoma",
-      "phone": "253-555-0199",
-      "website": "https://gritcitylaughs.example.com",
-      "verificationStatus": "PENDING",
-      "createdAt": "2024-01-05T12:00:00.000Z",
-      "updatedAt": "2024-02-28T09:00:00.000Z"
-    },
-    {
-      "userId": "user-promoter-olympia",
-      "organization": "Capitol Chuckles",
-      "contactName": "Oakley Olympia",
-      "phone": "360-555-0112",
-      "website": "https://capitolchuckles.example.com",
-      "verificationStatus": "APPROVED",
-      "createdAt": "2024-01-06T13:00:00.000Z",
-      "updatedAt": "2024-03-06T09:00:00.000Z"
+      "createdAt": "2024-01-07T09:00:00.000Z",
+      "updatedAt": "2024-04-01T09:00:00.000Z"
     }
   ],
   "venueProfiles": [
     {
-      "userId": "user-venue-seattle-laugh-lodge",
-      "venueName": "Laugh Lodge",
-      "address1": "123 Pike St",
-      "address2": null,
-      "city": "Seattle",
-      "state": "WA",
-      "postalCode": "98101",
-      "capacity": 220,
-      "contactEmail": "booking@laughlodge.example.com",
-      "phone": "206-555-0190",
-      "verificationStatus": "APPROVED",
-      "createdAt": "2024-01-07T14:00:00.000Z",
-      "updatedAt": "2024-03-01T10:00:00.000Z"
-    },
-    {
-      "userId": "user-venue-seattle-bay",
-      "venueName": "Bayfront Comedy",
-      "address1": "400 Alaskan Way",
-      "address2": "Suite 200",
-      "city": "Seattle",
-      "state": "WA",
-      "postalCode": "98104",
-      "capacity": 150,
-      "contactEmail": "hello@bayfrontcomedy.example.com",
-      "phone": "206-555-0191",
-      "verificationStatus": "APPROVED",
-      "createdAt": "2024-01-07T16:00:00.000Z",
-      "updatedAt": "2024-02-20T09:00:00.000Z"
-    },
-    {
-      "userId": "user-venue-portland-stumptown",
-      "venueName": "Stumptown Laugh Lab",
-      "address1": "88 Burnside St",
+      "userId": "user-venue",
+      "venueName": "Harbor Lights Comedy Club",
+      "address1": "123 Pier Ave",
       "address2": null,
       "city": "Portland",
       "state": "OR",
-      "postalCode": "97209",
+      "postalCode": "97205",
       "capacity": 180,
-      "contactEmail": "bookings@stumptownlaughlab.example.com",
-      "phone": "503-555-0108",
+      "contactEmail": "bookings@harborlights.local",
+      "phone": "503-555-4242",
       "verificationStatus": "APPROVED",
       "createdAt": "2024-01-08T09:00:00.000Z",
-      "updatedAt": "2024-03-03T09:00:00.000Z"
-    },
-    {
-      "userId": "user-venue-portland-bridge",
-      "venueName": "Bridge City Comedy",
-      "address1": "500 Hawthorne Blvd",
-      "address2": null,
-      "city": "Portland",
-      "state": "OR",
-      "postalCode": "97214",
-      "capacity": 120,
-      "contactEmail": "info@bridgecitycomedy.example.com",
-      "phone": "503-555-0110",
-      "verificationStatus": "APPROVED",
-      "createdAt": "2024-01-08T11:00:00.000Z",
-      "updatedAt": "2024-02-26T09:00:00.000Z"
-    },
-    {
-      "userId": "user-venue-tacoma-grit",
-      "venueName": "Grit City Stage",
-      "address1": "777 Pacific Ave",
-      "address2": null,
-      "city": "Tacoma",
-      "state": "WA",
-      "postalCode": "98402",
-      "capacity": 200,
-      "contactEmail": "stage@gritcitystage.example.com",
-      "phone": "253-555-0117",
-      "verificationStatus": "PENDING",
-      "createdAt": "2024-01-09T10:00:00.000Z",
-      "updatedAt": "2024-02-18T09:00:00.000Z"
-    },
-    {
-      "userId": "user-venue-tacoma-waterfront",
-      "venueName": "Waterfront Comedy Loft",
-      "address1": "2 Dock St",
-      "address2": "Floor 3",
-      "city": "Tacoma",
-      "state": "WA",
-      "postalCode": "98402",
-      "capacity": 140,
-      "contactEmail": "booking@waterfrontloft.example.com",
-      "phone": "253-555-0124",
-      "verificationStatus": "APPROVED",
-      "createdAt": "2024-01-09T12:00:00.000Z",
-      "updatedAt": "2024-03-05T09:00:00.000Z"
-    },
-    {
-      "userId": "user-venue-olympia-capitol",
-      "venueName": "Capitol City Club",
-      "address1": "100 Capitol Way",
-      "address2": null,
-      "city": "Olympia",
-      "state": "WA",
-      "postalCode": "98501",
-      "capacity": 180,
-      "contactEmail": "hello@capitolcityclub.example.com",
-      "phone": "360-555-0152",
-      "verificationStatus": "APPROVED",
-      "createdAt": "2024-01-10T10:00:00.000Z",
-      "updatedAt": "2024-02-15T09:00:00.000Z"
-    },
-    {
-      "userId": "user-venue-olympia-brew",
-      "venueName": "Brew HaHa Hall",
-      "address1": "44 4th Ave",
-      "address2": null,
-      "city": "Olympia",
-      "state": "WA",
-      "postalCode": "98501",
-      "capacity": 90,
-      "contactEmail": "bookings@brewhahahall.example.com",
-      "phone": "360-555-0195",
-      "verificationStatus": "APPROVED",
-      "createdAt": "2024-01-10T12:00:00.000Z",
-      "updatedAt": "2024-03-07T09:00:00.000Z"
+      "updatedAt": "2024-04-01T10:00:00.000Z"
     }
   ],
   "gigs": [
     {
-      "id": "gig-sea-clean-01",
-      "createdByUserId": "user-promoter-seattle",
-      "title": "Downtown Seattle Clean Showcase",
-      "description": "Friday showcase focused on clean corporate-ready material.",
+      "id": "gig-seattle-showcase",
+      "createdByUserId": "user-promoter",
+      "title": "Waterfront Weekend Showcase",
+      "description": "Book a headliner for a high-energy Saturday night showcase in Seattle.",
       "compensationType": "FLAT",
-      "payoutUsd": 60000,
-      "dateStart": "2024-04-13T03:00:00.000Z",
-      "dateEnd": "2024-04-13T05:00:00.000Z",
-      "timezone": "America/Los_Angeles",
-      "city": "Seattle",
-      "state": "WA",
-      "minAge": 18,
-      "isPublished": true,
-      "status": "PUBLISHED",
-      "format": "Showcase",
-      "setLengthMinutes": 20,
-      "audienceDescription": "Requires clean (PG-13 or cleaner) material for corporate partners.",
-      "totalSpots": 4,
-      "perks": [
-        "Green room catering",
-        "Professional photos"
-      ],
-      "createdAt": "2024-02-12T09:00:00.000Z",
-      "updatedAt": "2024-03-20T09:00:00.000Z"
-    },
-    {
-      "id": "gig-sea-late-02",
-      "createdByUserId": "user-venue-seattle-laugh-lodge",
-      "title": "Laugh Lodge Late Show",
-      "description": "Weekend late show looking for high-energy headliner.",
-      "compensationType": "FLAT",
-      "payoutUsd": 75000,
-      "dateStart": "2024-04-21T05:00:00.000Z",
-      "dateEnd": "2024-04-21T07:00:00.000Z",
+      "payoutUsd": 500,
+      "dateStart": "2024-06-15T03:00:00.000Z",
+      "dateEnd": null,
       "timezone": "America/Los_Angeles",
       "city": "Seattle",
       "state": "WA",
       "minAge": 21,
       "isPublished": true,
       "status": "OPEN",
-      "format": "Club weekend",
-      "setLengthMinutes": 45,
-      "audienceDescription": "Late-night crowd open to edgy material.",
+      "format": "Club Showcase",
+      "setLengthMinutes": 25,
+      "audienceDescription": "200-seat club audience looking for polished acts.",
       "totalSpots": 1,
       "perks": [
         "Hotel provided",
-        "Merch table"
+        "Ground transportation"
       ],
-      "createdAt": "2024-02-15T09:00:00.000Z",
-      "updatedAt": "2024-03-18T09:00:00.000Z"
+      "createdAt": "2024-04-10T09:00:00.000Z",
+      "updatedAt": "2024-04-25T09:00:00.000Z"
     },
     {
-      "id": "gig-pdx-brew-01",
-      "createdByUserId": "user-promoter-portland",
+      "id": "gig-portland-open",
+      "createdByUserId": "user-venue",
       "title": "Portland Brewery Comedy Night",
-      "description": "Monthly brewery show needs engaging feature acts.",
-      "compensationType": "DOOR_SPLIT",
-      "payoutUsd": 40000,
-      "dateStart": "2024-04-19T02:00:00.000Z",
-      "dateEnd": "2024-04-19T04:00:00.000Z",
-      "timezone": "America/Los_Angeles",
-      "city": "Portland",
-      "state": "OR",
-      "minAge": 21,
-      "isPublished": true,
-      "status": "PUBLISHED",
-      "format": "Brewery show",
-      "setLengthMinutes": 25,
-      "audienceDescription": "PG-13 friendly set requested for brewery partners.",
-      "totalSpots": 2,
-      "perks": [
-        "Drink tickets",
-        "Local press shoutout"
-      ],
-      "createdAt": "2024-02-10T09:00:00.000Z",
-      "updatedAt": "2024-03-14T09:00:00.000Z"
-    },
-    {
-      "id": "gig-pdx-club-02",
-      "createdByUserId": "user-venue-portland-stumptown",
-      "title": "Stumptown Laugh Lab Experimental Night",
-      "description": "Alternative comedy night, no clean requirement.",
-      "compensationType": "TIPS",
-      "payoutUsd": 15000,
-      "dateStart": "2024-05-03T03:00:00.000Z",
-      "dateEnd": "2024-05-03T05:00:00.000Z",
+      "description": "Seeking a clean comic for a Friday brewery crowd with family-friendly vibes.",
+      "compensationType": "FLAT",
+      "payoutUsd": 350,
+      "dateStart": "2024-06-21T02:00:00.000Z",
+      "dateEnd": null,
       "timezone": "America/Los_Angeles",
       "city": "Portland",
       "state": "OR",
       "minAge": 18,
       "isPublished": true,
       "status": "OPEN",
-      "format": "Alt showcase",
-      "setLengthMinutes": 15,
-      "audienceDescription": "Anything goes, supportive alt crowd.",
-      "totalSpots": 6,
-      "perks": [
-        "Professional video",
-        "Podcast interview"
-      ],
-      "createdAt": "2024-02-20T09:00:00.000Z",
-      "updatedAt": "2024-03-25T09:00:00.000Z"
-    },
-    {
-      "id": "gig-tac-corporate-01",
-      "createdByUserId": "user-promoter-tacoma",
-      "title": "Tacoma Tech Corporate Luncheon",
-      "description": "Corporate luncheon seeking clean MC and closer.",
-      "compensationType": "FLAT",
-      "payoutUsd": 95000,
-      "dateStart": "2024-03-22T19:00:00.000Z",
-      "dateEnd": "2024-03-22T21:00:00.000Z",
-      "timezone": "America/Los_Angeles",
-      "city": "Tacoma",
-      "state": "WA",
-      "minAge": 18,
-      "isPublished": true,
-      "status": "PUBLISHED",
-      "format": "Corporate",
-      "setLengthMinutes": 30,
-      "audienceDescription": "Strictly clean content for enterprise partners.",
-      "totalSpots": 1,
-      "perks": [
-        "Travel stipend",
-        "Post-event testimonials"
-      ],
-      "createdAt": "2024-02-01T09:00:00.000Z",
-      "updatedAt": "2024-03-10T09:00:00.000Z"
-    },
-    {
-      "id": "gig-tac-late-02",
-      "createdByUserId": "user-venue-tacoma-waterfront",
-      "title": "Waterfront Loft Late Night",
-      "description": "Saturday late show with rowdy crowd and DJ.",
-      "compensationType": "FLAT",
-      "payoutUsd": 65000,
-      "dateStart": "2024-04-28T05:30:00.000Z",
-      "dateEnd": "2024-04-28T07:30:00.000Z",
-      "timezone": "America/Los_Angeles",
-      "city": "Tacoma",
-      "state": "WA",
-      "minAge": 21,
-      "isPublished": true,
-      "status": "OPEN",
-      "format": "Club late night",
-      "setLengthMinutes": 30,
-      "audienceDescription": "Edgy material encouraged, crowd loves improv.",
-      "totalSpots": 2,
-      "perks": [
-        "Hotel discount",
-        "Drink tickets"
-      ],
-      "createdAt": "2024-02-25T09:00:00.000Z",
-      "updatedAt": "2024-03-22T09:00:00.000Z"
-    },
-    {
-      "id": "gig-oly-benefit-01",
-      "createdByUserId": "user-promoter-olympia",
-      "title": "Olympia Arts Benefit",
-      "description": "Fundraiser with families in attendance looking for clean headliner.",
-      "compensationType": "FLAT",
-      "payoutUsd": 70000,
-      "dateStart": "2024-03-31T01:00:00.000Z",
-      "dateEnd": "2024-03-31T03:00:00.000Z",
-      "timezone": "America/Los_Angeles",
-      "city": "Olympia",
-      "state": "WA",
-      "minAge": 12,
-      "isPublished": true,
-      "status": "PUBLISHED",
-      "format": "Fundraiser",
-      "setLengthMinutes": 35,
-      "audienceDescription": "Family friendly show supporting local arts.",
-      "totalSpots": 1,
-      "perks": [
-        "Professional photos",
-        "Local press"
-      ],
-      "createdAt": "2024-01-28T09:00:00.000Z",
-      "updatedAt": "2024-03-12T09:00:00.000Z"
-    },
-    {
-      "id": "gig-oly-brew-02",
-      "createdByUserId": "user-venue-olympia-brew",
-      "title": "Brew HaHa Comedy Night",
-      "description": "Monthly brewery show featuring regional comics.",
-      "compensationType": "DOOR_SPLIT",
-      "payoutUsd": 32000,
-      "dateStart": "2024-04-11T02:30:00.000Z",
-      "dateEnd": "2024-04-11T04:30:00.000Z",
-      "timezone": "America/Los_Angeles",
-      "city": "Olympia",
-      "state": "WA",
-      "minAge": 21,
-      "isPublished": true,
-      "status": "OPEN",
-      "format": "Brewery show",
+      "format": "Brewery Show",
       "setLengthMinutes": 20,
-      "audienceDescription": "Looking for PG-13 hosts who can riff with beer lovers.",
-      "totalSpots": 3,
+      "audienceDescription": "Cozy brewery audience who love music and storytelling.",
+      "totalSpots": 1,
       "perks": [
-        "Brewery gift cards"
+        "Meal voucher"
       ],
-      "createdAt": "2024-02-18T09:00:00.000Z",
-      "updatedAt": "2024-03-19T09:00:00.000Z"
+      "createdAt": "2024-04-12T09:00:00.000Z",
+      "updatedAt": "2024-04-24T10:00:00.000Z"
     },
     {
-      "id": "gig-bellingham-01",
-      "createdByUserId": "user-promoter-seattle",
-      "title": "Bellingham University Night",
-      "description": "Campus show needing youthful hosts and clean-ish material.",
+      "id": "gig-portland-past",
+      "createdByUserId": "user-promoter",
+      "title": "Rooftop Spring Finale",
+      "description": "Completed rooftop series closer featuring acoustic comedy and clean sets.",
       "compensationType": "FLAT",
-      "payoutUsd": 50000,
-      "dateStart": "2024-03-09T03:00:00.000Z",
-      "dateEnd": "2024-03-09T05:00:00.000Z",
+      "payoutUsd": 400,
+      "dateStart": "2024-03-05T02:00:00.000Z",
+      "dateEnd": null,
       "timezone": "America/Los_Angeles",
-      "city": "Bellingham",
-      "state": "WA",
-      "minAge": 18,
+      "city": "Portland",
+      "state": "OR",
+      "minAge": 21,
       "isPublished": true,
-      "status": "PUBLISHED",
-      "format": "Campus show",
+      "status": "CLOSED",
+      "format": "Rooftop Show",
       "setLengthMinutes": 30,
-      "audienceDescription": "PG-13 requested, students love local references.",
-      "totalSpots": 2,
+      "audienceDescription": "Outdoor rooftop crowd with curated seating.",
+      "totalSpots": 1,
       "perks": [
-        "Campus meal vouchers"
+        "Green room snacks"
       ],
       "createdAt": "2024-01-25T09:00:00.000Z",
-      "updatedAt": "2024-03-05T09:00:00.000Z"
-    },
-    {
-      "id": "gig-spokane-01",
-      "createdByUserId": "user-promoter-seattle",
-      "title": "Spokane Casino Weekend",
-      "description": "Weekend casino lounge seeking feature and closer.",
-      "compensationType": "FLAT",
-      "payoutUsd": 85000,
-      "dateStart": "2024-03-16T03:00:00.000Z",
-      "dateEnd": "2024-03-17T05:00:00.000Z",
-      "timezone": "America/Los_Angeles",
-      "city": "Airway Heights",
-      "state": "WA",
-      "minAge": 21,
-      "isPublished": true,
-      "status": "PUBLISHED",
-      "format": "Casino weekend",
-      "setLengthMinutes": 45,
-      "audienceDescription": "Prefers PG-13 with light crowd work.",
-      "totalSpots": 2,
-      "perks": [
-        "Hotel suite",
-        "Meal vouchers"
-      ],
-      "createdAt": "2024-01-20T09:00:00.000Z",
-      "updatedAt": "2024-03-07T09:00:00.000Z"
+      "updatedAt": "2024-03-06T09:00:00.000Z"
     }
   ],
   "applications": [],
   "verificationRequests": [],
-  "favorites": [],
+  "favorites": [
+    {
+      "id": "favorite-fan-seattle",
+      "userId": "user-fan",
+      "gigId": "gig-seattle-showcase",
+      "venueId": null,
+      "createdAt": "2024-04-22T09:00:00.000Z",
+      "updatedAt": "2024-04-22T09:00:00.000Z"
+    }
+  ],
   "threads": [
     {
-      "id": "thread-sea-clean-ella",
-      "gigId": "gig-sea-clean-01",
-      "createdById": "user-promoter-seattle",
+      "id": "thread-seattle-offer",
+      "gigId": "gig-seattle-showcase",
+      "createdById": "user-promoter",
       "participantIds": [
-        "user-promoter-seattle",
-        "user-comedian-ella"
+        "user-promoter",
+        "user-comic1"
       ],
-      "state": "BOOKED",
-      "lastMessageAt": "2024-03-05T18:00:00.000Z",
-      "createdAt": "2024-02-18T10:00:00.000Z",
-      "updatedAt": "2024-03-05T18:00:00.000Z"
+      "state": "INQUIRY",
+      "lastMessageAt": "2024-04-28T16:00:00.000Z",
+      "createdAt": "2024-04-20T15:00:00.000Z",
+      "updatedAt": "2024-04-28T16:00:00.000Z"
     },
     {
-      "id": "thread-oly-benefit-kai",
-      "gigId": "gig-oly-benefit-01",
-      "createdById": "user-promoter-olympia",
+      "id": "thread-portland-booked",
+      "gigId": "gig-portland-past",
+      "createdById": "user-promoter",
       "participantIds": [
-        "user-promoter-olympia",
-        "user-comedian-kai"
+        "user-promoter",
+        "user-comic2"
       ],
       "state": "BOOKED",
-      "lastMessageAt": "2024-02-28T19:00:00.000Z",
-      "createdAt": "2024-02-10T09:00:00.000Z",
-      "updatedAt": "2024-02-28T19:00:00.000Z"
-    },
-    {
-      "id": "thread-tac-corp-lena",
-      "gigId": "gig-tac-corporate-01",
-      "createdById": "user-promoter-tacoma",
-      "participantIds": [
-        "user-promoter-tacoma",
-        "user-comedian-lena"
-      ],
-      "state": "BOOKED",
-      "lastMessageAt": "2024-02-20T18:00:00.000Z",
-      "createdAt": "2024-01-28T09:00:00.000Z",
-      "updatedAt": "2024-02-20T18:00:00.000Z"
-    },
-    {
-      "id": "thread-bham-isa",
-      "gigId": "gig-bellingham-01",
-      "createdById": "user-promoter-seattle",
-      "participantIds": [
-        "user-promoter-seattle",
-        "user-comedian-isa"
-      ],
-      "state": "BOOKED",
-      "lastMessageAt": "2024-02-15T18:00:00.000Z",
-      "createdAt": "2024-01-30T09:00:00.000Z",
-      "updatedAt": "2024-02-15T18:00:00.000Z"
+      "lastMessageAt": "2024-03-06T17:00:00.000Z",
+      "createdAt": "2024-02-20T14:00:00.000Z",
+      "updatedAt": "2024-03-06T17:00:00.000Z"
     }
   ],
   "messages": [
     {
-      "id": "msg-sea-clean-1",
-      "threadId": "thread-sea-clean-ella",
-      "senderId": "user-promoter-seattle",
+      "id": "message-seattle-intro",
+      "threadId": "thread-seattle-offer",
+      "senderId": "user-promoter",
       "kind": "TEXT",
-      "body": "We'd love to have you headline our downtown clean showcase.",
+      "body": "Hey Casey! We'd love to have you headline our waterfront showcase.",
       "fileUrl": null,
       "offerId": null,
-      "createdAt": "2024-02-18T10:00:00.000Z"
+      "createdAt": "2024-04-20T15:00:00.000Z"
     },
     {
-      "id": "msg-sea-clean-2",
-      "threadId": "thread-sea-clean-ella",
-      "senderId": "user-comedian-ella",
+      "id": "message-seattle-details",
+      "threadId": "thread-seattle-offer",
+      "senderId": "user-promoter",
       "kind": "TEXT",
-      "body": "Thanks Sasha! Clean requirements work great for me.",
+      "body": "Offer sent with set length and budget details.",
       "fileUrl": null,
-      "offerId": null,
-      "createdAt": "2024-02-18T11:00:00.000Z"
+      "offerId": "offer-seattle-casey",
+      "createdAt": "2024-04-20T15:00:00.000Z"
     },
     {
-      "id": "msg-sea-clean-3",
-      "threadId": "thread-sea-clean-ella",
-      "senderId": "user-promoter-seattle",
-      "kind": "OFFER",
-      "body": null,
-      "fileUrl": null,
-      "offerId": "offer-sea-clean-ella",
-      "createdAt": "2024-02-18T12:00:00.000Z"
-    },
-    {
-      "id": "msg-sea-clean-4",
-      "threadId": "thread-sea-clean-ella",
-      "senderId": "user-comedian-ella",
-      "kind": "SYSTEM",
-      "body": "Offer accepted. Booking created: booking-sea-clean-ella",
-      "fileUrl": null,
-      "offerId": null,
-      "createdAt": "2024-03-05T18:00:00.000Z"
-    },
-    {
-      "id": "msg-oly-benefit-1",
-      "threadId": "thread-oly-benefit-kai",
-      "senderId": "user-promoter-olympia",
+      "id": "message-portland-confirm",
+      "threadId": "thread-portland-booked",
+      "senderId": "user-comic2",
       "kind": "TEXT",
-      "body": "Hi Kai! Looking for a clean, friendly host for our arts benefit.",
+      "body": "Excited for the rooftop finale! I'll bring the guitar for a closer.",
       "fileUrl": null,
-      "offerId": null,
-      "createdAt": "2024-02-10T09:00:00.000Z"
-    },
-    {
-      "id": "msg-oly-benefit-2",
-      "threadId": "thread-oly-benefit-kai",
-      "senderId": "user-comedian-kai",
-      "kind": "TEXT",
-      "body": "Sounds perfect. I can also help with audience warm-up games!",
-      "fileUrl": null,
-      "offerId": null,
-      "createdAt": "2024-02-10T10:00:00.000Z"
-    },
-    {
-      "id": "msg-oly-benefit-3",
-      "threadId": "thread-oly-benefit-kai",
-      "senderId": "user-promoter-olympia",
-      "kind": "OFFER",
-      "body": null,
-      "fileUrl": null,
-      "offerId": "offer-oly-benefit-kai",
-      "createdAt": "2024-02-10T11:00:00.000Z"
-    },
-    {
-      "id": "msg-oly-benefit-4",
-      "threadId": "thread-oly-benefit-kai",
-      "senderId": "user-comedian-kai",
-      "kind": "SYSTEM",
-      "body": "Offer accepted. Booking created: booking-oly-benefit-kai",
-      "fileUrl": null,
-      "offerId": null,
-      "createdAt": "2024-02-28T19:00:00.000Z"
-    },
-    {
-      "id": "msg-tac-corp-1",
-      "threadId": "thread-tac-corp-lena",
-      "senderId": "user-promoter-tacoma",
-      "kind": "TEXT",
-      "body": "Hi Lena, need a clean closer for Tacoma Tech luncheon.",
-      "fileUrl": null,
-      "offerId": null,
-      "createdAt": "2024-01-28T09:00:00.000Z"
-    },
-    {
-      "id": "msg-tac-corp-2",
-      "threadId": "thread-tac-corp-lena",
-      "senderId": "user-comedian-lena",
-      "kind": "TEXT",
-      "body": "Would love to! I'll tailor to their engineering team.",
-      "fileUrl": null,
-      "offerId": null,
-      "createdAt": "2024-01-28T11:00:00.000Z"
-    },
-    {
-      "id": "msg-tac-corp-3",
-      "threadId": "thread-tac-corp-lena",
-      "senderId": "user-promoter-tacoma",
-      "kind": "OFFER",
-      "body": null,
-      "fileUrl": null,
-      "offerId": "offer-tac-corp-lena",
-      "createdAt": "2024-01-28T12:00:00.000Z"
-    },
-    {
-      "id": "msg-tac-corp-4",
-      "threadId": "thread-tac-corp-lena",
-      "senderId": "user-comedian-lena",
-      "kind": "SYSTEM",
-      "body": "Offer accepted. Booking created: booking-tac-corp-lena",
-      "fileUrl": null,
-      "offerId": null,
-      "createdAt": "2024-02-20T18:00:00.000Z"
-    },
-    {
-      "id": "msg-bham-1",
-      "threadId": "thread-bham-isa",
-      "senderId": "user-promoter-seattle",
-      "kind": "TEXT",
-      "body": "Looking for someone who can connect with students—interested?",
-      "fileUrl": null,
-      "offerId": null,
-      "createdAt": "2024-01-30T09:00:00.000Z"
-    },
-    {
-      "id": "msg-bham-2",
-      "threadId": "thread-bham-isa",
-      "senderId": "user-comedian-isa",
-      "kind": "TEXT",
-      "body": "Absolutely. I'll bring campus-specific material.",
-      "fileUrl": null,
-      "offerId": null,
-      "createdAt": "2024-01-30T10:00:00.000Z"
-    },
-    {
-      "id": "msg-bham-3",
-      "threadId": "thread-bham-isa",
-      "senderId": "user-promoter-seattle",
-      "kind": "OFFER",
-      "body": null,
-      "fileUrl": null,
-      "offerId": "offer-bham-isa",
-      "createdAt": "2024-01-30T11:00:00.000Z"
-    },
-    {
-      "id": "msg-bham-4",
-      "threadId": "thread-bham-isa",
-      "senderId": "user-comedian-isa",
-      "kind": "SYSTEM",
-      "body": "Offer accepted. Booking created: booking-bham-isa",
-      "fileUrl": null,
-      "offerId": null,
-      "createdAt": "2024-02-15T18:00:00.000Z"
+      "offerId": "offer-portland-riley",
+      "createdAt": "2024-02-22T10:00:00.000Z"
     }
   ],
   "offers": [
     {
-      "id": "offer-sea-clean-ella",
-      "threadId": "thread-sea-clean-ella",
-      "fromUserId": "user-promoter-seattle",
-      "amount": 65000,
+      "id": "offer-seattle-casey",
+      "threadId": "thread-seattle-offer",
+      "fromUserId": "user-promoter",
+      "amount": 500,
       "currency": "USD",
-      "terms": "35-minute clean headline set, includes photo meet-and-greet.",
-      "eventDate": "2024-04-13T03:00:00.000Z",
-      "expiresAt": "2024-02-28T23:00:00.000Z",
-      "status": "ACCEPTED",
-      "createdAt": "2024-02-18T12:00:00.000Z"
+      "terms": "25 minute featured set plus meet and greet",
+      "eventDate": "2024-06-15T03:00:00.000Z",
+      "expiresAt": "2024-05-05T12:00:00.000Z",
+      "status": "PENDING",
+      "createdAt": "2024-04-20T15:00:00.000Z"
     },
     {
-      "id": "offer-oly-benefit-kai",
-      "threadId": "thread-oly-benefit-kai",
-      "fromUserId": "user-promoter-olympia",
-      "amount": 60000,
+      "id": "offer-portland-riley",
+      "threadId": "thread-portland-booked",
+      "fromUserId": "user-promoter",
+      "amount": 400,
       "currency": "USD",
-      "terms": "Host + 20-minute closing set, clean material only.",
-      "eventDate": "2024-03-31T01:00:00.000Z",
-      "expiresAt": "2024-02-29T23:00:00.000Z",
+      "terms": "30 minute rooftop closer, includes travel stipend",
+      "eventDate": "2024-03-05T02:00:00.000Z",
+      "expiresAt": null,
       "status": "ACCEPTED",
-      "createdAt": "2024-02-10T11:00:00.000Z"
-    },
-    {
-      "id": "offer-tac-corp-lena",
-      "threadId": "thread-tac-corp-lena",
-      "fromUserId": "user-promoter-tacoma",
-      "amount": 90000,
-      "currency": "USD",
-      "terms": "30-minute clean keynote with Q&A",
-      "eventDate": "2024-03-22T19:00:00.000Z",
-      "expiresAt": "2024-02-01T23:00:00.000Z",
-      "status": "ACCEPTED",
-      "createdAt": "2024-01-28T12:00:00.000Z"
-    },
-    {
-      "id": "offer-bham-isa",
-      "threadId": "thread-bham-isa",
-      "fromUserId": "user-promoter-seattle",
-      "amount": 52000,
-      "currency": "USD",
-      "terms": "Host + 25-minute featured set, PG-13.",
-      "eventDate": "2024-03-09T03:00:00.000Z",
-      "expiresAt": "2024-02-10T23:00:00.000Z",
-      "status": "ACCEPTED",
-      "createdAt": "2024-01-30T11:00:00.000Z"
+      "createdAt": "2024-02-20T14:00:00.000Z"
     }
   ],
   "bookings": [
     {
-      "id": "booking-sea-clean-ella",
-      "gigId": "gig-sea-clean-01",
-      "comedianId": "user-comedian-ella",
-      "promoterId": "user-promoter-seattle",
-      "offerId": "offer-sea-clean-ella",
-      "status": "PAID",
+      "id": "booking-portland-riley",
+      "gigId": "gig-portland-past",
+      "comedianId": "user-comic2",
+      "promoterId": "user-promoter",
+      "offerId": "offer-portland-riley",
+      "status": "COMPLETED",
       "payoutProtection": true,
       "cancellationPolicy": "STANDARD",
-      "paymentIntentId": "pi_demo_clean_ella",
-      "createdAt": "2024-03-05T18:00:00.000Z"
-    },
-    {
-      "id": "booking-oly-benefit-kai",
-      "gigId": "gig-oly-benefit-01",
-      "comedianId": "user-comedian-kai",
-      "promoterId": "user-promoter-olympia",
-      "offerId": "offer-oly-benefit-kai",
-      "status": "PAID",
-      "payoutProtection": true,
-      "cancellationPolicy": "FLEX",
-      "paymentIntentId": "pi_demo_oly_kai",
-      "createdAt": "2024-02-28T19:00:00.000Z"
-    },
-    {
-      "id": "booking-tac-corp-lena",
-      "gigId": "gig-tac-corporate-01",
-      "comedianId": "user-comedian-lena",
-      "promoterId": "user-promoter-tacoma",
-      "offerId": "offer-tac-corp-lena",
-      "status": "PAID",
-      "payoutProtection": true,
-      "cancellationPolicy": "STRICT",
-      "paymentIntentId": "pi_demo_tac_lena",
-      "createdAt": "2024-02-20T18:00:00.000Z"
-    },
-    {
-      "id": "booking-bham-isa",
-      "gigId": "gig-bellingham-01",
-      "comedianId": "user-comedian-isa",
-      "promoterId": "user-promoter-seattle",
-      "offerId": "offer-bham-isa",
-      "status": "PAID",
-      "payoutProtection": true,
-      "cancellationPolicy": "STANDARD",
-      "paymentIntentId": "pi_demo_bham_isa",
-      "createdAt": "2024-02-15T18:00:00.000Z"
+      "paymentIntentId": "pi_demo_portland_riley",
+      "createdAt": "2024-02-22T11:00:00.000Z"
     }
   ],
   "conversationReviews": [
     {
-      "id": "conv-review-sea-clean-promoter",
-      "bookingId": "booking-sea-clean-ella",
-      "fromUserId": "user-promoter-seattle",
-      "toUserId": "user-comedian-ella",
+      "id": "conversation-review-promoter",
+      "bookingId": "booking-portland-riley",
+      "fromUserId": "user-promoter",
+      "toUserId": "user-comic2",
       "rating": 5,
-      "body": "Ella was responsive and sent promo assets immediately.",
+      "body": "Fantastic communication and quick to confirm tech needs.",
       "visible": true,
-      "createdAt": "2024-04-13T12:00:00.000Z"
-    },
-    {
-      "id": "conv-review-sea-clean-comic",
-      "bookingId": "booking-sea-clean-ella",
-      "fromUserId": "user-comedian-ella",
-      "toUserId": "user-promoter-seattle",
-      "rating": 5,
-      "body": "Sasha communicated every detail and the crowd was lovely.",
-      "visible": true,
-      "createdAt": "2024-04-13T12:00:00.000Z"
-    },
-    {
-      "id": "conv-review-oly-benefit-promoter",
-      "bookingId": "booking-oly-benefit-kai",
-      "fromUserId": "user-promoter-olympia",
-      "toUserId": "user-comedian-kai",
-      "rating": 5,
-      "body": "Kai kept the families engaged and handled transitions perfectly.",
-      "visible": true,
-      "createdAt": "2024-03-31T12:00:00.000Z"
-    },
-    {
-      "id": "conv-review-oly-benefit-comic",
-      "bookingId": "booking-oly-benefit-kai",
-      "fromUserId": "user-comedian-kai",
-      "toUserId": "user-promoter-olympia",
-      "rating": 5,
-      "body": "Organized event with clear run-of-show. Happy to return!",
-      "visible": true,
-      "createdAt": "2024-03-31T12:00:00.000Z"
-    },
-    {
-      "id": "conv-review-tac-corp-promoter",
-      "bookingId": "booking-tac-corp-lena",
-      "fromUserId": "user-promoter-tacoma",
-      "toUserId": "user-comedian-lena",
-      "rating": 5,
-      "body": "Lena delivered polished material and handled exec banter flawlessly.",
-      "visible": true,
-      "createdAt": "2024-03-23T12:00:00.000Z"
-    },
-    {
-      "id": "conv-review-tac-corp-comic",
-      "bookingId": "booking-tac-corp-lena",
-      "fromUserId": "user-comedian-lena",
-      "toUserId": "user-promoter-tacoma",
-      "rating": 4,
-      "body": "Taylor was organized though AV check ran tight.",
-      "visible": true,
-      "createdAt": "2024-03-23T12:00:00.000Z"
-    },
-    {
-      "id": "conv-review-bham-promoter",
-      "bookingId": "booking-bham-isa",
-      "fromUserId": "user-promoter-seattle",
-      "toUserId": "user-comedian-isa",
-      "rating": 4,
-      "body": "Isa kept the show moving and was easy to work with.",
-      "visible": true,
-      "createdAt": "2024-03-09T12:00:00.000Z"
-    },
-    {
-      "id": "conv-review-bham-comic",
-      "bookingId": "booking-bham-isa",
-      "fromUserId": "user-comedian-isa",
-      "toUserId": "user-promoter-seattle",
-      "rating": 5,
-      "body": "Great crowd and smooth campus logistics!",
-      "visible": true,
-      "createdAt": "2024-03-09T12:00:00.000Z"
+      "createdAt": "2024-03-06T18:00:00.000Z"
     }
   ],
   "reviews": [
     {
-      "id": "review-1",
-      "authorUserId": "user-promoter-seattle",
-      "subjectUserId": "user-comedian-ella",
-      "gigId": "gig-sea-clean-01",
-      "rating": 1,
-      "comment": "Loved the energy and professionalism during gig-sea-clean-01. Would book again.",
-      "visible": true,
-      "createdAt": "2024-04-02T12:00:00.000Z"
-    },
-    {
-      "id": "review-2",
-      "authorUserId": "user-promoter-portland",
-      "subjectUserId": "user-comedian-kai",
-      "gigId": "gig-oly-benefit-01",
-      "rating": 2,
-      "comment": "Loved the energy and professionalism during gig-oly-benefit-01. Crowd had a blast.",
-      "visible": true,
-      "createdAt": "2024-04-03T12:00:00.000Z"
-    },
-    {
-      "id": "review-3",
-      "authorUserId": "user-promoter-tacoma",
-      "subjectUserId": "user-comedian-lena",
-      "gigId": "gig-tac-corporate-01",
-      "rating": 3,
-      "comment": "Loved the energy and professionalism during gig-tac-corporate-01. Would book again.",
-      "visible": true,
-      "createdAt": "2024-04-04T12:00:00.000Z"
-    },
-    {
-      "id": "review-4",
-      "authorUserId": "user-promoter-olympia",
-      "subjectUserId": "user-comedian-isa",
-      "gigId": "gig-bellingham-01",
-      "rating": 4,
-      "comment": "Loved the energy and professionalism during gig-bellingham-01. Crowd had a blast.",
-      "visible": true,
-      "createdAt": "2024-04-05T12:00:00.000Z"
-    },
-    {
-      "id": "review-5",
-      "authorUserId": "user-venue-seattle-laugh-lodge",
-      "subjectUserId": "user-comedian-ella",
-      "gigId": "gig-sea-clean-01",
+      "id": "review-promoter-riley",
+      "authorUserId": "user-promoter",
+      "subjectUserId": "user-comic2",
+      "gigId": "gig-portland-past",
       "rating": 5,
-      "comment": "Loved the energy and professionalism during gig-sea-clean-01. Would book again.",
+      "comment": "Riley crushed the rooftop closer with hilarious original songs.",
       "visible": true,
-      "createdAt": "2024-04-06T12:00:00.000Z"
+      "createdAt": "2024-03-07T12:00:00.000Z"
     },
     {
-      "id": "review-6",
-      "authorUserId": "user-venue-portland-stumptown",
-      "subjectUserId": "user-comedian-kai",
-      "gigId": "gig-oly-benefit-01",
-      "rating": 1,
-      "comment": "Loved the energy and professionalism during gig-oly-benefit-01. Crowd had a blast.",
-      "visible": true,
-      "createdAt": "2024-04-07T12:00:00.000Z"
-    },
-    {
-      "id": "review-7",
-      "authorUserId": "user-venue-olympia-brew",
-      "subjectUserId": "user-comedian-lena",
-      "gigId": "gig-tac-corporate-01",
-      "rating": 2,
-      "comment": "Loved the energy and professionalism during gig-tac-corporate-01. Would book again.",
-      "visible": true,
-      "createdAt": "2024-04-08T12:00:00.000Z"
-    },
-    {
-      "id": "review-8",
-      "authorUserId": "user-comedian-ava",
-      "subjectUserId": "user-comedian-isa",
-      "gigId": "gig-bellingham-01",
-      "rating": 3,
-      "comment": "Loved the energy and professionalism during gig-bellingham-01. Crowd had a blast.",
-      "visible": true,
-      "createdAt": "2024-04-09T12:00:00.000Z"
-    },
-    {
-      "id": "review-9",
-      "authorUserId": "user-comedian-ben",
-      "subjectUserId": "user-comedian-ella",
-      "gigId": "gig-sea-clean-01",
+      "id": "review-fan-riley",
+      "authorUserId": "user-fan",
+      "subjectUserId": "user-comic2",
+      "gigId": "gig-portland-past",
       "rating": 4,
-      "comment": "Loved the energy and professionalism during gig-sea-clean-01. Would book again.",
+      "comment": "Loved the musical closer—can't wait to catch another show!",
       "visible": true,
-      "createdAt": "2024-04-10T12:00:00.000Z"
-    },
-    {
-      "id": "review-10",
-      "authorUserId": "user-comedian-cara",
-      "subjectUserId": "user-comedian-kai",
-      "gigId": "gig-oly-benefit-01",
-      "rating": 5,
-      "comment": "Loved the energy and professionalism during gig-oly-benefit-01. Crowd had a blast.",
-      "visible": true,
-      "createdAt": "2024-04-11T12:00:00.000Z"
-    },
-    {
-      "id": "review-11",
-      "authorUserId": "user-comedian-diego",
-      "subjectUserId": "user-comedian-lena",
-      "gigId": "gig-tac-corporate-01",
-      "rating": 1,
-      "comment": "Loved the energy and professionalism during gig-tac-corporate-01. Would book again.",
-      "visible": true,
-      "createdAt": "2024-04-12T12:00:00.000Z"
-    },
-    {
-      "id": "review-12",
-      "authorUserId": "user-comedian-fern",
-      "subjectUserId": "user-comedian-isa",
-      "gigId": "gig-bellingham-01",
-      "rating": 2,
-      "comment": "Loved the energy and professionalism during gig-bellingham-01. Crowd had a blast.",
-      "visible": true,
-      "createdAt": "2024-04-13T12:00:00.000Z"
-    },
-    {
-      "id": "review-13",
-      "authorUserId": "user-comedian-gabe",
-      "subjectUserId": "user-comedian-ella",
-      "gigId": "gig-sea-clean-01",
-      "rating": 3,
-      "comment": "Loved the energy and professionalism during gig-sea-clean-01. Would book again.",
-      "visible": true,
-      "createdAt": "2024-04-14T12:00:00.000Z"
-    },
-    {
-      "id": "review-14",
-      "authorUserId": "user-comedian-hana",
-      "subjectUserId": "user-comedian-kai",
-      "gigId": "gig-oly-benefit-01",
-      "rating": 4,
-      "comment": "Loved the energy and professionalism during gig-oly-benefit-01. Crowd had a blast.",
-      "visible": true,
-      "createdAt": "2024-04-15T12:00:00.000Z"
-    },
-    {
-      "id": "review-15",
-      "authorUserId": "user-comedian-isa",
-      "subjectUserId": "user-comedian-lena",
-      "gigId": "gig-tac-corporate-01",
-      "rating": 5,
-      "comment": "Loved the energy and professionalism during gig-tac-corporate-01. Would book again.",
-      "visible": true,
-      "createdAt": "2024-04-16T12:00:00.000Z"
-    },
-    {
-      "id": "review-16",
-      "authorUserId": "user-comedian-jules",
-      "subjectUserId": "user-comedian-isa",
-      "gigId": "gig-bellingham-01",
-      "rating": 1,
-      "comment": "Loved the energy and professionalism during gig-bellingham-01. Crowd had a blast.",
-      "visible": true,
-      "createdAt": "2024-04-17T12:00:00.000Z"
-    },
-    {
-      "id": "review-17",
-      "authorUserId": "user-comedian-kai",
-      "subjectUserId": "user-comedian-ella",
-      "gigId": "gig-sea-clean-01",
-      "rating": 2,
-      "comment": "Loved the energy and professionalism during gig-sea-clean-01. Would book again.",
-      "visible": true,
-      "createdAt": "2024-04-18T12:00:00.000Z"
-    },
-    {
-      "id": "review-18",
-      "authorUserId": "user-comedian-lena",
-      "subjectUserId": "user-comedian-kai",
-      "gigId": "gig-oly-benefit-01",
-      "rating": 3,
-      "comment": "Loved the energy and professionalism during gig-oly-benefit-01. Crowd had a blast.",
-      "visible": true,
-      "createdAt": "2024-04-19T12:00:00.000Z"
-    },
-    {
-      "id": "review-19",
-      "authorUserId": "user-venue-tacoma-waterfront",
-      "subjectUserId": "user-comedian-lena",
-      "gigId": "gig-tac-corporate-01",
-      "rating": 4,
-      "comment": "Loved the energy and professionalism during gig-tac-corporate-01. Would book again.",
-      "visible": true,
-      "createdAt": "2024-04-20T12:00:00.000Z"
-    },
-    {
-      "id": "review-20",
-      "authorUserId": "user-comedian-ella",
-      "subjectUserId": "user-comedian-isa",
-      "gigId": "gig-bellingham-01",
-      "rating": 5,
-      "comment": "Loved the energy and professionalism during gig-bellingham-01. Crowd had a blast.",
-      "visible": true,
-      "createdAt": "2024-04-21T12:00:00.000Z"
+      "createdAt": "2024-03-08T19:00:00.000Z"
     }
   ],
   "reviewReminders": [],
   "availability": [
     {
-      "id": "avail-user-comedian-ava-fri",
-      "userId": "user-comedian-ava",
-      "date": "2024-04-05T00:00:00.000Z",
+      "id": "avail-comic1-weekend",
+      "userId": "user-comic1",
+      "date": "2024-05-18T12:00:00.000Z",
       "status": "free"
     },
     {
-      "id": "avail-user-comedian-ava-sat",
-      "userId": "user-comedian-ava",
-      "date": "2024-04-06T00:00:00.000Z",
+      "id": "avail-comic1-weeknight",
+      "userId": "user-comic1",
+      "date": "2024-05-22T12:00:00.000Z",
       "status": "busy"
     },
     {
-      "id": "avail-user-comedian-ben-fri",
-      "userId": "user-comedian-ben",
-      "date": "2024-04-08T00:00:00.000Z",
+      "id": "avail-comic2-weekend",
+      "userId": "user-comic2",
+      "date": "2024-05-25T12:00:00.000Z",
       "status": "free"
     },
     {
-      "id": "avail-user-comedian-ben-sat",
-      "userId": "user-comedian-ben",
-      "date": "2024-04-09T00:00:00.000Z",
-      "status": "busy"
-    },
-    {
-      "id": "avail-user-comedian-cara-fri",
-      "userId": "user-comedian-cara",
-      "date": "2024-04-11T00:00:00.000Z",
+      "id": "avail-comic2-weeknight",
+      "userId": "user-comic2",
+      "date": "2024-05-29T12:00:00.000Z",
       "status": "free"
-    },
-    {
-      "id": "avail-user-comedian-cara-sat",
-      "userId": "user-comedian-cara",
-      "date": "2024-04-12T00:00:00.000Z",
-      "status": "busy"
-    },
-    {
-      "id": "avail-user-comedian-diego-fri",
-      "userId": "user-comedian-diego",
-      "date": "2024-04-14T00:00:00.000Z",
-      "status": "free"
-    },
-    {
-      "id": "avail-user-comedian-diego-sat",
-      "userId": "user-comedian-diego",
-      "date": "2024-04-15T00:00:00.000Z",
-      "status": "busy"
-    },
-    {
-      "id": "avail-user-comedian-ella-fri",
-      "userId": "user-comedian-ella",
-      "date": "2024-04-17T00:00:00.000Z",
-      "status": "free"
-    },
-    {
-      "id": "avail-user-comedian-ella-sat",
-      "userId": "user-comedian-ella",
-      "date": "2024-04-18T00:00:00.000Z",
-      "status": "busy"
-    },
-    {
-      "id": "avail-user-comedian-fern-fri",
-      "userId": "user-comedian-fern",
-      "date": "2024-04-05T00:00:00.000Z",
-      "status": "free"
-    },
-    {
-      "id": "avail-user-comedian-fern-sat",
-      "userId": "user-comedian-fern",
-      "date": "2024-04-06T00:00:00.000Z",
-      "status": "busy"
-    },
-    {
-      "id": "avail-user-comedian-gabe-fri",
-      "userId": "user-comedian-gabe",
-      "date": "2024-04-08T00:00:00.000Z",
-      "status": "free"
-    },
-    {
-      "id": "avail-user-comedian-gabe-sat",
-      "userId": "user-comedian-gabe",
-      "date": "2024-04-09T00:00:00.000Z",
-      "status": "busy"
-    },
-    {
-      "id": "avail-user-comedian-hana-fri",
-      "userId": "user-comedian-hana",
-      "date": "2024-04-11T00:00:00.000Z",
-      "status": "free"
-    },
-    {
-      "id": "avail-user-comedian-hana-sat",
-      "userId": "user-comedian-hana",
-      "date": "2024-04-12T00:00:00.000Z",
-      "status": "busy"
-    },
-    {
-      "id": "avail-user-comedian-isa-fri",
-      "userId": "user-comedian-isa",
-      "date": "2024-04-14T00:00:00.000Z",
-      "status": "free"
-    },
-    {
-      "id": "avail-user-comedian-isa-sat",
-      "userId": "user-comedian-isa",
-      "date": "2024-04-15T00:00:00.000Z",
-      "status": "busy"
-    },
-    {
-      "id": "avail-user-comedian-jules-fri",
-      "userId": "user-comedian-jules",
-      "date": "2024-04-17T00:00:00.000Z",
-      "status": "free"
-    },
-    {
-      "id": "avail-user-comedian-jules-sat",
-      "userId": "user-comedian-jules",
-      "date": "2024-04-18T00:00:00.000Z",
-      "status": "busy"
-    },
-    {
-      "id": "avail-user-comedian-kai-fri",
-      "userId": "user-comedian-kai",
-      "date": "2024-04-05T00:00:00.000Z",
-      "status": "free"
-    },
-    {
-      "id": "avail-user-comedian-kai-sat",
-      "userId": "user-comedian-kai",
-      "date": "2024-04-06T00:00:00.000Z",
-      "status": "busy"
-    },
-    {
-      "id": "avail-user-comedian-lena-fri",
-      "userId": "user-comedian-lena",
-      "date": "2024-04-08T00:00:00.000Z",
-      "status": "free"
-    },
-    {
-      "id": "avail-user-comedian-lena-sat",
-      "userId": "user-comedian-lena",
-      "date": "2024-04-09T00:00:00.000Z",
-      "status": "busy"
     }
   ],
   "reports": [],
@@ -2436,51 +474,40 @@
       "id": "ad-home-hero",
       "page": "home",
       "placement": "top",
-      "html": "<div class=\"ad-creative\">\n  <h3>PNW Laugh Fest</h3>\n  <p>Grab VIP passes before they're gone.</p>\n</div>",
-      "linkUrl": "https://pnwlaughfest.example.com",
+      "html": "<div class=\"ad-creative\">\n  <h3>Harbor Lights Summer Series</h3>\n  <p>Three weekends of rooftop comedy under the stars.</p>\n</div>",
+      "linkUrl": "https://harborlightscomedy.example.com",
       "active": true,
       "priority": 1,
       "createdAt": "2024-02-01T09:00:00.000Z",
-      "updatedAt": "2024-03-01T09:00:00.000Z"
+      "updatedAt": "2024-04-01T09:00:00.000Z"
     },
     {
-      "id": "ad-search-sidebar",
+      "id": "ad-search-inline",
       "page": "search",
-      "placement": "sidebar",
-      "imageUrl": "https://images.unsplash.com/photo-1472653816316-3ad6f10a6592",
-      "linkUrl": "https://thefunny.local/promo/premium",
+      "placement": "inline",
+      "html": "<div class=\"ad-creative\">\n  <strong>Need a clean comic?</strong> Book Riley Riff for your summer events.\n</div>",
+      "linkUrl": "https://rileyriff.live",
       "active": true,
       "priority": 2,
-      "createdAt": "2024-02-05T09:00:00.000Z",
-      "updatedAt": "2024-03-04T09:00:00.000Z"
-    },
-    {
-      "id": "ad-profile-inline",
-      "page": "profile",
-      "placement": "inline",
-      "html": "<div class=\"ad-creative\">\n  <strong>Need merch?</strong> Partner with PNW Print House.\n</div>",
-      "linkUrl": "https://pnwprinthouse.example.com",
-      "active": true,
-      "priority": 3,
-      "createdAt": "2024-02-07T09:00:00.000Z",
-      "updatedAt": "2024-03-06T09:00:00.000Z"
+      "createdAt": "2024-02-10T09:00:00.000Z",
+      "updatedAt": "2024-04-15T09:00:00.000Z"
     }
   ],
   "featureFlags": [
     {
       "key": "premiumBoost",
       "enabled": false,
-      "updatedAt": "2024-02-01T09:00:00.000Z"
+      "updatedAt": "2024-01-01T08:00:00.000Z"
     },
     {
       "key": "premiumEarlyApply",
       "enabled": false,
-      "updatedAt": "2024-02-01T09:00:00.000Z"
+      "updatedAt": "2024-01-01T08:00:00.000Z"
     },
     {
       "key": "adsEnabled",
       "enabled": true,
-      "updatedAt": "2024-02-01T09:00:00.000Z"
+      "updatedAt": "2024-01-01T08:00:00.000Z"
     }
   ]
 }

@@ -1,7 +1,9 @@
+import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { comedianProfileFormSchema } from "@/lib/zodSchemas";
 import { createComedianProfile, updateUser } from "@/lib/dataStore";
+import type { AvailabilityRecord } from "@/types/database";
 
 export async function PUT(request: Request) {
   const session = await auth();
@@ -24,6 +26,13 @@ export async function PUT(request: Request) {
   if (!updatedUser) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
+  const availability: AvailabilityRecord[] = data.availability.map((entry) => ({
+    id: entry.id ?? randomUUID(),
+    userId: entry.userId ?? session.user.id,
+    date: entry.date,
+    status: entry.status,
+  }));
+
   const profile = await createComedianProfile({
     userId: session.user.id,
     stageName: data.stageName,
@@ -44,7 +53,7 @@ export async function PUT(request: Request) {
     reelUrls: data.reelUrls,
     photoUrls: data.photoUrls,
     notableClubs: data.notableClubs,
-    availability: data.availability,
+    availability,
   });
 
   return NextResponse.json({

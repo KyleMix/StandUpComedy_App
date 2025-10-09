@@ -5,6 +5,7 @@ import {
   listBookingsForComedian,
   listBookingsForPromoter,
 } from "@/lib/dataStore";
+import type { Booking } from "@/lib/dataStore";
 import { rateLimit } from "@/lib/rateLimit";
 import { Role } from "@/lib/prismaEnums";
 import { bookingCreateSchema } from "@/lib/zodSchemas";
@@ -15,7 +16,7 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  let bookings = [];
+  let bookings: Booking[] = [];
   if (session.user.role === Role.COMEDIAN) {
     bookings = await listBookingsForComedian(session.user.id);
   } else if (

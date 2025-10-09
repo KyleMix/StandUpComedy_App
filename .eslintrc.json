@@ -2,6 +2,13 @@
   "extends": ["next", "next/core-web-vitals", "prettier"],
   "plugins": ["@typescript-eslint", "tailwindcss"],
   "rules": {
-    "tailwindcss/no-custom-classname": "off"
+    "tailwindcss/no-custom-classname": "off",
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_"
+      }
+    ]
   }
 }

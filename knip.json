@@ -1,0 +1,20 @@
+{
+  "$schema": "https://unpkg.com/knip@latest/schema.json",
+  "entry": [
+    "app/**/*",
+    "components/**/*",
+    "lib/**/*",
+    "scripts/**/*"
+  ],
+  "project": [
+    "app/**/*",
+    "components/**/*",
+    "lib/**/*",
+    "scripts/**/*"
+  ],
+  "ignore": [
+    "docs/**/*",
+    ".next/**/*",
+    "public/**/*"
+  ]
+}

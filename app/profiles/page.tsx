@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import AdSlot from "@/components/ads/AdSlot";
 import { searchComedians, type ComedianSearchFilters } from "@/lib/dataStore";
 import { comedianSearchFiltersSchema } from "@/lib/zodSchemas";
 import { ComedianFilters } from "./ComedianFilters";
@@ -164,6 +165,7 @@ export default async function ProfilesPage({ searchParams }: ProfilesPageProps) 
 
   return (
     <div className="space-y-8">
+      <AdSlot page="search" placement="top" />
       <header className="space-y-3 text-center lg:text-left">
         <h1 className="text-4xl font-manrope">Discover the right comic for your stage</h1>
         <p className="text-base text-base-content/70">
@@ -185,6 +187,7 @@ export default async function ProfilesPage({ searchParams }: ProfilesPageProps) 
           {result.items.map((item) => (
             <ComedianResultCard key={item.profile.userId} item={item} />
           ))}
+          <AdSlot page="search" placement="inline" className="lg:col-span-2" />
         </div>
 
         {result.items.length === 0 && (

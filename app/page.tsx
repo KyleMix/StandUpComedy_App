@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { format, formatDistanceToNow } from "date-fns";
 
+import AdSlot from "@/components/ads/AdSlot";
 import { GigCard } from "@/components/GigCard";
 import { ComedianAvailabilityCalendar } from "@/components/dashboard/ComedianAvailabilityCalendar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -501,6 +502,7 @@ function TrendingSection({ heading, description }: { heading: string; descriptio
 function PublicHome() {
   return (
     <div className="space-y-16">
+      <AdSlot page="home" placement="top" />
       <HeroShell>
         <div className="space-y-6 text-center lg:text-left">
           <span className="badge badge-secondary badge-outline border-secondary/40 px-4 py-3 uppercase tracking-[0.3em]">
@@ -568,6 +570,7 @@ export default async function HomePage() {
 
   return (
     <div className="space-y-16">
+      <AdSlot page="home" placement="top" />
       <HeroShell>
         <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_320px]">
           <div className="space-y-6">
@@ -590,6 +593,7 @@ export default async function HomePage() {
                 bookings={comedianCalendar.bookings}
               />
             ) : null}
+            <AdSlot page="home" placement="sidebar" />
           </div>
         </div>
       </HeroShell>

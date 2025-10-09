@@ -212,8 +212,9 @@ export interface ReviewReminder extends Omit<ReviewReminderRecord, "sendAt" | "c
   sentAt: Date | null;
 }
 
-export interface AdSlot extends Omit<AdSlotRecord, "createdAt"> {
+export interface AdSlot extends Omit<AdSlotRecord, "createdAt" | "updatedAt"> {
   createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface Report extends Omit<ReportRecord, "createdAt" | "resolvedAt"> {
@@ -525,7 +526,8 @@ function mapAdSlot(record: AdSlotRecord): AdSlot {
     html: record.html,
     imageUrl: record.imageUrl,
     linkUrl: record.linkUrl,
-    createdAt: new Date(record.createdAt)
+    createdAt: new Date(record.createdAt),
+    updatedAt: new Date(record.updatedAt ?? record.createdAt)
   };
 }
 
@@ -1684,7 +1686,8 @@ export async function createAdSlot(input: CreateAdSlotInput): Promise<AdSlot> {
     linkUrl: input.linkUrl ? sanitizeHtml(input.linkUrl) : undefined,
     active: input.active ?? true,
     priority: typeof input.priority === "number" ? input.priority : 0,
-    createdAt: now
+    createdAt: now,
+    updatedAt: now
   };
   snapshot.adSlots.push(record);
   await persist(snapshot);
@@ -1709,8 +1712,80 @@ export async function toggleAdSlot(id: string, active: boolean): Promise<AdSlot 
   const record = snapshot.adSlots.find((slot) => slot.id === id);
   if (!record) return null;
   record.active = active;
+  record.updatedAt = nowIso();
   await persist(snapshot);
   return mapAdSlot(record);
+}
+
+export async function listAllAdSlots(): Promise<AdSlot[]> {
+  const snapshot = await loadSnapshot();
+  return snapshot.adSlots
+    .map(mapAdSlot)
+    .sort((a, b) => {
+      if (a.page !== b.page) {
+        return a.page.localeCompare(b.page);
+      }
+      if (a.placement !== b.placement) {
+        return a.placement.localeCompare(b.placement);
+      }
+      if (b.priority !== a.priority) {
+        return b.priority - a.priority;
+      }
+      return b.updatedAt.getTime() - a.updatedAt.getTime();
+    });
+}
+
+interface UpdateAdSlotInput {
+  page?: AdSlotPage;
+  placement?: AdSlotPlacement;
+  html?: string | null;
+  imageUrl?: string | null;
+  linkUrl?: string | null;
+  active?: boolean;
+  priority?: number;
+}
+
+export async function updateAdSlot(id: string, input: UpdateAdSlotInput): Promise<AdSlot | null> {
+  const snapshot = await loadSnapshot();
+  const record = snapshot.adSlots.find((slot) => slot.id === id);
+  if (!record) return null;
+
+  if (input.page) {
+    record.page = input.page;
+  }
+  if (input.placement) {
+    record.placement = input.placement;
+  }
+  if (input.html !== undefined) {
+    record.html = input.html ? sanitizeHtml(input.html) : undefined;
+  }
+  if (input.imageUrl !== undefined) {
+    record.imageUrl = input.imageUrl ? sanitizeHtml(input.imageUrl) : undefined;
+  }
+  if (input.linkUrl !== undefined) {
+    record.linkUrl = input.linkUrl ? sanitizeHtml(input.linkUrl) : undefined;
+  }
+  if (typeof input.active === "boolean") {
+    record.active = input.active;
+  }
+  if (typeof input.priority === "number" && Number.isFinite(input.priority)) {
+    record.priority = input.priority;
+  }
+
+  record.updatedAt = nowIso();
+  await persist(snapshot);
+  return mapAdSlot(record);
+}
+
+export async function deleteAdSlot(id: string): Promise<boolean> {
+  const snapshot = await loadSnapshot();
+  const initialLength = snapshot.adSlots.length;
+  snapshot.adSlots = snapshot.adSlots.filter((slot) => slot.id !== id);
+  if (snapshot.adSlots.length === initialLength) {
+    return false;
+  }
+  await persist(snapshot);
+  return true;
 }
 
 interface CreateOfferInput {

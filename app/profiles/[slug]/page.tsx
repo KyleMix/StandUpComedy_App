@@ -2,6 +2,7 @@
 import type { Metadata } from "next";
 import type { SVGProps } from "react";
 import { notFound } from "next/navigation";
+import AdSlot from "@/components/ads/AdSlot";
 import { Badge } from "@/components/ui/badge";
 import {
   getUserById,
@@ -283,6 +284,7 @@ export default async function ProfileDetailPage({ params }: ProfileDetailPagePro
         </div>
 
         <aside className="space-y-6">
+          <AdSlot page="profile" placement="sidebar" />
           <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
             <h2 className="flex items-center gap-2 text-lg font-semibold text-slate-900">
               <DollarSign className="h-5 w-5" /> Booking info

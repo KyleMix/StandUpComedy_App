@@ -54,6 +54,45 @@ const phoneSchema = z
   .optional();
 
 const boardCategoryEnum = z.enum(COMMUNITY_BOARD_CATEGORIES as [CommunityBoardCategory, ...CommunityBoardCategory[]]);
+const cleanRatingEnum = z.enum(["CLEAN", "PG13", "R"] as const);
+
+const tagArraySchema = z
+  .array(
+    z
+      .string()
+      .trim()
+      .min(2)
+      .max(60)
+  )
+  .max(20)
+  .optional();
+
+const urlArraySchema = z
+  .array(
+    z
+      .string()
+      .trim()
+      .url()
+  )
+  .max(20)
+  .optional();
+
+const availabilityEntrySchema = z.object({
+  id: z
+    .string()
+    .trim()
+    .min(1)
+    .optional(),
+  userId: z
+    .string()
+    .trim()
+    .min(1)
+    .optional(),
+  date: z
+    .union([z.string().datetime(), z.date()])
+    .transform((value) => (value instanceof Date ? value.toISOString() : value)),
+  status: z.enum(["free", "busy"] as const),
+});
 
 export const comedianProfileFormSchema = z.object({
   legalName: z.string().trim().min(2).max(120),
@@ -73,6 +112,18 @@ export const comedianProfileFormSchema = z.object({
     .regex(/^[A-Z]{2}$/u, "Use a two-letter state or province code")
     .nullable()
     .optional(),
+  styles: tagArraySchema.transform((value) => value ?? []),
+  cleanRating: cleanRatingEnum.optional(),
+  rateMin: z.union([z.number().int().min(0).max(10000), z.null()]).optional(),
+  rateMax: z.union([z.number().int().min(0).max(10000), z.null()]).optional(),
+  reelUrls: urlArraySchema.transform((value) => value ?? []),
+  photoUrls: urlArraySchema.transform((value) => value ?? []),
+  notableClubs: tagArraySchema.transform((value) => value ?? []),
+  availability: z
+    .array(availabilityEntrySchema)
+    .max(180)
+    .optional()
+    .transform((entries) => entries ?? []),
 });
 
 export const promoterProfileFormSchema = z.object({

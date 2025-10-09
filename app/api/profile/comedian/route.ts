@@ -36,7 +36,15 @@ export async function PUT(request: Request) {
     youtubeChannel: data.youtubeChannel ?? null,
     travelRadiusMiles: data.travelRadiusMiles ?? null,
     homeCity: data.homeCity ?? null,
-    homeState: data.homeState ?? null
+    homeState: data.homeState ?? null,
+    styles: data.styles,
+    cleanRating: data.cleanRating,
+    rateMin: data.rateMin ?? null,
+    rateMax: data.rateMax ?? null,
+    reelUrls: data.reelUrls,
+    photoUrls: data.photoUrls,
+    notableClubs: data.notableClubs,
+    availability: data.availability,
   });
 
   return NextResponse.json({

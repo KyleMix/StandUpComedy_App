@@ -1,6 +1,7 @@
 "use client";
+/* eslint-disable @next/next/no-img-element */
 
-import { useEffect, useMemo, useState } from "react";
+import { ChangeEvent, KeyboardEvent, useEffect, useMemo, useState } from "react";
 import type { CommunityBoardCategory } from "@/types/database";
 import { Role } from "@/lib/prismaEnums";
 import { cn } from "@/lib/utils";
@@ -29,6 +30,19 @@ interface ComedianProfilePayload extends BaseProfilePayload {
   travelRadiusMiles: number | null;
   homeCity: string | null;
   homeState: string | null;
+  styles: string[];
+  cleanRating: "CLEAN" | "PG13" | "R";
+  rateMin: number | null;
+  rateMax: number | null;
+  reelUrls: string[];
+  photoUrls: string[];
+  notableClubs: string[];
+  availability: Array<{
+    id?: string;
+    userId?: string;
+    date: string;
+    status: "free" | "busy";
+  }>;
 }
 
 interface PromoterProfilePayload extends BaseProfilePayload {
@@ -110,6 +124,8 @@ interface BoardMessage extends Omit<BoardMessagePayload, "createdAt" | "updatedA
   updatedAt: Date;
 }
 
+type AvailabilityDraft = ComedianProfilePayload["availability"][number];
+
 const ROLE_TABS: ProfileRoleTab[] = ["COMEDIAN", "PROMOTER", "VENUE"];
 
 const CATEGORY_LABELS: Record<CommunityBoardCategory, string> = {
@@ -117,6 +133,74 @@ const CATEGORY_LABELS: Record<CommunityBoardCategory, string> = {
   OFFER: "Opportunity",
   ANNOUNCEMENT: "Announcement"
 };
+
+const CLEAN_RATING_OPTIONS: ComedianProfilePayload["cleanRating"][] = ["CLEAN", "PG13", "R"];
+
+const CLEAN_RATING_LABELS: Record<ComedianProfilePayload["cleanRating"], { title: string; description: string }> = {
+  CLEAN: {
+    title: "Clean",
+    description: "Family-friendly with no swearing or adult themes",
+  },
+  PG13: {
+    title: "PG-13",
+    description: "Mild language or innuendo—great for most crowds",
+  },
+  R: {
+    title: "R-rated",
+    description: "Fully uncensored and club-ready",
+  },
+};
+
+const STYLE_SUGGESTIONS = [
+  "Observational",
+  "Storytelling",
+  "Improv",
+  "Crowd work",
+  "Satire",
+  "Clean",
+  "Dark",
+  "One-liners",
+  "Musical",
+  "Character",
+  "Political",
+  "Impressions",
+  "Alt",
+];
+
+const RATE_MIN_VALUE = 0;
+const RATE_MAX_VALUE = 1500;
+const RATE_STEP = 25;
+const AVAILABILITY_WINDOW_DAYS = 14;
+
+function normalizeAvailabilityDate(value: string | Date): string {
+  const date = value instanceof Date ? new Date(value.getTime()) : new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return new Date().toISOString();
+  }
+  date.setUTCHours(0, 0, 0, 0);
+  return date.toISOString();
+}
+
+function formatAvailabilityLabel(date: Date) {
+  return date.toLocaleDateString(undefined, {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+  });
+}
+
+function readFileAsDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      resolve(typeof reader.result === "string" ? reader.result : "");
+    };
+    reader.onerror = (event) => {
+      reject(event);
+    };
+    reader.readAsDataURL(file);
+  });
+}
 
 function allowedCategoriesFor(role: Role): CommunityBoardCategory[] {
   switch (role) {
@@ -169,8 +253,213 @@ const ProfileWorkspace = ({ user, boardMessages }: ProfileWorkspaceProps) => {
     youtubeChannel: user.comedian?.youtubeChannel ?? "",
     travelRadiusMiles: user.comedian?.travelRadiusMiles ? String(user.comedian.travelRadiusMiles) : "",
     homeCity: user.comedian?.homeCity ?? "",
-    homeState: user.comedian?.homeState ?? ""
+    homeState: user.comedian?.homeState ?? "",
+    styles: user.comedian?.styles ?? [],
+    cleanRating: user.comedian?.cleanRating ?? "PG13",
+    rateMin: user.comedian?.rateMin ?? null,
+    rateMax: user.comedian?.rateMax ?? null,
+    reelUrls: user.comedian?.reelUrls ?? [],
+    photoUrls: user.comedian?.photoUrls ?? [],
+    notableClubs: user.comedian?.notableClubs ?? [],
+    availability: Array.isArray(user.comedian?.availability)
+      ? (user.comedian?.availability ?? []).map((entry) => ({
+          ...entry,
+          date: normalizeAvailabilityDate(entry.date),
+        }))
+      : [],
   });
+
+  const [styleInput, setStyleInput] = useState("");
+  const [newReelUrl, setNewReelUrl] = useState("");
+  const [newPhotoUrl, setNewPhotoUrl] = useState("");
+  const [newClub, setNewClub] = useState("");
+  const [availabilityStart, setAvailabilityStart] = useState(() => new Date());
+
+  const availabilityDays = useMemo(() => {
+    const start = new Date(availabilityStart);
+    start.setUTCHours(0, 0, 0, 0);
+    return Array.from({ length: AVAILABILITY_WINDOW_DAYS }, (_, index) => {
+      const date = new Date(start);
+      date.setUTCDate(start.getUTCDate() + index);
+      return date;
+    });
+  }, [availabilityStart]);
+
+  const availabilityByDate = useMemo(() => {
+    const map = new Map<string, AvailabilityDraft>();
+    comedianForm.availability.forEach((entry) => {
+      const normalized = normalizeAvailabilityDate(entry.date);
+      map.set(normalized, { ...entry, date: normalized });
+    });
+    return map;
+  }, [comedianForm.availability]);
+
+  const styleSuggestions = useMemo(() => {
+    const current = new Set(comedianForm.styles.map((style) => style.toLowerCase()));
+    return STYLE_SUGGESTIONS.filter((style) => !current.has(style.toLowerCase()));
+  }, [comedianForm.styles]);
+
+  function addStyle(value: string) {
+    const trimmed = value.trim();
+    if (!trimmed) return;
+    setComedianForm((prev) => {
+      if (prev.styles.some((style) => style.toLowerCase() === trimmed.toLowerCase())) {
+        return prev;
+      }
+      return { ...prev, styles: [...prev.styles, trimmed].slice(0, 20) };
+    });
+    setStyleInput("");
+  }
+
+  function removeStyle(value: string) {
+    setComedianForm((prev) => ({
+      ...prev,
+      styles: prev.styles.filter((style) => style !== value),
+    }));
+  }
+
+  function addReelUrl(value: string) {
+    const trimmed = value.trim();
+    if (!trimmed) return;
+    setComedianForm((prev) => ({
+      ...prev,
+      reelUrls: [...prev.reelUrls, trimmed].slice(0, 20),
+    }));
+    setNewReelUrl("");
+  }
+
+  function removeReelUrl(value: string) {
+    setComedianForm((prev) => ({
+      ...prev,
+      reelUrls: prev.reelUrls.filter((url) => url !== value),
+    }));
+  }
+
+  function addPhotoUrl(value: string) {
+    const trimmed = value.trim();
+    if (!trimmed) return;
+    setComedianForm((prev) => ({
+      ...prev,
+      photoUrls: [...prev.photoUrls, trimmed].slice(0, 20),
+    }));
+    setNewPhotoUrl("");
+  }
+
+  function removePhotoUrl(value: string) {
+    setComedianForm((prev) => ({
+      ...prev,
+      photoUrls: prev.photoUrls.filter((url) => url !== value),
+    }));
+  }
+
+  function addClub(value: string) {
+    const trimmed = value.trim();
+    if (!trimmed) return;
+    setComedianForm((prev) => {
+      if (prev.notableClubs.some((club) => club.toLowerCase() === trimmed.toLowerCase())) {
+        return prev;
+      }
+      return { ...prev, notableClubs: [...prev.notableClubs, trimmed].slice(0, 20) };
+    });
+    setNewClub("");
+  }
+
+  function removeClub(value: string) {
+    setComedianForm((prev) => ({
+      ...prev,
+      notableClubs: prev.notableClubs.filter((club) => club !== value),
+    }));
+  }
+
+  async function handlePhotoUpload(event: ChangeEvent<HTMLInputElement>) {
+    const files = event.target.files;
+    if (!files || files.length === 0) {
+      return;
+    }
+    const uploads = await Promise.all(Array.from(files).map((file) => readFileAsDataUrl(file).catch(() => "")));
+    const urls = uploads.filter((value) => value.length > 0);
+    if (urls.length === 0) return;
+    setComedianForm((prev) => ({
+      ...prev,
+      photoUrls: [...prev.photoUrls, ...urls].slice(0, 20),
+    }));
+    event.target.value = "";
+  }
+
+  function updateAvailability(date: Date, status: "free" | "busy") {
+    const normalized = normalizeAvailabilityDate(date);
+    setComedianForm((prev) => {
+      const existingIndex = prev.availability.findIndex(
+        (entry) => normalizeAvailabilityDate(entry.date) === normalized
+      );
+      const updated: AvailabilityDraft = {
+        ...(existingIndex >= 0 ? prev.availability[existingIndex] : {}),
+        date: normalized,
+        status,
+      };
+      const next = [...prev.availability];
+      if (existingIndex >= 0) {
+        next[existingIndex] = updated;
+      } else {
+        const generatedId =
+          typeof crypto !== "undefined" && "randomUUID" in crypto
+            ? crypto.randomUUID()
+            : `temp-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+        next.push({ ...updated, id: generatedId });
+      }
+      return { ...prev, availability: next };
+    });
+  }
+
+  function toggleAvailability(date: Date) {
+    const normalized = normalizeAvailabilityDate(date);
+    const current = availabilityByDate.get(normalized);
+    const nextStatus: "free" | "busy" = current?.status === "free" ? "busy" : "free";
+    updateAvailability(date, nextStatus);
+  }
+
+  const rateMinValue = comedianForm.rateMin ?? RATE_MIN_VALUE;
+  const rateMaxValue = comedianForm.rateMax ?? Math.max(rateMinValue, RATE_STEP * 4);
+
+  function updateRate(key: "rateMin" | "rateMax", value: number) {
+    const bounded = Math.min(Math.max(value, RATE_MIN_VALUE), RATE_MAX_VALUE);
+    setComedianForm((prev) => {
+      if (key === "rateMin") {
+        const existingMax = prev.rateMax ?? Math.max(bounded, RATE_STEP * 4);
+        const nextMax = Math.max(existingMax, bounded);
+        return { ...prev, rateMin: bounded, rateMax: nextMax };
+      }
+      const existingMin = prev.rateMin ?? RATE_MIN_VALUE;
+      const nextMin = Math.min(existingMin, bounded);
+      return { ...prev, rateMin: nextMin, rateMax: bounded };
+    });
+  }
+
+  const rateSummary = useMemo(() => {
+    if (rateMinValue === RATE_MIN_VALUE && (!comedianForm.rateMax || comedianForm.rateMax === RATE_MIN_VALUE)) {
+      return "Share your typical pay range";
+    }
+    const formatter = new Intl.NumberFormat(undefined, { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+    const minDisplay = rateMinValue > 0 ? formatter.format(rateMinValue) : "Flexible";
+    const maxDisplay = rateMaxValue > 0 ? formatter.format(rateMaxValue) : "Flexible";
+    return `${minDisplay} - ${maxDisplay}`;
+  }, [comedianForm.rateMax, rateMaxValue, rateMinValue]);
+
+  const availabilityCanGoBack = useMemo(() => {
+    const today = new Date();
+    today.setUTCHours(0, 0, 0, 0);
+    const start = new Date(availabilityStart);
+    start.setUTCHours(0, 0, 0, 0);
+    return start.getTime() > today.getTime();
+  }, [availabilityStart]);
+
+  function shiftAvailability(days: number) {
+    setAvailabilityStart((prev) => {
+      const next = new Date(prev);
+      next.setUTCDate(prev.getUTCDate() + days);
+      return next;
+    });
+  }
 
   const [promoterForm, setPromoterForm] = useState({
     organization: user.promoter?.organization ?? "",
@@ -296,6 +585,11 @@ const ProfileWorkspace = ({ user, boardMessages }: ProfileWorkspaceProps) => {
     setComedianFeedback(null);
     setComedianError(null);
 
+    const sanitizedStyles = comedianForm.styles.map((style) => style.trim()).filter((style) => style.length > 0);
+    const sanitizedReels = comedianForm.reelUrls.map((url) => url.trim()).filter((url) => url.length > 0);
+    const sanitizedPhotos = comedianForm.photoUrls.map((url) => url.trim()).filter((url) => url.length > 0);
+    const sanitizedClubs = comedianForm.notableClubs.map((club) => club.trim()).filter((club) => club.length > 0);
+
     const payload = {
       legalName: comedianForm.legalName.trim(),
       stageName: comedianForm.stageName.trim(),
@@ -308,7 +602,18 @@ const ProfileWorkspace = ({ user, boardMessages }: ProfileWorkspaceProps) => {
       youtubeChannel: comedianForm.youtubeChannel.trim() ? comedianForm.youtubeChannel.trim() : null,
       travelRadiusMiles: comedianForm.travelRadiusMiles ? Number(comedianForm.travelRadiusMiles) : null,
       homeCity: comedianForm.homeCity.trim() ? comedianForm.homeCity.trim() : null,
-      homeState: comedianForm.homeState.trim() ? comedianForm.homeState.trim().toUpperCase() : null
+      homeState: comedianForm.homeState.trim() ? comedianForm.homeState.trim().toUpperCase() : null,
+      styles: sanitizedStyles,
+      cleanRating: comedianForm.cleanRating,
+      rateMin: comedianForm.rateMin,
+      rateMax: comedianForm.rateMax,
+      reelUrls: sanitizedReels,
+      photoUrls: sanitizedPhotos,
+      notableClubs: sanitizedClubs,
+      availability: comedianForm.availability.map((entry) => ({
+        ...entry,
+        date: normalizeAvailabilityDate(entry.date),
+      })),
     };
 
     try {
@@ -347,7 +652,20 @@ const ProfileWorkspace = ({ user, boardMessages }: ProfileWorkspaceProps) => {
             ? String(result.profile.travelRadiusMiles)
             : "",
           homeCity: result.profile.homeCity ?? "",
-          homeState: result.profile.homeState ?? ""
+          homeState: result.profile.homeState ?? "",
+          styles: Array.isArray(result.profile.styles) ? result.profile.styles : [],
+          cleanRating: result.profile.cleanRating ?? "PG13",
+          rateMin: result.profile.rateMin ?? null,
+          rateMax: result.profile.rateMax ?? null,
+          reelUrls: Array.isArray(result.profile.reelUrls) ? result.profile.reelUrls : [],
+          photoUrls: Array.isArray(result.profile.photoUrls) ? result.profile.photoUrls : [],
+          notableClubs: Array.isArray(result.profile.notableClubs) ? result.profile.notableClubs : [],
+          availability: Array.isArray(result.profile.availability)
+            ? result.profile.availability.map((entry: AvailabilityDraft) => ({
+                ...entry,
+                date: normalizeAvailabilityDate(entry.date),
+              }))
+            : [],
         });
       }
       setComedianFeedback("Your comedian profile is up to date!");
@@ -916,7 +1234,7 @@ const ProfileWorkspace = ({ user, boardMessages }: ProfileWorkspaceProps) => {
             </Badge>
           )}
           {activeRole === "COMEDIAN" && (
-            <form onSubmit={handleComedianSubmit} className="space-y-4">
+            <form onSubmit={handleComedianSubmit} className="space-y-6">
               {!canEditActiveTab && (
                 <p className="rounded-md bg-slate-100 px-3 py-2 text-xs text-slate-500">
                   Viewing the comedian form. Sign in as a comedian to edit these details.
@@ -968,7 +1286,7 @@ const ProfileWorkspace = ({ user, boardMessages }: ProfileWorkspaceProps) => {
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-slate-700">Reel URL</label>
+                  <label className="text-sm font-medium text-slate-700">Featured reel URL</label>
                   <Input
                     value={comedianForm.reelUrl}
                     onChange={(event) => setComedianForm((prev) => ({ ...prev, reelUrl: event.target.value }))}
@@ -1028,6 +1346,387 @@ const ProfileWorkspace = ({ user, boardMessages }: ProfileWorkspaceProps) => {
                     disabled={!canEditActiveTab}
                   />
                 </div>
+              </div>
+              <div>
+                <div className="flex items-center justify-between gap-2">
+                  <label className="text-sm font-medium text-slate-700">Comedy styles</label>
+                  <span className="text-xs text-slate-500">{comedianForm.styles.length}/20</span>
+                </div>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {comedianForm.styles.map((style) => (
+                    <span
+                      key={style}
+                      className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-sm text-slate-700"
+                    >
+                      {style}
+                      {canEditActiveTab && (
+                        <button
+                          type="button"
+                          onClick={() => removeStyle(style)}
+                          className="text-xs text-slate-500 hover:text-slate-700"
+                        >
+                          ×
+                        </button>
+                      )}
+                    </span>
+                  ))}
+                  {comedianForm.styles.length === 0 && (
+                    <p className="text-xs text-slate-500">Share a few keywords so bookers know your vibe.</p>
+                  )}
+                </div>
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <Input
+                    value={styleInput}
+                    onChange={(event) => setStyleInput(event.target.value)}
+                    onKeyDown={(event: KeyboardEvent<HTMLInputElement>) => {
+                      if (event.key === "Enter") {
+                        event.preventDefault();
+                        if (canEditActiveTab) {
+                          addStyle(styleInput);
+                        }
+                      }
+                    }}
+                    placeholder="Add a style (e.g. Storytelling)"
+                    disabled={!canEditActiveTab}
+                  />
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={() => addStyle(styleInput)}
+                    disabled={!canEditActiveTab || !styleInput.trim()}
+                  >
+                    Add style
+                  </Button>
+                </div>
+                {styleSuggestions.length > 0 && (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {styleSuggestions.slice(0, 6).map((suggestion) => (
+                      <Button
+                        key={suggestion}
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        onClick={() => addStyle(suggestion)}
+                        disabled={!canEditActiveTab}
+                      >
+                        {suggestion}
+                      </Button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div>
+                <label className="text-sm font-medium text-slate-700">Clean rating</label>
+                <div className="mt-3 grid gap-3 sm:grid-cols-3">
+                  {CLEAN_RATING_OPTIONS.map((rating) => {
+                    const info = CLEAN_RATING_LABELS[rating];
+                    const isSelected = comedianForm.cleanRating === rating;
+                    return (
+                      <label
+                        key={rating}
+                        className={cn(
+                          "flex cursor-pointer flex-col gap-1 rounded-md border px-3 py-2",
+                          isSelected ? "border-brand ring-1 ring-brand" : "border-slate-200",
+                          !canEditActiveTab && "cursor-not-allowed opacity-70"
+                        )}
+                      >
+                        <input
+                          type="radio"
+                          className="sr-only"
+                          name="cleanRating"
+                          value={rating}
+                          checked={isSelected}
+                          onChange={() => canEditActiveTab && setComedianForm((prev) => ({ ...prev, cleanRating: rating }))}
+                          disabled={!canEditActiveTab}
+                        />
+                        <span className="text-sm font-semibold text-slate-800">{info.title}</span>
+                        <span className="text-xs text-slate-500">{info.description}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+              <div className="rounded-lg border border-slate-200 p-4">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <label className="text-sm font-medium text-slate-700">Typical booking rate</label>
+                  <span className="text-xs text-slate-500">{rateSummary}</span>
+                </div>
+                <div className="mt-4 grid gap-4 md:grid-cols-2">
+                  <div>
+                    <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">Minimum</span>
+                    <input
+                      type="range"
+                      min={RATE_MIN_VALUE}
+                      max={rateMaxValue}
+                      step={RATE_STEP}
+                      value={rateMinValue}
+                      onChange={(event) => updateRate("rateMin", Number(event.target.value))}
+                      disabled={!canEditActiveTab}
+                      className="mt-2 w-full"
+                    />
+                    <Input
+                      type="number"
+                      value={rateMinValue}
+                      onChange={(event) => updateRate("rateMin", Number(event.target.value))}
+                      min={RATE_MIN_VALUE}
+                      max={RATE_MAX_VALUE}
+                      step={RATE_STEP}
+                      disabled={!canEditActiveTab}
+                      className="mt-2"
+                    />
+                  </div>
+                  <div>
+                    <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">Maximum</span>
+                    <input
+                      type="range"
+                      min={rateMinValue}
+                      max={RATE_MAX_VALUE}
+                      step={RATE_STEP}
+                      value={rateMaxValue}
+                      onChange={(event) => updateRate("rateMax", Number(event.target.value))}
+                      disabled={!canEditActiveTab}
+                      className="mt-2 w-full"
+                    />
+                    <Input
+                      type="number"
+                      value={rateMaxValue}
+                      onChange={(event) => updateRate("rateMax", Number(event.target.value))}
+                      min={RATE_MIN_VALUE}
+                      max={RATE_MAX_VALUE}
+                      step={RATE_STEP}
+                      disabled={!canEditActiveTab}
+                      className="mt-2"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div className="space-y-3">
+                <h3 className="text-sm font-medium text-slate-700">Reel gallery</h3>
+                <div className="flex flex-wrap gap-2">
+                  {comedianForm.reelUrls.map((url) => (
+                    <span
+                      key={url}
+                      className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1 text-xs text-slate-600"
+                    >
+                      <a href={url} className="truncate text-slate-700 hover:text-brand" target="_blank" rel="noreferrer">
+                        {url}
+                      </a>
+                      {canEditActiveTab && (
+                        <button
+                          type="button"
+                          className="text-slate-400 hover:text-slate-600"
+                          onClick={() => removeReelUrl(url)}
+                        >
+                          ×
+                        </button>
+                      )}
+                    </span>
+                  ))}
+                  {comedianForm.reelUrls.length === 0 && (
+                    <p className="text-xs text-slate-500">Add multiple clips to showcase your range.</p>
+                  )}
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Input
+                    value={newReelUrl}
+                    onChange={(event) => setNewReelUrl(event.target.value)}
+                    onKeyDown={(event: KeyboardEvent<HTMLInputElement>) => {
+                      if (event.key === "Enter") {
+                        event.preventDefault();
+                        if (canEditActiveTab) {
+                          addReelUrl(newReelUrl);
+                        }
+                      }
+                    }}
+                    placeholder="Add another reel URL"
+                    disabled={!canEditActiveTab}
+                  />
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={() => addReelUrl(newReelUrl)}
+                    disabled={!canEditActiveTab || !newReelUrl.trim()}
+                  >
+                    Add reel
+                  </Button>
+                </div>
+              </div>
+              <div className="space-y-3">
+                <h3 className="text-sm font-medium text-slate-700">Photo gallery</h3>
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                  {comedianForm.photoUrls.map((url) => (
+                    <div key={url} className="relative">
+                      <img
+                        src={url}
+                        alt="Comedian gallery"
+                        className="h-36 w-full rounded-md object-cover"
+                        loading="lazy"
+                      />
+                      {canEditActiveTab && (
+                        <button
+                          type="button"
+                          onClick={() => removePhotoUrl(url)}
+                          className="absolute right-2 top-2 rounded-full bg-white/80 px-2 py-1 text-xs text-slate-600 shadow"
+                        >
+                          Remove
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  {comedianForm.photoUrls.length === 0 && (
+                    <div className="rounded-md border border-dashed border-slate-300 p-4 text-sm text-slate-500">
+                      Upload a few promo shots or link to hosted images.
+                    </div>
+                  )}
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Input
+                    value={newPhotoUrl}
+                    onChange={(event) => setNewPhotoUrl(event.target.value)}
+                    onKeyDown={(event: KeyboardEvent<HTMLInputElement>) => {
+                      if (event.key === "Enter") {
+                        event.preventDefault();
+                        if (canEditActiveTab) {
+                          addPhotoUrl(newPhotoUrl);
+                        }
+                      }
+                    }}
+                    placeholder="Add photo URL"
+                    disabled={!canEditActiveTab}
+                  />
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={() => addPhotoUrl(newPhotoUrl)}
+                    disabled={!canEditActiveTab || !newPhotoUrl.trim()}
+                  >
+                    Add photo
+                  </Button>
+                  <label className={cn("inline-flex cursor-pointer items-center gap-2 text-sm", !canEditActiveTab && "cursor-not-allowed opacity-70")}> 
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      className="hidden"
+                      onChange={handlePhotoUpload}
+                      disabled={!canEditActiveTab}
+                    />
+                    <span className="rounded-md border border-slate-200 px-3 py-1 text-xs text-slate-600">
+                      Upload images
+                    </span>
+                  </label>
+                </div>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-slate-700">Notable clubs or festivals</label>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {comedianForm.notableClubs.map((club) => (
+                    <span
+                      key={club}
+                      className="inline-flex items-center gap-2 rounded-full bg-amber-100 px-3 py-1 text-xs text-amber-800"
+                    >
+                      {club}
+                      {canEditActiveTab && (
+                        <button
+                          type="button"
+                          className="text-amber-600 hover:text-amber-800"
+                          onClick={() => removeClub(club)}
+                        >
+                          ×
+                        </button>
+                      )}
+                    </span>
+                  ))}
+                  {comedianForm.notableClubs.length === 0 && (
+                    <p className="text-xs text-slate-500">List clubs, festivals, or tours you&apos;re proud of.</p>
+                  )}
+                </div>
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <Input
+                    value={newClub}
+                    onChange={(event) => setNewClub(event.target.value)}
+                    onKeyDown={(event: KeyboardEvent<HTMLInputElement>) => {
+                      if (event.key === "Enter") {
+                        event.preventDefault();
+                        if (canEditActiveTab) {
+                          addClub(newClub);
+                        }
+                      }
+                    }}
+                    placeholder="Add a club or festival"
+                    disabled={!canEditActiveTab}
+                  />
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={() => addClub(newClub)}
+                    disabled={!canEditActiveTab || !newClub.trim()}
+                  >
+                    Add club
+                  </Button>
+                </div>
+              </div>
+              <div className="space-y-3">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <label className="text-sm font-medium text-slate-700">
+                    Availability (next {AVAILABILITY_WINDOW_DAYS} days)
+                  </label>
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={() => shiftAvailability(-7)}
+                      disabled={!canEditActiveTab || !availabilityCanGoBack}
+                    >
+                      Previous week
+                    </Button>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={() => shiftAvailability(7)}
+                      disabled={!canEditActiveTab}
+                    >
+                      Next week
+                    </Button>
+                  </div>
+                </div>
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7">
+                  {availabilityDays.map((day) => {
+                    const normalized = normalizeAvailabilityDate(day);
+                    const status = availabilityByDate.get(normalized)?.status ?? "free";
+                    return (
+                      <button
+                        key={normalized}
+                        type="button"
+                        onClick={() => toggleAvailability(day)}
+                        disabled={!canEditActiveTab}
+                        className={cn(
+                          "rounded-md border px-3 py-2 text-left text-sm transition",
+                          status === "free"
+                            ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                            : "border-rose-200 bg-rose-50 text-rose-700",
+                          !canEditActiveTab && "cursor-not-allowed opacity-70"
+                        )}
+                      >
+                        <span className="text-xs font-semibold uppercase tracking-wide text-slate-600">
+                          {formatAvailabilityLabel(day)}
+                        </span>
+                        <span className="mt-1 block text-sm font-medium">
+                          {status === "free" ? "Available" : "Booked"}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="text-xs text-slate-500">
+                  We&apos;ll sync these availability preferences so promoters know when to reach out.
+                </p>
               </div>
               {comedianError && <p className="text-sm text-red-600">{comedianError}</p>}
               {comedianFeedback && <p className="text-sm text-emerald-600">{comedianFeedback}</p>}

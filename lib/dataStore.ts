@@ -41,6 +41,7 @@ import type {
   VerificationStatus
 } from "@/lib/prismaEnums";
 import { sanitizeHtml } from "@/lib/sanitize";
+import { FEATURE_FLAGS } from "@/lib/config/flags";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 const DATABASE_PATH = path.join(DATA_DIR, "database.json");
@@ -597,6 +598,27 @@ function compareByRating(a: ComedianSearchListItem, b: ComedianSearchListItem) {
   return a.profile.stageName.localeCompare(b.profile.stageName);
 }
 
+function applyPremiumBoost(items: ComedianSearchListItem[]): ComedianSearchListItem[] {
+  if (!FEATURE_FLAGS.premiumBoost) {
+    return items;
+  }
+
+  const boosted = [...items];
+  for (let index = 1; index < boosted.length; index += 1) {
+    const current = boosted[index];
+    const previous = boosted[index - 1];
+    const currentPremium = current.user?.isPremium ?? false;
+    const previousPremium = previous.user?.isPremium ?? false;
+
+    if (currentPremium && !previousPremium) {
+      boosted[index - 1] = current;
+      boosted[index] = previous;
+    }
+  }
+
+  return boosted;
+}
+
 export async function searchComedians(filters: ComedianSearchFilters = {}): Promise<ComedianSearchResult> {
   const snapshot = await loadSnapshot();
   const pageSize = Math.max(filters.pageSize ?? 12, 1);
@@ -755,7 +777,8 @@ export async function searchComedians(filters: ComedianSearchFilters = {}): Prom
 
   const total = sorted.length;
   const start = (page - 1) * pageSize;
-  const paginated = sorted.slice(start, start + pageSize);
+  const pageItems = sorted.slice(start, start + pageSize);
+  const paginated = applyPremiumBoost(pageItems);
 
   return {
     items: paginated,

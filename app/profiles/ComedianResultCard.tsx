@@ -72,8 +72,12 @@ export function ComedianResultCard({ item }: ComedianResultCardProps) {
           <div className="flex items-center gap-2">
             <h3 className="text-xl font-semibold text-base-content">{profile.stageName}</h3>
             {isPremium && (
-              <Badge variant="secondary" className="gap-1 bg-amber-100 text-amber-800">
-                <Sparkles className="h-3.5 w-3.5" /> Premium
+              <Badge
+                variant="secondary"
+                className="gap-1 border border-amber-200 bg-amber-50 text-amber-700 shadow-sm"
+              >
+                <Sparkles className="h-3.5 w-3.5" />
+                <span className="font-semibold uppercase tracking-wide">Premium</span>
               </Badge>
             )}
           </div>

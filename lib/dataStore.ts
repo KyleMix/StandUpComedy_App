@@ -314,8 +314,15 @@ async function persist(snapshot: DatabaseSnapshot) {
   await fs.writeFile(DATABASE_PATH, JSON.stringify(snapshot, null, 2));
 }
 
-function toDate(value: string | null): Date | null {
-  return value ? new Date(value) : null;
+function toDate(value: string | null | undefined): Date | null {
+  if (!value) {
+    return null;
+  }
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+  return date;
 }
 
 function mapUser(record: UserRecord): User {
@@ -1417,17 +1424,6 @@ export async function countActiveApplicationsForGig(gigId: string): Promise<numb
   return snapshot.applications.filter(
     (application) => application.gigId === gigId && activeStatuses.includes(application.status)
   ).length;
-}
-
-function toDate(value: string | null | undefined): Date | null {
-  if (!value) {
-    return null;
-  }
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) {
-    return null;
-  }
-  return date;
 }
 
 function computeGigMetrics(snapshot: DatabaseSnapshot, gigId: string): GigMetrics {

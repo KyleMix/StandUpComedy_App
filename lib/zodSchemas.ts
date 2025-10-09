@@ -188,7 +188,7 @@ export const gigFiltersSchema = z.object({
   path: ["dateEnd"]
 });
 
-export const gigFormSchema = z.object({
+const gigFormBaseSchema = z.object({
   id: z.string().optional(),
   title: z.string().trim().min(3).max(120),
   description: z.string().trim().min(20).max(4000),
@@ -201,7 +201,14 @@ export const gigFormSchema = z.object({
   state: z.string().trim().regex(/^[A-Z]{2}$/u, "State must be 2 uppercase letters"),
   minAge: z.number().int().nonnegative().nullable().optional(),
   isPublished: z.boolean().optional()
-}).refine((data) => {
+});
+
+const gigDateRangeRefinement = {
+  message: "End date must be on or after the start date",
+  path: ["dateEnd"] as const
+};
+
+const isValidGigDateRange = (data: z.infer<typeof gigFormBaseSchema>) => {
   if (data.dateEnd) {
     if (!data.dateStart) {
       return true;
@@ -209,10 +216,21 @@ export const gigFormSchema = z.object({
     return data.dateEnd >= data.dateStart;
   }
   return true;
-}, {
-  message: "End date must be on or after the start date",
-  path: ["dateEnd"]
-});
+};
+
+export const gigFormSchema = gigFormBaseSchema.refine(isValidGigDateRange, gigDateRangeRefinement);
+
+export const gigFormUpdateSchema = gigFormBaseSchema
+  .partial()
+  .refine(
+    (data) => {
+      if (data.dateEnd && data.dateStart) {
+        return data.dateEnd >= data.dateStart;
+      }
+      return true;
+    },
+    gigDateRangeRefinement
+  );
 
 export const applicationSchema = z.object({
   gigId: z.string().cuid(),

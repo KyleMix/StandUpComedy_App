@@ -85,7 +85,12 @@ export async function POST(request: Request) {
       state: parsed.data.state,
       minAge: parsed.data.minAge ?? null,
       isPublished: parsed.data.isPublished ?? false,
-      status: "OPEN"
+      status: "OPEN",
+      format: null,
+      setLengthMinutes: null,
+      audienceDescription: null,
+      totalSpots: null,
+      perks: null
     }
   });
 

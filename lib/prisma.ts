@@ -117,6 +117,23 @@ interface FindUniqueComedianArgs {
   include?: ComedianInclude;
 }
 
+interface CreateComedianProfileArgs {
+  data: {
+    userId: string;
+    stageName: string;
+    bio?: string | null;
+    credits?: string | null;
+    website?: string | null;
+    reelUrl?: string | null;
+    instagram?: string | null;
+    tiktokHandle?: string | null;
+    youtubeChannel?: string | null;
+    travelRadiusMiles?: number | null;
+    homeCity?: string | null;
+    homeState?: string | null;
+  };
+}
+
 interface FindUniqueUserArgs {
   where: { id?: string; email?: string };
   include?: {
@@ -395,7 +412,7 @@ export const prisma = {
     }
   },
   comedianProfile: {
-    async create(args: { data: { userId: string; stageName: string } }) {
+    async create(args: CreateComedianProfileArgs) {
       return createComedianProfile(args.data);
     },
     async findUnique(args: { where: { userId: string } }) {

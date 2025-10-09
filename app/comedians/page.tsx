@@ -35,10 +35,14 @@ export default async function ComediansPage() {
     }
   });
 
-  const enriched = comedians.map((comedian) => ({
-    ...comedian,
-    avatar: comedian.user?.image ?? avatarDataUrl(comedian.userId)
-  }));
+  const enriched = comedians.map((comedian) => {
+    const avatar = avatarDataUrl(comedian.userId);
+    return {
+      ...comedian,
+      avatar,
+      usesGeneratedAvatar: true
+    };
+  });
 
   return (
     <div className="space-y-10">
@@ -179,7 +183,7 @@ export default async function ComediansPage() {
                   <Button asChild variant="outline" className="w-full border-brand/40 text-brand">
                     <Link href={`/comedians/${comedian.userId}`}>View full profile</Link>
                   </Button>
-                  {!comedian.user?.image && (
+                  {comedian.usesGeneratedAvatar && (
                     <AssetAttribution
                       source="DiceBear"
                       author={LICENSED_STYLES.dicebear.style}

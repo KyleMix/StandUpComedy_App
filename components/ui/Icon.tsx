@@ -12,7 +12,7 @@ type LucideModule = typeof Lucide;
 type HeroOutlineModule = typeof HeroOutline;
 type HeroSolidModule = typeof HeroSolid;
 
-const lucideIcons = Lucide as Record<string, ComponentType<ComponentProps<"svg">>>;
+const lucideIcons = Lucide as unknown as Record<string, ComponentType<ComponentProps<"svg">>>;
 const heroOutlineIcons = HeroOutline as Record<string, ComponentType<ComponentProps<"svg">>>;
 const heroSolidIcons = HeroSolid as Record<string, ComponentType<ComponentProps<"svg">>>;
 const phosphorIcons = { Star, MapPin, ChatsCircle } satisfies Record<string, ComponentType<ComponentProps<"svg">>>;

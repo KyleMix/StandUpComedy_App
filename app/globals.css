@@ -4,30 +4,136 @@
 
 @layer base {
   :root {
+    color-scheme: light;
+    --font-sans: "Inter Variable", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --font-display: "Manrope Variable", "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --font-mono: "JetBrains Mono", "Fira Code", "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono",
+      "Courier New", monospace;
+
+    --background: 214 40% 97%;
+    --foreground: 220 26% 14%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 26% 14%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 26% 14%;
+    --primary: 42 100% 58%;
+    --primary-foreground: 215 32% 12%;
+    --secondary: 243 100% 68%;
+    --secondary-foreground: 222 47% 9%;
+    --accent: 164 95% 43%;
+    --accent-foreground: 210 20% 13%;
+    --muted: 216 33% 92%;
+    --muted-foreground: 217 16% 36%;
+    --success: 151 80% 36%;
+    --success-foreground: 144 84% 94%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 214 24% 88%;
+    --input: 214 24% 88%;
+    --ring: 42 100% 58%;
+    --shadow-color: 220 26% 14%;
+    --radius: 0.875rem;
+
+    --font-size-xs: 0.75rem;
+    --font-size-sm: 0.875rem;
+    --font-size-base: 1rem;
+    --font-size-lg: 1.125rem;
+    --font-size-xl: 1.25rem;
+    --font-size-2xl: 1.5rem;
+    --font-size-3xl: 1.875rem;
+    --font-size-4xl: clamp(2.5rem, 4vw, 3rem);
+
+    --leading-tight: 1.15;
+    --leading-normal: 1.6;
+    --tracking-tight: -0.02em;
+    --tracking-normal: 0em;
+  }
+
+  .dark {
     color-scheme: dark;
-    --font-inter: "Inter Variable", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    --font-manrope: "Manrope Variable", "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --background: 216 28% 8%;
+    --foreground: 210 20% 96%;
+    --card: 216 28% 12%;
+    --card-foreground: 210 20% 96%;
+    --popover: 216 28% 12%;
+    --popover-foreground: 210 20% 96%;
+    --primary: 42 100% 58%;
+    --primary-foreground: 216 28% 10%;
+    --secondary: 244 95% 72%;
+    --secondary-foreground: 222 47% 11%;
+    --accent: 164 95% 46%;
+    --accent-foreground: 210 20% 10%;
+    --muted: 220 24% 18%;
+    --muted-foreground: 215 20% 80%;
+    --success: 151 80% 40%;
+    --success-foreground: 144 84% 94%;
+    --destructive: 0 72% 55%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 218 19% 24%;
+    --input: 218 19% 24%;
+    --ring: 42 100% 60%;
+    --shadow-color: 210 28% 4%;
+  }
+
+  * {
+    @apply border-border;
   }
 
   body {
-    @apply min-h-screen bg-base-100 font-inter text-base-content antialiased;
+    @apply min-h-screen bg-background font-sans text-foreground antialiased;
+    font-size: var(--font-size-base);
+    line-height: var(--leading-normal);
+    font-feature-settings: "ss02" 1, "cv02" 1;
   }
 
   h1,
   h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-display);
+    letter-spacing: var(--tracking-tight);
+    line-height: var(--leading-tight);
+  }
+
+  h1 {
+    font-size: var(--font-size-4xl);
+  }
+
+  h2 {
+    font-size: var(--font-size-3xl);
+  }
+
   h3 {
-    @apply font-manrope font-semibold tracking-tight;
+    font-size: var(--font-size-2xl);
+  }
+
+  h4 {
+    font-size: var(--font-size-xl);
+  }
+
+  p,
+  a,
+  span,
+  li,
+  button,
+  input,
+  textarea {
+    letter-spacing: var(--tracking-normal);
   }
 
   a {
-    @apply text-primary underline-offset-4 transition hover:text-secondary;
+    @apply text-primary underline-offset-4 transition-colors hover:text-secondary;
   }
 
-  .font-inter {
-    font-family: var(--font-inter);
+  .font-inter,
+  .font-sans {
+    font-family: var(--font-sans);
   }
 
-  .font-manrope {
-    font-family: var(--font-manrope);
+  .font-manrope,
+  .font-display {
+    font-family: var(--font-display);
   }
 }

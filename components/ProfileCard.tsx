@@ -7,10 +7,12 @@ import Link from "next/link";
 export type ProfileRole = "comedian" | "venue" | "fan";
 
 export interface ProfileCardProps {
+  slug: string;
   displayName: string;
   role: ProfileRole;
   city: string;
   avatarUrl?: string;
+  tagline?: string;
 }
 
 const ROLE_STYLES: Record<ProfileRole, { label: string; icon: typeof Mic }> = {
@@ -19,7 +21,7 @@ const ROLE_STYLES: Record<ProfileRole, { label: string; icon: typeof Mic }> = {
   fan: { label: "Fan", icon: Users }
 };
 
-export function ProfileCard({ displayName, role, city, avatarUrl }: ProfileCardProps) {
+export function ProfileCard({ slug, displayName, role, city, avatarUrl, tagline }: ProfileCardProps) {
   const roleInfo = ROLE_STYLES[role];
   const imageSrc = avatarFor(displayName, avatarUrl);
 
@@ -36,6 +38,7 @@ export function ProfileCard({ displayName, role, city, avatarUrl }: ProfileCardP
           <div className="space-y-1">
             <h3 className="text-lg font-manrope">{displayName}</h3>
             <p className="text-sm text-base-content/70">{city}</p>
+            {tagline && <p className="text-sm text-base-content/60">{tagline}</p>}
             <span className="badge badge-outline flex items-center gap-1 border-secondary/40 text-xs uppercase tracking-wide">
               <Icon icon={roleInfo.icon} className="h-3.5 w-3.5" /> {roleInfo.label}
             </span>
@@ -44,7 +47,7 @@ export function ProfileCard({ displayName, role, city, avatarUrl }: ProfileCardP
 
         <div className="card-actions justify-end">
           <Link
-            href="#"
+            href={`/profiles/${slug}`}
             className="btn btn-outline btn-sm focus-visible:outline-none focus-visible:ring focus-visible:ring-secondary/60"
             aria-label={`View profile for ${displayName}`}
           >

@@ -255,7 +255,22 @@ const ProfileWorkspace = ({ user, boardMessages }: ProfileWorkspaceProps) => {
   ]);
 
   const isAdmin = currentUser.role === "ADMIN";
-  const canEditActiveTab = isAdmin || activeRole === currentUser.role;
+  const canEditActiveTab = useMemo(() => {
+    if (isAdmin) {
+      return true;
+    }
+
+    switch (activeRole) {
+      case "COMEDIAN":
+        return currentUser.role === "COMEDIAN";
+      case "PROMOTER":
+        return currentUser.role === "PROMOTER";
+      case "VENUE":
+        return currentUser.role === "VENUE";
+      default:
+        return false;
+    }
+  }, [activeRole, currentUser.role, isAdmin]);
 
   useEffect(() => {
     if (!allowedMessageCategories.includes(messageCategory)) {

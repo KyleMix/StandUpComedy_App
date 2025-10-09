@@ -1,6 +1,8 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Bars3Icon } from "@heroicons/react/24/outline";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { auth, signOut } from "@/lib/auth";
 
 const links = [
   { href: "/", label: "Home" },
@@ -9,7 +11,15 @@ const links = [
   { href: "/about", label: "About" }
 ];
 
-export function Navbar() {
+export async function Navbar() {
+  const session = await auth();
+
+  async function handleSignOut() {
+    "use server";
+    await signOut();
+    redirect("/");
+  }
+
   return (
     <header className="border-b border-base-300 bg-base-100/80 backdrop-blur">
       <div className="container">
@@ -63,12 +73,23 @@ export function Navbar() {
           </div>
           <div className="navbar-end gap-2">
             <ThemeToggle />
-            <Link
-              href="/auth/sign-in"
-              className="btn btn-secondary btn-sm font-semibold focus-visible:outline-none focus-visible:ring focus-visible:ring-secondary/50"
-            >
-              Sign In
-            </Link>
+            {session?.user ? (
+              <form action={handleSignOut}>
+                <button
+                  type="submit"
+                  className="btn btn-secondary btn-sm font-semibold focus-visible:outline-none focus-visible:ring focus-visible:ring-secondary/50"
+                >
+                  Sign Out
+                </button>
+              </form>
+            ) : (
+              <Link
+                href="/auth/sign-in"
+                className="btn btn-secondary btn-sm font-semibold focus-visible:outline-none focus-visible:ring focus-visible:ring-secondary/50"
+              >
+                Sign In
+              </Link>
+            )}
           </div>
         </div>
       </div>

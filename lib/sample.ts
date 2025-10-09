@@ -25,7 +25,7 @@ export const gigs: GigSample[] = [
     venue: "Obsidian Stage",
     city: "Olympia, WA",
     dateISO: "2025-02-14",
-    signupUrl: "#",
+    signupUrl: "/gigs/oly-midnight-oil",
     tags: ["booked", "paid"],
     isOpenMic: false
   },
@@ -35,7 +35,7 @@ export const gigs: GigSample[] = [
     venue: "Gravity Espresso",
     city: "Olympia, WA",
     dateISO: "2025-02-19",
-    signupUrl: "#",
+    signupUrl: "/gigs/oly-open-late",
     tags: ["open mic"],
     isOpenMic: true
   },
@@ -45,7 +45,7 @@ export const gigs: GigSample[] = [
     venue: "Blue Mouse Lounge",
     city: "Tacoma, WA",
     dateISO: "2025-02-23",
-    signupUrl: "#",
+    signupUrl: "/gigs/tacoma-sunday",
     tags: ["booked"],
     isOpenMic: false
   },
@@ -55,7 +55,7 @@ export const gigs: GigSample[] = [
     venue: "Alma Mater Loft",
     city: "Tacoma, WA",
     dateISO: "2025-03-02",
-    signupUrl: "#",
+    signupUrl: "/gigs/tacoma-backroom",
     tags: ["open mic"],
     isOpenMic: true
   },
@@ -65,7 +65,7 @@ export const gigs: GigSample[] = [
     venue: "Clock-Out Lounge",
     city: "Seattle, WA",
     dateISO: "2025-03-07",
-    signupUrl: "#",
+    signupUrl: "/gigs/seattle-late-show",
     tags: ["booked", "paid"],
     isOpenMic: false
   },
@@ -75,7 +75,7 @@ export const gigs: GigSample[] = [
     venue: "Laughing Planet Basement",
     city: "Seattle, WA",
     dateISO: "2025-03-12",
-    signupUrl: "#",
+    signupUrl: "/gigs/seattle-rain-city",
     tags: ["open mic"],
     isOpenMic: true
   },
@@ -85,7 +85,7 @@ export const gigs: GigSample[] = [
     venue: "Helium Annex",
     city: "Portland, OR",
     dateISO: "2025-03-16",
-    signupUrl: "#",
+    signupUrl: "/gigs/portland-bridge",
     tags: ["booked"],
     isOpenMic: false
   },
@@ -95,7 +95,7 @@ export const gigs: GigSample[] = [
     venue: "The Fixin' To Patio",
     city: "Portland, OR",
     dateISO: "2025-03-20",
-    signupUrl: "#",
+    signupUrl: "/gigs/portland-diy",
     tags: ["open mic"],
     isOpenMic: true
   }

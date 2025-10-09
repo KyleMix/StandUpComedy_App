@@ -12,6 +12,8 @@ import type {
   VerificationStatus
 } from "@/lib/prismaEnums";
 
+export type ComedianCleanRating = "CLEAN" | "PG13" | "R";
+
 export interface UserRecord {
   id: string;
   name: string | null;
@@ -19,6 +21,8 @@ export interface UserRecord {
   hashedPassword: string | null;
   role: Role;
   createdAt: string;
+  isPremium: boolean;
+  premiumSince: string | null;
 }
 
 export interface ComedianProfileRecord {
@@ -34,6 +38,14 @@ export interface ComedianProfileRecord {
   travelRadiusMiles: number | null;
   homeCity: string | null;
   homeState: string | null;
+  styles: string[];
+  cleanRating: ComedianCleanRating;
+  rateMin: number | null;
+  rateMax: number | null;
+  reelUrls: string[];
+  photoUrls: string[];
+  notableClubs: string[];
+  availability: AvailabilityRecord[];
   createdAt: string;
   updatedAt: string;
 }
@@ -221,6 +233,31 @@ export interface ConversationReviewRecord {
   createdAt: string;
 }
 
+export interface ReviewRecord {
+  id: string;
+  authorUserId: string;
+  subjectUserId: string;
+  gigId: string;
+  rating: 1 | 2 | 3 | 4 | 5;
+  comment: string;
+  createdAt: string;
+}
+
+export type AdSlotPage = "home" | "search" | "profile";
+export type AdSlotPlacement = "top" | "inline" | "sidebar";
+
+export interface AdSlotRecord {
+  id: string;
+  page: AdSlotPage;
+  placement: AdSlotPlacement;
+  html?: string;
+  imageUrl?: string;
+  linkUrl?: string;
+  active: boolean;
+  priority: number;
+  createdAt: string;
+}
+
 export interface AvailabilityRecord {
   id: string;
   userId: string;
@@ -255,7 +292,9 @@ export interface DatabaseSnapshot {
   offers: OfferRecord[];
   bookings: BookingRecord[];
   conversationReviews: ConversationReviewRecord[];
+  reviews: ReviewRecord[];
   availability: AvailabilityRecord[];
   reports: ReportRecord[];
   communityBoardMessages: CommunityBoardMessageRecord[];
+  adSlots: AdSlotRecord[];
 }

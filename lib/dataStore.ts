@@ -2,10 +2,14 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
 import type {
+  AdSlotPage,
+  AdSlotPlacement,
+  AdSlotRecord,
   ApplicationRecord,
   AvailabilityRecord,
   BookingRecord,
   ComedianAppearanceRecord,
+  ComedianCleanRating,
   ComedianProfileRecord,
   ComedianVideoRecord,
   CommunityBoardMessageRecord,
@@ -18,6 +22,7 @@ import type {
   OfferRecord,
   PromoterProfileRecord,
   ReportRecord,
+  ReviewRecord,
   ThreadRecord,
   UserRecord,
   VenueProfileRecord,
@@ -61,21 +66,26 @@ async function ensureDataStore() {
       offers: [],
       bookings: [],
       conversationReviews: [],
+      reviews: [],
       availability: [],
       reports: [],
-      communityBoardMessages: []
+      communityBoardMessages: [],
+      adSlots: []
     };
     await fs.writeFile(DATABASE_PATH, JSON.stringify(emptySnapshot, null, 2));
   }
 }
 
-export interface User extends Omit<UserRecord, "createdAt"> {
+export interface User extends Omit<UserRecord, "createdAt" | "premiumSince"> {
   createdAt: Date;
+  premiumSince: Date | null;
 }
 
-export interface ComedianProfile extends Omit<ComedianProfileRecord, "createdAt" | "updatedAt"> {
+export interface ComedianProfile
+  extends Omit<ComedianProfileRecord, "createdAt" | "updatedAt" | "availability"> {
   createdAt: Date;
   updatedAt: Date;
+  availability: Availability[];
 }
 
 export interface ComedianVideo extends Omit<ComedianVideoRecord, "postedAt"> {
@@ -155,6 +165,14 @@ export interface Availability extends Omit<AvailabilityRecord, "date"> {
   date: Date;
 }
 
+export interface Review extends Omit<ReviewRecord, "createdAt"> {
+  createdAt: Date;
+}
+
+export interface AdSlot extends Omit<AdSlotRecord, "createdAt"> {
+  createdAt: Date;
+}
+
 export interface Report extends Omit<ReportRecord, "createdAt" | "resolvedAt"> {
   createdAt: Date;
   resolvedAt: Date | null;
@@ -177,9 +195,11 @@ function withDefaults(snapshot: Partial<DatabaseSnapshot>): DatabaseSnapshot {
     offers: snapshot.offers ?? [],
     bookings: snapshot.bookings ?? [],
     conversationReviews: snapshot.conversationReviews ?? [],
+    reviews: snapshot.reviews ?? [],
     availability: snapshot.availability ?? [],
     reports: snapshot.reports ?? [],
-    communityBoardMessages: snapshot.communityBoardMessages ?? []
+    communityBoardMessages: snapshot.communityBoardMessages ?? [],
+    adSlots: snapshot.adSlots ?? []
   };
 }
 
@@ -209,12 +229,64 @@ function toDate(value: string | null): Date | null {
 }
 
 function mapUser(record: UserRecord): User {
-  return { ...record, name: record.name ?? null, hashedPassword: record.hashedPassword ?? null, createdAt: new Date(record.createdAt) };
+  return {
+    id: record.id,
+    name: record.name ?? null,
+    email: record.email,
+    hashedPassword: record.hashedPassword ?? null,
+    role: record.role,
+    createdAt: new Date(record.createdAt),
+    isPremium: record.isPremium ?? false,
+    premiumSince: record.premiumSince ? new Date(record.premiumSince) : null
+  };
+}
+
+const CLEAN_RATINGS: ComedianCleanRating[] = ["CLEAN", "PG13", "R"];
+
+function coerceCleanRating(value: ComedianCleanRating | string | undefined): ComedianCleanRating {
+  if (value && CLEAN_RATINGS.includes(value as ComedianCleanRating)) {
+    return value as ComedianCleanRating;
+  }
+  return "PG13";
+}
+
+function sanitizeStringArray(values: string[] | null | undefined): string[] {
+  if (!Array.isArray(values)) return [];
+  return values
+    .map((value) => sanitizeHtml(value))
+    .filter((value) => value.length > 0);
+}
+
+function sanitizeAvailabilityStatus(status: string | undefined): "free" | "busy" {
+  return status === "busy" ? "busy" : "free";
+}
+
+function toIsoString(value: string | Date | null | undefined): string {
+  if (typeof value === "string") return value;
+  if (value instanceof Date) {
+    return value.toISOString();
+  }
+  const date = value ? new Date(value) : new Date();
+  return Number.isNaN(date.getTime()) ? new Date().toISOString() : date.toISOString();
+}
+
+function sanitizeProfileAvailability(
+  userId: string,
+  entries: AvailabilityRecord[] | undefined
+): AvailabilityRecord[] {
+  if (!Array.isArray(entries)) return [];
+  return entries.map((entry) => ({
+    id: entry.id ?? randomUUID(),
+    userId: entry.userId ?? userId,
+    date: toIsoString(entry.date),
+    status: sanitizeAvailabilityStatus(entry.status)
+  }));
 }
 
 function mapComedian(record: ComedianProfileRecord): ComedianProfile {
   return {
-    ...record,
+    userId: record.userId,
+    stageName: record.stageName,
     bio: record.bio ?? null,
     credits: record.credits ?? null,
     website: record.website ?? null,
@@ -225,6 +297,16 @@ function mapComedian(record: ComedianProfileRecord): ComedianProfile {
     travelRadiusMiles: record.travelRadiusMiles ?? null,
     homeCity: record.homeCity ?? null,
     homeState: record.homeState ?? null,
+    styles: sanitizeStringArray(record.styles),
+    cleanRating: coerceCleanRating(record.cleanRating),
+    rateMin: typeof record.rateMin === "number" ? record.rateMin : null,
+    rateMax: typeof record.rateMax === "number" ? record.rateMax : null,
+    reelUrls: sanitizeStringArray(record.reelUrls),
+    photoUrls: sanitizeStringArray(record.photoUrls),
+    notableClubs: sanitizeStringArray(record.notableClubs),
+    availability: Array.isArray(record.availability)
+      ? record.availability.map(mapAvailability)
+      : [],
     createdAt: new Date(record.createdAt),
     updatedAt: new Date(record.updatedAt)
   };
@@ -385,6 +467,31 @@ function mapReport(record: ReportRecord): Report {
   };
 }
 
+function mapReview(record: ReviewRecord): Review {
+  return {
+    ...record,
+    comment: record.comment ?? "",
+    createdAt: new Date(record.createdAt)
+  };
+}
+
+function mapAdSlot(record: AdSlotRecord): AdSlot {
+  return {
+    ...record,
+    html: record.html,
+    imageUrl: record.imageUrl,
+    linkUrl: record.linkUrl,
+    createdAt: new Date(record.createdAt)
+  };
+}
+
+function normalizeReviewRating(value: number): 1 | 2 | 3 | 4 | 5 {
+  const rounded = Math.round(value);
+  if (rounded <= 1) return 1;
+  if (rounded >= 5) return 5;
+  return (rounded as 2 | 3 | 4);
+}
+
 function nowIso() {
   return new Date().toISOString();
 }
@@ -432,17 +539,23 @@ interface CreateUserInput {
   email: string;
   hashedPassword?: string | null;
   role: Role;
+  isPremium?: boolean;
+  premiumSince?: Date | string | null;
 }
 
 export async function createUser(input: CreateUserInput): Promise<User> {
   const snapshot = await loadSnapshot();
+  const now = nowIso();
+  const isPremium = input.isPremium ?? false;
   const user: UserRecord = {
     id: randomUUID(),
     name: input.name ?? null,
     email: input.email,
     hashedPassword: input.hashedPassword ?? null,
     role: input.role,
-    createdAt: nowIso()
+    createdAt: now,
+    isPremium,
+    premiumSince: isPremium ? toIsoString(input.premiumSince ?? now) : null
   };
   snapshot.users.push(user);
   await persist(snapshot);
@@ -457,6 +570,24 @@ export async function updateUser(id: string, data: Partial<Omit<UserRecord, "id"
   if (data.email !== undefined) record.email = data.email;
   if (data.hashedPassword !== undefined) record.hashedPassword = data.hashedPassword;
   if (data.role !== undefined) record.role = data.role;
+  if (data.isPremium !== undefined) record.isPremium = data.isPremium;
+  if (data.premiumSince !== undefined) {
+    record.premiumSince = data.premiumSince ? toIsoString(data.premiumSince) : null;
+  }
+  await persist(snapshot);
+  return mapUser(record);
+}
+
+export async function setUserPremium(userId: string, isPremium: boolean): Promise<User | null> {
+  const snapshot = await loadSnapshot();
+  const record = snapshot.users.find((user) => user.id === userId);
+  if (!record) return null;
+  record.isPremium = isPremium;
+  if (isPremium) {
+    record.premiumSince = record.premiumSince ?? nowIso();
+  } else {
+    record.premiumSince = null;
+  }
   await persist(snapshot);
   return mapUser(record);
 }
@@ -480,6 +611,14 @@ interface CreateComedianProfileInput {
   travelRadiusMiles?: number | null;
   homeCity?: string | null;
   homeState?: string | null;
+  styles?: string[];
+  cleanRating?: ComedianCleanRating | string;
+  rateMin?: number | null;
+  rateMax?: number | null;
+  reelUrls?: string[];
+  photoUrls?: string[];
+  notableClubs?: string[];
+  availability?: AvailabilityRecord[];
 }
 
 export async function createComedianProfile(input: CreateComedianProfileInput): Promise<ComedianProfile> {
@@ -498,6 +637,14 @@ export async function createComedianProfile(input: CreateComedianProfileInput): 
     travelRadiusMiles: input.travelRadiusMiles ?? null,
     homeCity: input.homeCity ? sanitizeHtml(input.homeCity) : null,
     homeState: input.homeState ? sanitizeHtml(input.homeState) : null,
+    styles: sanitizeStringArray(input.styles),
+    cleanRating: coerceCleanRating(input.cleanRating as ComedianCleanRating | undefined),
+    rateMin: typeof input.rateMin === "number" ? input.rateMin : null,
+    rateMax: typeof input.rateMax === "number" ? input.rateMax : null,
+    reelUrls: sanitizeStringArray(input.reelUrls),
+    photoUrls: sanitizeStringArray(input.photoUrls),
+    notableClubs: sanitizeStringArray(input.notableClubs),
+    availability: sanitizeProfileAvailability(input.userId, input.availability),
     createdAt: now,
     updatedAt: now
   };
@@ -507,6 +654,87 @@ export async function createComedianProfile(input: CreateComedianProfileInput): 
   } else {
     snapshot.comedianProfiles.push(record);
   }
+  await persist(snapshot);
+  return mapComedian(record);
+}
+
+interface UpdateComedianProfileMediaInput {
+  reelUrl?: string | null;
+  reelUrls?: string[];
+  photoUrls?: string[];
+  notableClubs?: string[];
+}
+
+export async function updateComedianProfileMedia(
+  userId: string,
+  data: UpdateComedianProfileMediaInput
+): Promise<ComedianProfile | null> {
+  const snapshot = await loadSnapshot();
+  const record = snapshot.comedianProfiles.find((profile) => profile.userId === userId);
+  if (!record) return null;
+  if (data.reelUrl !== undefined) {
+    record.reelUrl = data.reelUrl ? sanitizeHtml(data.reelUrl) : null;
+  }
+  if (data.reelUrls !== undefined) {
+    record.reelUrls = sanitizeStringArray(data.reelUrls);
+  }
+  if (data.photoUrls !== undefined) {
+    record.photoUrls = sanitizeStringArray(data.photoUrls);
+  }
+  if (data.notableClubs !== undefined) {
+    record.notableClubs = sanitizeStringArray(data.notableClubs);
+  }
+  record.updatedAt = nowIso();
+  await persist(snapshot);
+  return mapComedian(record);
+}
+
+interface UpdateComedianProfileRatesInput {
+  rateMin?: number | null;
+  rateMax?: number | null;
+  availability?: AvailabilityRecord[];
+}
+
+export async function updateComedianProfileRates(
+  userId: string,
+  data: UpdateComedianProfileRatesInput
+): Promise<ComedianProfile | null> {
+  const snapshot = await loadSnapshot();
+  const record = snapshot.comedianProfiles.find((profile) => profile.userId === userId);
+  if (!record) return null;
+  if (data.rateMin !== undefined) {
+    record.rateMin = typeof data.rateMin === "number" ? data.rateMin : null;
+  }
+  if (data.rateMax !== undefined) {
+    record.rateMax = typeof data.rateMax === "number" ? data.rateMax : null;
+  }
+  if (data.availability !== undefined) {
+    record.availability = sanitizeProfileAvailability(userId, data.availability);
+  }
+  record.updatedAt = nowIso();
+  await persist(snapshot);
+  return mapComedian(record);
+}
+
+interface UpdateComedianProfileStylesInput {
+  styles?: string[];
+  cleanRating?: ComedianCleanRating | string | null;
+}
+
+export async function updateComedianProfileStyles(
+  userId: string,
+  data: UpdateComedianProfileStylesInput
+): Promise<ComedianProfile | null> {
+  const snapshot = await loadSnapshot();
+  const record = snapshot.comedianProfiles.find((profile) => profile.userId === userId);
+  if (!record) return null;
+  if (data.styles !== undefined) {
+    record.styles = sanitizeStringArray(data.styles);
+  }
+  if (data.cleanRating !== undefined) {
+    record.cleanRating = coerceCleanRating(data.cleanRating ?? undefined);
+  }
+  record.updatedAt = nowIso();
   await persist(snapshot);
   return mapComedian(record);
 }
@@ -1133,6 +1361,57 @@ export async function updateCommunityBoardMessage(
   return mapCommunityBoardMessage(record);
 }
 
+interface CreateAdSlotInput {
+  page: AdSlotPage;
+  placement: AdSlotPlacement;
+  html?: string | null;
+  imageUrl?: string | null;
+  linkUrl?: string | null;
+  active?: boolean;
+  priority?: number;
+}
+
+export async function createAdSlot(input: CreateAdSlotInput): Promise<AdSlot> {
+  const snapshot = await loadSnapshot();
+  const now = nowIso();
+  const record: AdSlotRecord = {
+    id: randomUUID(),
+    page: input.page,
+    placement: input.placement,
+    html: input.html ? sanitizeHtml(input.html) : undefined,
+    imageUrl: input.imageUrl ? sanitizeHtml(input.imageUrl) : undefined,
+    linkUrl: input.linkUrl ? sanitizeHtml(input.linkUrl) : undefined,
+    active: input.active ?? true,
+    priority: typeof input.priority === "number" ? input.priority : 0,
+    createdAt: now
+  };
+  snapshot.adSlots.push(record);
+  await persist(snapshot);
+  return mapAdSlot(record);
+}
+
+export async function listAdSlots(page: AdSlotPage, placement: AdSlotPlacement): Promise<AdSlot[]> {
+  const snapshot = await loadSnapshot();
+  return snapshot.adSlots
+    .filter((slot) => slot.page === page && slot.placement === placement && slot.active)
+    .map(mapAdSlot)
+    .sort((a, b) => {
+      if (b.priority !== a.priority) {
+        return b.priority - a.priority;
+      }
+      return b.createdAt.getTime() - a.createdAt.getTime();
+    });
+}
+
+export async function toggleAdSlot(id: string, active: boolean): Promise<AdSlot | null> {
+  const snapshot = await loadSnapshot();
+  const record = snapshot.adSlots.find((slot) => slot.id === id);
+  if (!record) return null;
+  record.active = active;
+  await persist(snapshot);
+  return mapAdSlot(record);
+}
+
 interface CreateOfferInput {
   threadId: string;
   fromUserId: string;
@@ -1285,6 +1564,47 @@ export async function listConversationReviewsForBooking(bookingId: string): Prom
   return snapshot.conversationReviews
     .filter((review) => review.bookingId === bookingId)
     .map(mapConversationReview)
+    .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+}
+
+interface CreateReviewInput {
+  authorUserId: string;
+  subjectUserId: string;
+  gigId: string;
+  rating: number;
+  comment: string;
+}
+
+export async function createReview(input: CreateReviewInput): Promise<Review> {
+  const snapshot = await loadSnapshot();
+  const now = nowIso();
+  const record: ReviewRecord = {
+    id: randomUUID(),
+    authorUserId: input.authorUserId,
+    subjectUserId: input.subjectUserId,
+    gigId: input.gigId,
+    rating: normalizeReviewRating(input.rating),
+    comment: sanitizeHtml(input.comment),
+    createdAt: now
+  };
+  snapshot.reviews.push(record);
+  await persist(snapshot);
+  return mapReview(record);
+}
+
+export async function listReviewsForUser(subjectUserId: string): Promise<Review[]> {
+  const snapshot = await loadSnapshot();
+  return snapshot.reviews
+    .filter((review) => review.subjectUserId === subjectUserId)
+    .map(mapReview)
+    .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+}
+
+export async function listReviewsForGig(gigId: string): Promise<Review[]> {
+  const snapshot = await loadSnapshot();
+  return snapshot.reviews
+    .filter((review) => review.gigId === gigId)
+    .map(mapReview)
     .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 }
 

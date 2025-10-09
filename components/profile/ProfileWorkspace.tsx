@@ -152,6 +152,10 @@ const ProfileWorkspace = ({ user, boardMessages }: ProfileWorkspaceProps) => {
   const initialRoleTab: ProfileRoleTab =
     user.role === "PROMOTER" ? "PROMOTER" : user.role === "VENUE" ? "VENUE" : "COMEDIAN";
   const [activeRole, setActiveRole] = useState<ProfileRoleTab>(initialRoleTab);
+  const isAdmin = currentUser.role === "ADMIN";
+  const allowedRoleTabs = useMemo<ProfileRoleTab[]>(() => {
+    return isAdmin ? ROLE_TABS : [initialRoleTab];
+  }, [initialRoleTab, isAdmin]);
 
   const [comedianForm, setComedianForm] = useState({
     legalName: user.name ?? "",
@@ -198,6 +202,12 @@ const ProfileWorkspace = ({ user, boardMessages }: ProfileWorkspaceProps) => {
   const [comedianError, setComedianError] = useState<string | null>(null);
   const [promoterError, setPromoterError] = useState<string | null>(null);
   const [venueError, setVenueError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!allowedRoleTabs.includes(activeRole)) {
+      setActiveRole(initialRoleTab);
+    }
+  }, [activeRole, allowedRoleTabs, initialRoleTab]);
 
   const [messages, setMessages] = useState<BoardMessage[]>(
     boardMessages.map((message) => ({
@@ -254,7 +264,6 @@ const ProfileWorkspace = ({ user, boardMessages }: ProfileWorkspaceProps) => {
     gigSlotsAvailable
   ]);
 
-  const isAdmin = currentUser.role === "ADMIN";
   const canEditActiveTab = useMemo(() => {
     if (isAdmin) {
       return true;
@@ -882,22 +891,30 @@ const ProfileWorkspace = ({ user, boardMessages }: ProfileWorkspaceProps) => {
         <CardHeader>
           <CardTitle className="text-2xl font-semibold text-slate-900">Complete your profile</CardTitle>
           <p className="text-sm text-slate-600">
-            Switch between the three profile types to see what information is collected for each community member.
+            {isAdmin
+              ? "Switch between the three profile types to see what information is collected for each community member."
+              : "Review and update the details for your account type so promoters know how to reach you."}
           </p>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="flex flex-wrap gap-2">
-            {ROLE_TABS.map((role) => (
-              <Button
-                key={role}
-                type="button"
-                variant={activeRole === role ? "default" : "outline"}
-                onClick={() => setActiveRole(role)}
-              >
-                {role.charAt(0) + role.slice(1).toLowerCase()}
-              </Button>
-            ))}
-          </div>
+          {allowedRoleTabs.length > 1 ? (
+            <div className="flex flex-wrap gap-2">
+              {allowedRoleTabs.map((role) => (
+                <Button
+                  key={role}
+                  type="button"
+                  variant={activeRole === role ? "default" : "outline"}
+                  onClick={() => setActiveRole(role)}
+                >
+                  {role.charAt(0) + role.slice(1).toLowerCase()}
+                </Button>
+              ))}
+            </div>
+          ) : (
+            <Badge variant="secondary" className="uppercase tracking-wide">
+              {activeRole.charAt(0) + activeRole.slice(1).toLowerCase()} profile
+            </Badge>
+          )}
           {activeRole === "COMEDIAN" && (
             <form onSubmit={handleComedianSubmit} className="space-y-4">
               {!canEditActiveTab && (

@@ -1223,6 +1223,14 @@ export async function getBookingById(bookingId: string): Promise<Booking | null>
   return record ? mapBooking(record) : null;
 }
 
+export async function listBookingsForComedian(userId: string): Promise<Booking[]> {
+  const snapshot = await loadSnapshot();
+  return snapshot.bookings
+    .filter((booking) => booking.comedianId === userId)
+    .map(mapBooking)
+    .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+}
+
 export async function updateBooking(
   bookingId: string,
   data: Partial<Omit<BookingRecord, "id" | "gigId" | "comedianId" | "promoterId" | "offerId" | "createdAt">>
@@ -1278,6 +1286,14 @@ export async function listConversationReviewsForBooking(bookingId: string): Prom
     .filter((review) => review.bookingId === bookingId)
     .map(mapConversationReview)
     .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+}
+
+export async function listAvailabilityForUser(userId: string): Promise<Availability[]> {
+  const snapshot = await loadSnapshot();
+  return snapshot.availability
+    .filter((record) => record.userId === userId)
+    .map(mapAvailability)
+    .sort((a, b) => a.date.getTime() - b.date.getTime());
 }
 
 interface CreateReportInput {

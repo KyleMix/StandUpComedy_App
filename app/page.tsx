@@ -307,7 +307,7 @@ async function buildActivitySection(user: HomeUser): Promise<ActivityContent> {
     const favorites = user.favorites ?? [];
     const items = (
       await Promise.all(
-        favorites.slice(0, 3).map(async (favorite) => {
+        favorites.slice(0, 3).map(async (favorite): Promise<ActivityItem | null> => {
           if (favorite.gigId) {
             const gig = await prisma.gig.findUnique({ where: { id: favorite.gigId } });
             if (!gig) return null;

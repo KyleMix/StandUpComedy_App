@@ -1,5 +1,3 @@
-import type { AllowlistSource } from "@prisma/client";
-
 export interface AllowlistEntry {
   domain: string;
   label: string;
@@ -22,6 +20,12 @@ export const STARTER_ALLOWLIST: AllowlistEntry[] = [
   },
 ];
 
-export type AllowlistSourceRecord = Pick<AllowlistSource, "id" | "domain" | "label" | "enabled" | "lastCheckedAt">;
+export type AllowlistSourceRecord = {
+  id: string;
+  domain: string;
+  label: string;
+  enabled: boolean;
+  lastCheckedAt: Date | null;
+};
 
 export const ALLOWLIST_DOC = `The Funny ingestion allowlist only queries public gig calendars. Respect each site's robots.txt and honor request rate limits. Private or paid platforms like Eventbrite or Ticketmaster are excluded.`;

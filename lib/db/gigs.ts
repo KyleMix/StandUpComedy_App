@@ -1,10 +1,15 @@
-import { GigStatus, GigType, SignUpMethod } from "@prisma/client";
-import type { Prisma } from "@prisma/client";
+import { GigStatus, GigType, SignUpMethod } from "@/lib/prismaEnums";
 import { listGigs as listJsonGigs } from "@/lib/dataStore";
 import type { Gig as JsonGig } from "@/lib/dataStore";
 import { getPrismaClient, isDatabaseEnabled } from "./client";
 
 type MaybeDate = string | Date | null | undefined;
+
+type GigWhereInput = Record<string, unknown> & {
+  AND?: GigWhereInput[];
+  OR?: GigWhereInput[];
+  startsAt?: { gte?: Date; lte?: Date };
+};
 
 export interface GigFilters {
   query?: string;
@@ -70,7 +75,7 @@ function mapJsonGig(gig: JsonGig): GigSummary {
 export async function listPublishedGigs(filters: GigFilters = {}): Promise<GigSummary[]> {
   if (isDatabaseEnabled()) {
     const prisma = getPrismaClient();
-    const where: Prisma.GigWhereInput = {
+    const where: GigWhereInput = {
       status: filters.status ?? GigStatus.PUBLISHED,
     };
     if (filters.type) {
@@ -84,7 +89,7 @@ export async function listPublishedGigs(filters: GigFilters = {}): Promise<GigSu
     }
     if (filters.payMin !== undefined || filters.payMax !== undefined) {
       where.AND = where.AND ?? [];
-      const range: Prisma.GigWhereInput = {};
+      const range: GigWhereInput = {};
       if (filters.payMin !== undefined) {
         range.OR = [
           { payMin: { gte: filters.payMin } },
@@ -98,7 +103,7 @@ export async function listPublishedGigs(filters: GigFilters = {}): Promise<GigSu
           { payMax: { lte: filters.payMax } },
         ];
       }
-      (where.AND as Prisma.GigWhereInput[]).push(range);
+      (where.AND ??= []).push(range);
     }
     if (filters.query) {
       where.OR = [
@@ -110,7 +115,7 @@ export async function listPublishedGigs(filters: GigFilters = {}): Promise<GigSu
     const start = coerceDate(filters.startDate);
     const end = coerceDate(filters.endDate);
     if (start || end) {
-      where.startsAt = {};
+      where.startsAt = where.startsAt ?? {};
       if (start) where.startsAt.gte = start;
       if (end) where.startsAt.lte = end;
     }
@@ -121,7 +126,7 @@ export async function listPublishedGigs(filters: GigFilters = {}): Promise<GigSu
         { venue: { name: { contains: filters.city, mode: "insensitive" } } },
       ];
     }
-    const gigs = await prisma.gig.findMany({
+    const gigs = (await prisma.gig.findMany({
       where,
       include: {
         venue: true,
@@ -130,7 +135,7 @@ export async function listPublishedGigs(filters: GigFilters = {}): Promise<GigSu
       orderBy: { startsAt: "asc" },
       take: filters.take ?? 50,
       skip: filters.skip ?? 0,
-    });
+    })) as Array<Record<string, any>>;
     return gigs.map((gig) => ({
       id: gig.id,
       title: gig.title,

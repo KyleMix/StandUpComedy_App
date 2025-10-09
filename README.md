@@ -30,7 +30,7 @@ Copy `.env.example` to `.env` if you want to override the defaults:
 cp .env.example .env
 ```
 
-The application reads `SESSION_SECRET` for cookie signing and SMTP settings for notification emails. If those variables are omitted the app still runs with sensible fallbacks (SMTP emails are skipped).
+The application reads `SESSION_SECRET` for cookie signing and SMTP settings for notification emails. Set `DATABASE_URL` to a Postgres connection string when you want Prisma to talk to a real database; leaving it empty falls back to the built-in JSON datastore. If any of these variables are omitted the app still runs with sensible fallbacks (SMTP emails are skipped).
 
 ### 3. Start the app
 
@@ -38,7 +38,7 @@ The application reads `SESSION_SECRET` for cookie signing and SMTP settings for 
 npm run dev
 ```
 
-The app will be available at `http://localhost:3000` using the bundled JSON dataset.
+The app will be available at `http://localhost:3000` using the bundled JSON dataset. Sign in with the pre-seeded QA admin from `data/database.json`: `master@thefunny.local` / `TestingMaster!123`.
 
 ### 4. Running in Docker
 

@@ -380,7 +380,8 @@ export const prisma = {
         minAge: args.data.minAge,
         payoutUsd: args.data.payoutUsd,
         isPublished: args.data.isPublished,
-        status: args.data.status
+        status: args.data.status,
+        perks: args.data.perks ?? []
       });
     },
     async update(args: UpdateGigArgs) {

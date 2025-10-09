@@ -7,6 +7,7 @@ import {
   VerificationStatus
 } from "@/lib/prismaEnums";
 import { COMMUNITY_BOARD_CATEGORIES } from "@/lib/dataStore";
+import type { CommunityBoardCategory } from "@/types/database";
 
 export const registerSchema = z.object({
   name: z.string().min(1),
@@ -50,7 +51,7 @@ const phoneSchema = z
   .nullable()
   .optional();
 
-const boardCategoryEnum = z.enum(COMMUNITY_BOARD_CATEGORIES);
+const boardCategoryEnum = z.enum(COMMUNITY_BOARD_CATEGORIES as [CommunityBoardCategory, ...CommunityBoardCategory[]]);
 
 export const comedianProfileFormSchema = z.object({
   legalName: z.string().trim().min(2).max(120),
@@ -205,7 +206,7 @@ const gigFormBaseSchema = z.object({
 
 const gigDateRangeRefinement = {
   message: "End date must be on or after the start date",
-  path: ["dateEnd"] as const
+  path: ["dateEnd"] as (string | number)[]
 };
 
 const isValidGigDateRange = (data: z.infer<typeof gigFormBaseSchema>) => {

@@ -22,6 +22,8 @@ import {
 import type { Review, User } from "@/lib/dataStore";
 import type { FeatureFlagKey } from "@/lib/config/flags";
 import { FEATURE_FLAG_METADATA } from "@/lib/config/flags";
+import { rateLimit } from "@/lib/rateLimit";
+import { premiumToggleSchema, featureFlagToggleSchema } from "@/lib/zodSchemas";
 
 const DATE_TIME_FORMATTER = new Intl.DateTimeFormat("en-US", {
   dateStyle: "medium",
@@ -73,17 +75,25 @@ async function requireAdmin() {
 async function toggleUserPremiumAction(formData: FormData) {
   "use server";
 
-  await requireAdmin();
-
-  const userId = formData.get("id");
-  const enabled = formData.get("enabled") === "true";
   const tab = typeof formData.get("tab") === "string" ? (formData.get("tab") as string) : "users";
 
-  if (typeof userId !== "string" || userId.length === 0) {
+  const session = await requireAdmin();
+
+  if (!rateLimit(`admin:premium-toggle:${session.user.id}`)) {
     redirect(`/admin?tab=${tab}`);
   }
 
-  await setUserPremium(userId, enabled);
+  const payload = {
+    userId: typeof formData.get("id") === "string" ? (formData.get("id") as string) : "",
+    enabled: formData.get("enabled") === "true",
+  };
+
+  const parsed = premiumToggleSchema.safeParse(payload);
+  if (!parsed.success) {
+    redirect(`/admin?tab=${tab}`);
+  }
+
+  await setUserPremium(parsed.data.userId, parsed.data.enabled);
   revalidatePath("/admin");
   redirect(`/admin?tab=${tab}`);
 }
@@ -109,11 +119,16 @@ async function toggleReviewVisibilityAction(formData: FormData) {
 async function toggleAdSlotAction(formData: FormData) {
   "use server";
 
-  await requireAdmin();
+  const tab = typeof formData.get("tab") === "string" ? (formData.get("tab") as string) : "ads";
+
+  const session = await requireAdmin();
+
+  if (!rateLimit(`ads:toggle:${session.user.id}`)) {
+    redirect(`/admin?tab=${tab}`);
+  }
 
   const slotId = formData.get("id");
   const active = formData.get("active") === "true";
-  const tab = typeof formData.get("tab") === "string" ? (formData.get("tab") as string) : "ads";
 
   if (typeof slotId !== "string" || slotId.length === 0) {
     redirect(`/admin?tab=${tab}`);
@@ -127,17 +142,27 @@ async function toggleAdSlotAction(formData: FormData) {
 async function toggleFeatureFlagAction(formData: FormData) {
   "use server";
 
-  await requireAdmin();
-
   const key = formData.get("key");
   const enabled = formData.get("enabled") === "true";
   const tab = typeof formData.get("tab") === "string" ? (formData.get("tab") as string) : "flags";
 
-  if (!isFeatureFlagKey(key)) {
+  const session = await requireAdmin();
+
+  if (!rateLimit(`admin:flag-toggle:${session.user.id}`)) {
     redirect(`/admin?tab=${tab}`);
   }
 
-  await setFeatureFlag(key, enabled);
+  const payload = {
+    key: typeof key === "string" ? key : "",
+    enabled,
+  };
+
+  const parsed = featureFlagToggleSchema.safeParse(payload);
+  if (!parsed.success || !isFeatureFlagKey(parsed.data.key)) {
+    redirect(`/admin?tab=${tab}`);
+  }
+
+  await setFeatureFlag(parsed.data.key, parsed.data.enabled);
   revalidatePath("/admin");
   redirect(`/admin?tab=${tab}`);
 }

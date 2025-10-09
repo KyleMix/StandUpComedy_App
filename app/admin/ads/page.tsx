@@ -15,6 +15,8 @@ import {
 } from "@/lib/ads";
 import type { AdSlotPage, AdSlotPlacement } from "@/types/database";
 import { cn } from "@/lib/utils";
+import { rateLimit } from "@/lib/rateLimit";
+import { adSlotCreateSchema, adSlotUpdateSchema } from "@/lib/zodSchemas";
 
 const PAGES: AdSlotPage[] = ["home", "search", "profile"];
 const PLACEMENTS: AdSlotPlacement[] = ["top", "inline", "sidebar"];
@@ -38,7 +40,11 @@ async function requireAdmin() {
 async function createSlot(formData: FormData) {
   "use server";
 
-  await requireAdmin();
+  const session = await requireAdmin();
+
+  if (!rateLimit(`ads:create:${session.user.id}`)) {
+    throw new Error("Too many ad slot requests. Please try again later.");
+  }
 
   const rawPage = formData.get("page");
   const rawPlacement = formData.get("placement");
@@ -51,17 +57,25 @@ async function createSlot(formData: FormData) {
   const linkUrl = formData.get("linkUrl");
   const active = formData.get("active") === "on";
   const priorityValue = Number(formData.get("priority") ?? 0);
-  const priority = Number.isFinite(priorityValue) ? Math.round(priorityValue) : 0;
+  const priority = Number.isFinite(priorityValue) ? Math.round(priorityValue) : undefined;
 
-  await createAdSlot({
+  const payload = {
     page: rawPage,
     placement: rawPlacement,
-    html: typeof html === "string" && html.trim().length > 0 ? html : null,
-    imageUrl: typeof imageUrl === "string" && imageUrl.trim().length > 0 ? imageUrl : null,
-    linkUrl: typeof linkUrl === "string" && linkUrl.trim().length > 0 ? linkUrl : null,
+    html: typeof html === "string" && html.trim().length > 0 ? html.trim() : null,
+    imageUrl: typeof imageUrl === "string" && imageUrl.trim().length > 0 ? imageUrl.trim() : null,
+    linkUrl: typeof linkUrl === "string" && linkUrl.trim().length > 0 ? linkUrl.trim() : null,
     active,
     priority,
-  });
+  } satisfies Parameters<typeof createAdSlot>[0];
+
+  const parsed = adSlotCreateSchema.safeParse(payload);
+  if (!parsed.success) {
+    const message = parsed.error.errors.at(0)?.message ?? "Invalid ad slot payload";
+    throw new Error(message);
+  }
+
+  await createAdSlot(parsed.data);
 
   revalidatePath("/admin/ads");
 }
@@ -69,7 +83,11 @@ async function createSlot(formData: FormData) {
 async function updateSlot(formData: FormData) {
   "use server";
 
-  await requireAdmin();
+  const session = await requireAdmin();
+
+  if (!rateLimit(`ads:update:${session.user.id}`)) {
+    throw new Error("Too many ad slot requests. Please try again later.");
+  }
 
   const id = formData.get("id");
   if (typeof id !== "string" || id.length === 0) {
@@ -91,27 +109,37 @@ async function updateSlot(formData: FormData) {
     payload.placement = rawPlacement;
   }
   if (typeof html === "string") {
-    payload.html = html.trim().length > 0 ? html : null;
+    payload.html = html.trim().length > 0 ? html.trim() : null;
   }
   if (typeof imageUrl === "string") {
-    payload.imageUrl = imageUrl.trim().length > 0 ? imageUrl : null;
+    payload.imageUrl = imageUrl.trim().length > 0 ? imageUrl.trim() : null;
   }
   if (typeof linkUrl === "string") {
-    payload.linkUrl = linkUrl.trim().length > 0 ? linkUrl : null;
+    payload.linkUrl = linkUrl.trim().length > 0 ? linkUrl.trim() : null;
   }
   payload.active = formData.get("active") === "on";
   if (Number.isFinite(priorityValue)) {
     payload.priority = Math.round(priorityValue);
   }
 
-  await updateAdSlotRecord(id, payload);
+  const parsed = adSlotUpdateSchema.safeParse(payload);
+  if (!parsed.success) {
+    const message = parsed.error.errors.at(0)?.message ?? "Invalid ad slot update";
+    throw new Error(message);
+  }
+
+  await updateAdSlotRecord(id, parsed.data);
   revalidatePath("/admin/ads");
 }
 
 async function deleteSlot(formData: FormData) {
   "use server";
 
-  await requireAdmin();
+  const session = await requireAdmin();
+
+  if (!rateLimit(`ads:delete:${session.user.id}`)) {
+    throw new Error("Too many ad slot requests. Please try again later.");
+  }
 
   const id = formData.get("id");
   if (typeof id !== "string" || id.length === 0) {

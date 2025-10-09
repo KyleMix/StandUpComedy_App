@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { z } from "zod";
 import { auth } from "@/lib/auth";
 import {
   createMessage,
@@ -10,30 +9,7 @@ import {
   markThreadState
 } from "@/lib/dataStore";
 import { rateLimit } from "@/lib/rateLimit";
-
-const messageSchema = z.discriminatedUnion("kind", [
-  z.object({
-    kind: z.literal("TEXT"),
-    body: z.string().min(1),
-    fileUrl: z.string().url().optional()
-  }),
-  z.object({
-    kind: z.literal("FILE"),
-    body: z.string().optional(),
-    fileUrl: z.string().url()
-  }),
-  z.object({
-    kind: z.literal("OFFER"),
-    body: z.string().optional(),
-    offer: z.object({
-      amount: z.number().int().min(1),
-      currency: z.string().default("USD"),
-      terms: z.string().min(5),
-      eventDate: z.string().datetime(),
-      expiresAt: z.string().datetime().optional()
-    })
-  })
-]);
+import { threadMessageSchema } from "@/lib/zodSchemas";
 
 export async function GET(_: Request, { params }: { params: { id: string } }) {
   const session = await auth();
@@ -74,7 +50,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
   }
 
   const json = await request.json();
-  const parsed = messageSchema.safeParse(json);
+  const parsed = threadMessageSchema.safeParse(json);
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }

@@ -159,6 +159,17 @@ export interface Gig extends Omit<GigRecord, "dateStart" | "dateEnd" | "createdA
   updatedAt: Date;
 }
 
+export interface GigMetrics {
+  gigId: string;
+  totalApplications: number;
+  pendingApplications: number;
+  favorites: number;
+  bookings: number;
+  threads: number;
+  messages: number;
+  lastActivityAt: Date | null;
+}
+
 export interface Application extends Omit<ApplicationRecord, "createdAt" | "updatedAt"> {
   createdAt: Date;
   updatedAt: Date;
@@ -1395,6 +1406,69 @@ export async function countActiveApplicationsForGig(gigId: string): Promise<numb
   return snapshot.applications.filter(
     (application) => application.gigId === gigId && activeStatuses.includes(application.status)
   ).length;
+}
+
+function toDate(value: string | null | undefined): Date | null {
+  if (!value) {
+    return null;
+  }
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+  return date;
+}
+
+function computeGigMetrics(snapshot: DatabaseSnapshot, gigId: string): GigMetrics {
+  const gig = snapshot.gigs.find((item) => item.id === gigId) ?? null;
+  const applications = snapshot.applications.filter((application) => application.gigId === gigId);
+  const favorites = snapshot.favorites.filter((favorite) => favorite.gigId === gigId);
+  const threads = snapshot.threads.filter((thread) => thread.gigId === gigId);
+  const threadIds = new Set(threads.map((thread) => thread.id));
+  const messages = snapshot.messages.filter((message) => threadIds.has(message.threadId));
+  const bookings = snapshot.bookings.filter((booking) => booking.gigId === gigId);
+
+  const pendingStatuses: ApplicationStatus[] = ["SUBMITTED", "APPLIED", "SHORTLISTED"];
+
+  const timestamps: Array<string | null | undefined> = [gig?.updatedAt ?? gig?.createdAt ?? null];
+  applications.forEach((application) => {
+    timestamps.push(application.updatedAt ?? application.createdAt);
+  });
+  threads.forEach((thread) => {
+    timestamps.push(thread.updatedAt ?? thread.createdAt);
+  });
+  messages.forEach((message) => {
+    timestamps.push(message.createdAt);
+  });
+  bookings.forEach((booking) => {
+    timestamps.push(booking.createdAt);
+  });
+
+  const lastActivityAt = timestamps
+    .map(toDate)
+    .filter((value): value is Date => value !== null)
+    .sort((a, b) => b.getTime() - a.getTime())[0] ?? null;
+
+  return {
+    gigId,
+    totalApplications: applications.length,
+    pendingApplications: applications.filter((application) => pendingStatuses.includes(application.status)).length,
+    favorites: favorites.length,
+    bookings: bookings.length,
+    threads: threads.length,
+    messages: messages.length,
+    lastActivityAt,
+  };
+}
+
+export async function getGigMetrics(gigId: string): Promise<GigMetrics> {
+  const snapshot = await loadSnapshot();
+  return computeGigMetrics(snapshot, gigId);
+}
+
+export async function listGigMetrics(): Promise<GigMetrics[]> {
+  const snapshot = await loadSnapshot();
+  return snapshot.gigs.map((gig) => computeGigMetrics(snapshot, gig.id));
 }
 
 export async function listGigsForUser(userId: string): Promise<Gig[]> {

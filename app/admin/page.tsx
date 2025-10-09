@@ -12,6 +12,7 @@ import { listAllAdSlots, updateAdSlot } from "@/lib/ads";
 import {
   listUsers,
   listGigs,
+  listGigMetrics,
   listAllReviews,
   listFeatureFlags as loadFeatureFlags,
   listVerificationRequests,
@@ -185,9 +186,10 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
 
   const activeTab = isTabId(searchParams?.tab) ? (searchParams!.tab as TabId) : "users";
 
-  const [users, gigs, reviews, adSlots, featureFlags, verificationRequests] = await Promise.all([
+  const [users, gigs, gigMetrics, reviews, adSlots, featureFlags, verificationRequests] = await Promise.all([
     listUsers(),
     listGigs({ orderByDateStart: "desc" }),
+    listGigMetrics(),
     listAllReviews(),
     listAllAdSlots(),
     loadFeatureFlags(),
@@ -198,8 +200,28 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
   const pendingRequests = verificationRequests.filter((request) => request.status === "PENDING");
   const sortedUsers = sortUsers(users);
   const latestGigs = gigs.slice(0, 20);
+  const metricsByGig = new Map(gigMetrics.map((metric) => [metric.gigId, metric]));
+  const latestGigRows = latestGigs.map((gig) => ({ gig, metrics: metricsByGig.get(gig.id) ?? null }));
   const latestReviews = reviews.slice(0, 20);
   const reviewSummary = summarizeReviews(reviews);
+
+  const now = new Date();
+  const gigTotals = {
+    total: gigs.length,
+    published: gigs.filter((gig) => gig.isPublished).length,
+    drafts: gigs.filter((gig) => !gig.isPublished).length,
+    upcoming: gigs.filter((gig) => gig.dateStart.getTime() > now.getTime()).length,
+  };
+  const metricsTotals = gigMetrics.reduce(
+    (acc, metric) => {
+      acc.totalApplications += metric.totalApplications;
+      acc.pendingApplications += metric.pendingApplications;
+      acc.favorites += metric.favorites;
+      acc.bookings += metric.bookings;
+      return acc;
+    },
+    { totalApplications: 0, pendingApplications: 0, favorites: 0, bookings: 0 }
+  );
 
   return (
     <div className="space-y-8">
@@ -316,40 +338,91 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
         <Card>
           <CardHeader className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
             <CardTitle>Recent gigs</CardTitle>
-            <p className="text-sm text-slate-600">Showing {latestGigs.length} most recent gigs by start date.</p>
+            <p className="text-sm text-slate-600">Showing {latestGigRows.length} most recent gigs by start date.</p>
           </CardHeader>
-          <CardContent>
-            {latestGigs.length === 0 ? (
+          <CardContent className="space-y-6">
+            {gigTotals.total === 0 ? (
               <p className="text-sm text-slate-600">No gigs have been created yet.</p>
             ) : (
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableHeaderCell>Title</TableHeaderCell>
-                    <TableHeaderCell>Status</TableHeaderCell>
-                    <TableHeaderCell>City</TableHeaderCell>
-                    <TableHeaderCell>Start</TableHeaderCell>
-                    <TableHeaderCell>Payout</TableHeaderCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {latestGigs.map((gig) => (
-                    <TableRow key={gig.id}>
-                      <TableCell className="font-medium">{gig.title}</TableCell>
-                      <TableCell>
-                        <Badge variant="outline">{gig.status}</Badge>
-                      </TableCell>
-                      <TableCell className="text-slate-600">
-                        {gig.city}, {gig.state}
-                      </TableCell>
-                      <TableCell className="text-slate-500">{formatDateTime(gig.dateStart)}</TableCell>
-                      <TableCell className="text-slate-500">
-                        {gig.payoutUsd ? `$${gig.payoutUsd.toLocaleString()}` : "—"}
-                      </TableCell>
+              <>
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                  <div className="rounded-lg border border-slate-200 bg-white p-4">
+                    <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Total gigs</p>
+                    <p className="mt-1 text-2xl font-semibold text-slate-900">{gigTotals.total}</p>
+                  </div>
+                  <div className="rounded-lg border border-slate-200 bg-white p-4">
+                    <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Published</p>
+                    <p className="mt-1 text-2xl font-semibold text-slate-900">{gigTotals.published}</p>
+                  </div>
+                  <div className="rounded-lg border border-slate-200 bg-white p-4">
+                    <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Drafts</p>
+                    <p className="mt-1 text-2xl font-semibold text-slate-900">{gigTotals.drafts}</p>
+                  </div>
+                  <div className="rounded-lg border border-slate-200 bg-white p-4">
+                    <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Upcoming</p>
+                    <p className="mt-1 text-2xl font-semibold text-slate-900">{gigTotals.upcoming}</p>
+                  </div>
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                  <div className="rounded-lg border border-slate-200 bg-white p-4">
+                    <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Applications</p>
+                    <p className="mt-1 text-2xl font-semibold text-slate-900">{metricsTotals.totalApplications}</p>
+                    <p className="text-xs text-slate-500">{metricsTotals.pendingApplications} pending review</p>
+                  </div>
+                  <div className="rounded-lg border border-slate-200 bg-white p-4">
+                    <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Favorites</p>
+                    <p className="mt-1 text-2xl font-semibold text-slate-900">{metricsTotals.favorites}</p>
+                    <p className="text-xs text-slate-500">Total saves across gigs</p>
+                  </div>
+                  <div className="rounded-lg border border-slate-200 bg-white p-4">
+                    <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Bookings</p>
+                    <p className="mt-1 text-2xl font-semibold text-slate-900">{metricsTotals.bookings}</p>
+                    <p className="text-xs text-slate-500">Confirmed gigs</p>
+                  </div>
+                </div>
+
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableHeaderCell>Title</TableHeaderCell>
+                      <TableHeaderCell>Status</TableHeaderCell>
+                      <TableHeaderCell>City</TableHeaderCell>
+                      <TableHeaderCell>Start</TableHeaderCell>
+                      <TableHeaderCell>Payout</TableHeaderCell>
+                      <TableHeaderCell>Applications</TableHeaderCell>
+                      <TableHeaderCell>Favorites</TableHeaderCell>
+                      <TableHeaderCell>Bookings</TableHeaderCell>
+                      <TableHeaderCell>Last activity</TableHeaderCell>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHead>
+                  <TableBody>
+                    {latestGigRows.map(({ gig, metrics }) => (
+                      <TableRow key={gig.id}>
+                        <TableCell className="font-medium">{gig.title}</TableCell>
+                        <TableCell>
+                          <Badge variant="outline">{gig.status}</Badge>
+                        </TableCell>
+                        <TableCell className="text-slate-600">
+                          {gig.city}, {gig.state}
+                        </TableCell>
+                        <TableCell className="text-slate-500">{formatDateTime(gig.dateStart)}</TableCell>
+                        <TableCell className="text-slate-500">
+                          {gig.payoutUsd ? `$${gig.payoutUsd.toLocaleString()}` : "—"}
+                        </TableCell>
+                        <TableCell className="text-slate-600">
+                          {metrics?.totalApplications ?? 0}
+                        </TableCell>
+                        <TableCell className="text-slate-600">{metrics?.favorites ?? 0}</TableCell>
+                        <TableCell className="text-slate-600">{metrics?.bookings ?? 0}</TableCell>
+                        <TableCell className="text-slate-500">
+                          {metrics?.lastActivityAt ? formatRelative(metrics.lastActivityAt) : "—"}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </>
             )}
           </CardContent>
         </Card>

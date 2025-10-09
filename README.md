@@ -37,11 +37,19 @@ cp .env.example .env
 
 Key variables:
 
-- `SESSION_SECRET` – required for production cookie signing.
-- `DATABASE_URL` – optional Postgres connection string enabling Prisma delegates (otherwise the JSON datastore is used).
-- `SMTP_*` – optional transactional email settings; when omitted the app skips outbound email sends.
-- `GOOGLE_CSE_*`, `OPENMIC_ALLOWED_SITES`, `DEFAULT_*`, `ENABLE_REDDIT_OPENMICS` – configure the optional open mic ingestion workflow (details below).
-- `NEXT_PUBLIC_VERCEL_URL` – hostname allowlist for deploying to Vercel.
+| Variable | Description | Default |
+| --- | --- | --- |
+| `SESSION_SECRET` | Secret used to sign authentication cookies. Always override in production. | _(required)_ |
+| `DATABASE_URL` | Postgres connection string; when omitted the JSON datastore at `data/database.json` is used. | _(empty)_ |
+| `NEXT_PUBLIC_VERCEL_URL` | Hostname allowlist entry for server actions when deploying to Vercel. | _(empty)_ |
+| `PLAUSIBLE_DOMAIN` | Enables the Plausible analytics embed for the provided domain. | _(empty)_ |
+| `SMTP_*` | Optional SMTP credentials for transactional emails (see [Email](#email-optional)). | _(empty)_ |
+| `GOOGLE_CSE_*` | Google Custom Search Engine credentials for open mic ingestion. | _(empty)_ |
+| `OPENMIC_ALLOWED_SITES` | Comma-separated origin allowlist for ingestion. | `config/openmic.allowlist.ts` |
+| `DEFAULT_CITIES` | Semicolon-separated list of default city/state pairs for discovery filters. | `Olympia,WA; Tacoma,WA; Seattle,WA; Portland,OR` |
+| `DEFAULT_RADIUS_MILES` | Default radius (miles) for open mic searches. | `60` |
+| `INGEST_WINDOW_DAYS` | How far ahead (days) to look for open mic events. | `45` |
+| `ENABLE_REDDIT_OPENMICS` | Toggle for the Reddit ingestion source. | `false` |
 
 All variables have sensible defaults for local development. Leaving `DATABASE_URL` empty keeps persistence on `data/database.json`.
 
@@ -65,12 +73,25 @@ npm run start
 ### 5. Running in Docker
 
 ```bash
-docker-compose up --build
+docker compose up --build
 ```
 
-This starts the Next.js app using the same on-disk JSON datastore.
+This starts both the Next.js app and a Postgres instance. The application connects to Postgres via the `DATABASE_URL` value declared in `docker-compose.yml`. Comment out that environment variable (or stop the `db` service) if you prefer the JSON datastore during containerized development.
 
-### 6. Quality checks
+### 6. Production-style Postgres workflow
+
+For parity with production you can boot the compose stack in detached mode, run migrations, and seed the relational database:
+
+```bash
+docker compose up -d
+docker compose exec web npm run db:generate
+docker compose exec web npm run db:migrate
+docker compose exec web npm run db:seed
+```
+
+With the database ready, restart the web container or run `docker compose restart web` to ensure Prisma reconnects using the seeded schema.
+
+### 7. Quality checks
 
 ```bash
 npm run lint     # ESLint + Tailwind conventions
@@ -121,7 +142,7 @@ Set the `GOOGLE_CSE_*`, `OPENMIC_ALLOWED_SITES`, `DEFAULT_CITIES`, `DEFAULT_RADI
 
 ### Automation & CI
 
-- GitHub Actions (`.github/workflows/ci.yml`) installs dependencies with `npm ci`, runs `tsc --noEmit`, `npm run lint`, `npm test -- --run`, and `npm run build` on Node.js 20.x.
+- GitHub Actions (`.github/workflows/ci.yml`) installs dependencies with `npm ci` and runs `npm run typecheck`, `npm run lint`, and `npm test -- --run` on Node.js 20.
 - An optional Datadog Synthetics workflow (`.github/workflows/datadog-synthetics.yml`) is wired for tagged end-to-end checks when API and application keys are provided.
 
 ## Assets & Licenses

@@ -1,11 +1,23 @@
 version: "3.9"
 
 services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: funny
+      POSTGRES_PASSWORD: funny
+      POSTGRES_DB: thefunny
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
   web:
     build: .
     command: npm run dev
     environment:
       SESSION_SECRET: change-me
+      DATABASE_URL: postgresql://funny:funny@db:5432/thefunny
     env_file:
       - .env
     ports:
@@ -13,3 +25,8 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
+    depends_on:
+      - db
+
+volumes:
+  pgdata:

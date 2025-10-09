@@ -1,6 +1,6 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
-import execa from "execa";
+import { execa } from "execa";
 
 interface TsPruneIssue {
   file: string;
@@ -94,7 +94,10 @@ async function runKnip(): Promise<string[]> {
 
 async function runTsPrune(): Promise<TsPruneIssue[]> {
   const { stdout } = await execa("ts-prune", ["--ignore", ".*\\.test\\.tsx?"], { cwd: ROOT });
-  const lines = stdout.split("\n").map((line) => line.trim()).filter(Boolean);
+  const lines = stdout
+    .split("\n")
+    .map((line: string) => line.trim())
+    .filter(Boolean);
   const issues: TsPruneIssue[] = [];
   for (const line of lines) {
     const match = line.match(/^(.*?):(\d+) - (.*)$/);

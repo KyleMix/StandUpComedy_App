@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Bars3Icon } from "@heroicons/react/24/outline";
-import { ThemeToggle } from "@/components/ThemeToggle";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { auth, signOut } from "@/lib/auth";
 
 const links = [

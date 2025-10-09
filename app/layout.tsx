@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
+import { ThemeProvider } from "@/components/providers/theme-provider";
 import { interFontClass } from "./fonts";
 import type { ReactNode } from "react";
+import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "The Funny — Find Gigs, Book Comics, Pack Rooms",
@@ -23,14 +25,22 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body data-theme="thefunny" className={`min-h-screen bg-base-100 text-base-content ${interFontClass}`}>
-        <div className="flex min-h-screen flex-col">
-          <Navbar />
-          <main className="flex-1">
-            <div className="container py-12 md:py-16">{children}</div>
-          </main>
-          <Footer />
-        </div>
+      <body
+        data-theme="thefunny"
+        className={cn(
+          "min-h-screen bg-background font-sans text-foreground antialiased",
+          interFontClass
+        )}
+      >
+        <ThemeProvider>
+          <div className="flex min-h-screen flex-col">
+            <Navbar />
+            <main className="flex-1">
+              <div className="container py-12 md:py-16">{children}</div>
+            </main>
+            <Footer />
+          </div>
+        </ThemeProvider>
       </body>
     </html>
   );

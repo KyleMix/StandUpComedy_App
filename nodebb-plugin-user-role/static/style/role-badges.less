@@ -1,0 +1,69 @@
+.standup-role-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.15rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  background: var(--standup-role-bg, #1f2937);
+  color: var(--standup-role-color, #fff);
+}
+
+.standup-role-badge .fa {
+  font-size: 0.85rem;
+}
+
+[data-standup-role='comedian'] {
+  --standup-role-bg: rgba(249, 115, 22, 0.15);
+  --standup-role-color: #f97316;
+}
+
+[data-standup-role='promoter'] {
+  --standup-role-bg: rgba(99, 102, 241, 0.15);
+  --standup-role-color: #6366f1;
+}
+
+[data-standup-role='venue'] {
+  --standup-role-bg: rgba(34, 197, 94, 0.15);
+  --standup-role-color: #22c55e;
+}
+
+.account .standup-role-field.standup-role-comedian .fa,
+.user-profile .standup-role-badge.standup-role-comedian .fa {
+  color: #f97316;
+}
+
+.account .standup-role-field.standup-role-promoter .fa,
+.user-profile .standup-role-badge.standup-role-promoter .fa {
+  color: #6366f1;
+}
+
+.account .standup-role-field.standup-role-venue .fa,
+.user-profile .standup-role-badge.standup-role-venue .fa {
+  color: #22c55e;
+}
+
+.topic [data-standup-role='promoter'] .post-content {
+  border-left: 3px solid rgba(99, 102, 241, 0.4);
+  padding-left: 1rem;
+}
+
+.topic [data-standup-role='venue'] .post-content {
+  border-left: 3px solid rgba(34, 197, 94, 0.4);
+  padding-left: 1rem;
+}
+
+.topic [data-standup-role='comedian'] .post-content {
+  border-left: 3px solid rgba(249, 115, 22, 0.4);
+  padding-left: 1rem;
+}
+
+@media (max-width: 576px) {
+  .standup-role-badge {
+    font-size: 0.7rem;
+    padding: 0.1rem 0.5rem;
+  }
+}

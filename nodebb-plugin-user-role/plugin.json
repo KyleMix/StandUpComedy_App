@@ -1,0 +1,22 @@
+{
+  "id": "nodebb-plugin-user-role",
+  "name": "StandUp Comedy Role Manager",
+  "description": "Adds comedian, promoter, and venue roles with automated group assignment and profile badges.",
+  "version": "0.1.0",
+  "library": "./library.js",
+  "hooks": [
+    { "hook": "static:app.load", "method": "init" },
+    { "hook": "filter:register.build", "method": "addRoleField" },
+    { "hook": "filter:register.check", "method": "validateRoleSelection" },
+    { "hook": "action:user.create", "method": "onUserCreate" },
+    { "hook": "filter:users.get", "method": "exposeRoleField" },
+    { "hook": "filter:account.profileFields", "method": "addProfileField" },
+    { "hook": "filter:posts.custom_profile_info", "method": "appendPostBadge" }
+  ],
+  "scripts": [
+    "static/lib/client.js"
+  ],
+  "less": [
+    "static/style/role-badges.less"
+  ]
+}

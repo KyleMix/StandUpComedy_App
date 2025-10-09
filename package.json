@@ -40,9 +40,9 @@
     "date-fns": "^3.6.0",
     "dotenv": "^16.4.5",
     "lucide-react": "^0.322.0",
-    "next": "14.1.0",
+    "next": "^14.2.33",
     "node-cron": "^4.2.1",
-    "nodemailer": "^6.9.8",
+    "nodemailer": "^7.0.9",
     "p-limit": "^7.1.1",
     "phosphor-react": "^1.4.1",
     "postcss": "^8.4.32",
@@ -74,6 +74,9 @@
     "ts-prune": "^0.10.3",
     "tsx": "^4.20.6",
     "typescript": "^5.3.3",
-    "vitest": "^1.2.0"
+    "vitest": "^2.1.8"
+  },
+  "overrides": {
+    "esbuild": "^0.25.0"
   }
 }

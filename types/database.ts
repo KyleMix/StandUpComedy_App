@@ -265,6 +265,7 @@ export interface AdSlotRecord {
   active: boolean;
   priority: number;
   createdAt: string;
+  updatedAt: string;
 }
 
 export interface AvailabilityRecord {

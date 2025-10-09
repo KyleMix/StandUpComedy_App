@@ -2,9 +2,9 @@
 
 import React, { useState, useEffect } from "react";
 import { 
-  Search, Mic2, MapPin, Star, CalendarDays, Ticket, Users, HeartHandshake, Building2,
+  Search, Mic2, MapPin, Star, CalendarDays, Ticket, Users, Building2,
   ArrowRight, Play, Sparkles, BadgeCheck, Laugh, ThumbsUp, Share2, Menu, X, ChevronDown,
-  ExternalLink, Clock, Loader2, CheckCircle2, AlertTriangle, Info
+  ExternalLink, Clock, CheckCircle2, AlertTriangle, Info
 } from "lucide-react";
 
 // NOTE: This single-file component showcases a mini design system + landing page for

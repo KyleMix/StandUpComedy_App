@@ -96,7 +96,7 @@ export default async function InboxPage() {
       </Card>
 
       <div className="space-y-6">
-        {hydrated.map(({ thread, gig, participants, messages, offers, bookings }) => (
+        {hydrated.map(({ thread, gig, participants, messages, offers, bookings, reviews }) => (
           <Card key={thread.id}>
             <CardHeader>
               <CardTitle className="flex items-center justify-between gap-2 text-base">

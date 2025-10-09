@@ -327,4 +327,3 @@ export function ProfileDetails({ profile, allProfiles }: ProfileDetailsProps) {
   );
 }
 
-export default ProfileDetails;

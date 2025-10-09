@@ -1,0 +1,167 @@
+# Removed Files
+
+Generated at: 2025-10-09T08:11:24.229Z
+
+# Analyzer Summary
+
+- Knip unused files: 0
+- ts-prune unused exports: 150
+- depcheck unused dependencies: 1 (runtime), 0 (dev)
+
+## Deleted Files
+- None
+
+## Protected Files Flagged by Analyzers
+- None
+
+## Remaining Unused Exports (manual review)
+- tailwind.config.ts: default
+- vitest.config.ts: default
+- app/error.tsx: default
+- app/fonts.ts: manropeFontClass
+- app/layout.tsx: default
+- app/layout.tsx: metadata
+- app/loading.tsx: default
+- app/not-found.tsx: default
+- app/page.tsx: default
+- components/GigCard.tsx: GigCardProps (used in module)
+- components/Icon.tsx: IconComponent (used in module)
+- components/OpenMicList.tsx: default
+- components/ProfileCard.tsx: ProfileCard
+- components/ProfileCard.tsx: ProfileRole (used in module)
+- components/ProfileCard.tsx: ProfileCardProps (used in module)
+- lib/ads.ts: AdSlot (used in module)
+- lib/ads.ts: AdSlotInput (used in module)
+- lib/ads.ts: UpdateAdSlotInput (used in module)
+- lib/auth.ts: getSessionCookieName
+- lib/auth.ts: Session (used in module)
+- lib/external-apis.ts: JokeInspiration (used in module)
+- lib/external-apis.ts: GigWeatherSummary (used in module)
+- lib/mailer.ts: mailer (used in module)
+- lib/sample.ts: GigSample (used in module)
+- lib/sample.ts: ProfileShowcase (used in module)
+- lib/sample.ts: profiles
+- lib/uploads.ts: ensureUploadDir (used in module)
+- lib/uploads.ts: saveFile
+- types/database.ts: ComedianVideoPlatform (used in module)
+- app/about/page.tsx: default
+- app/admin/page.tsx: default
+- app/comedians/page.tsx: default
+- app/credits/page.tsx: default
+- app/dashboard/page.tsx: default
+- app/event-types/page.tsx: default
+- app/gigs/GigFilters.tsx: GigFilters
+- app/gigs/page.tsx: default
+- app/help/page.tsx: default
+- app/inbox/page.tsx: default
+- app/locations/page.tsx: default
+- app/post-gig/page.tsx: default
+- app/pricing/page.tsx: default
+- app/pricing/page.tsx: metadata
+- app/profile/page.tsx: default
+- app/profiles/page.tsx: default
+- app/profiles/page.tsx: metadata
+- app/resources/page.tsx: default
+- app/services/page.tsx: default
+- app/the-funny/page.tsx: default
+- app/verification/page.tsx: default
+- components/profile/ProfileDetails.tsx: ProfileDetails
+- components/profile/ProfileWorkspace.tsx: ProfileRoleTab (used in module)
+- components/ui/AssetAttribution.tsx: AssetSource (used in module)
+- components/ui/button.tsx: ButtonProps (used in module)
+- components/ui/button.tsx: buttonVariants (used in module)
+- components/ui/EmptyState.tsx: EmptyState
+- components/ui/HeroBackground.tsx: HeroBackground
+- components/ui/input.tsx: InputProps (used in module)
+- components/ui/textarea.tsx: TextareaProps (used in module)
+- lib/assets/hero.ts: HeroAssetSource (used in module)
+- lib/assets/hero.ts: HERO_IMAGE_MANIFEST
+- lib/assets/hero.ts: HERO_VIDEO_MANIFEST
+- lib/assets/licenses.ts: requiresAttribution
+- lib/assets/licenses.ts: getLicenseEntry
+- lib/assets/licenses.ts: AssetProvider (used in module)
+- lib/assets/licenses.ts: LICENSE_DIRECTORY (used in module)
+- lib/config/commerce.ts: FEES
+- lib/config/commerce.ts: CANCELLATION_POLICIES
+- lib/config/flags.ts: FEATURE_FLAGS (used in module)
+- lib/config/flags.ts: isPremiumBoostEnabled
+- lib/config/flags.ts: isPremiumEarlyApplyEnabled
+- lib/config/flags.ts: areAdsEnabled
+- lib/db/client.ts: disconnectPrisma
+- lib/db/gigs.ts: listPublishedGigs
+- lib/db/gigs.ts: GigFilters (used in module)
+- lib/db/gigs.ts: GigSummary (used in module)
+- lib/db/leads.ts: listLeads
+- lib/db/leads.ts: updateLeadStatus
+- lib/db/leads.ts: LeadInput (used in module)
+- lib/db/leads.ts: LeadRecord (used in module)
+- lib/ingest/allowlist.ts: AllowlistSourceRecord
+- lib/ingest/allowlist.ts: ALLOWLIST_DOC
+- lib/ingest/normalize.ts: NormalizedLead (used in module)
+- lib/ingest/runner.ts: ensureIngestionQueue
+- lib/ingest/runner.ts: runIngestionNow
+- lib/maintenance/cleanup.ts: loadSnapshot (used in module)
+- lib/maintenance/cleanup.ts: saveSnapshot (used in module)
+- lib/maintenance/cleanup.ts: resolveWhitelistedUserIds
+- lib/maintenance/cleanup.ts: CleanupReport (used in module)
+- lib/maintenance/cleanup.ts: CollectionReport (used in module)
+- lib/openmics/types.ts: COMEDY_KEYWORDS
+- app/api/applications/route.ts: POST
+- app/api/gigs/route.ts: GET
+- app/api/gigs/route.ts: POST
+- app/api/me/route.ts: GET
+- app/api/open-mics/route.ts: GET
+- app/api/profile/route.ts: GET
+- app/api/profile/route.ts: POST
+- app/api/profiles/route.ts: GET
+- app/api/report/route.ts: POST
+- app/api/threads/route.ts: GET
+- app/api/threads/route.ts: POST
+- app/api/users/route.ts: GET
+- app/api/users/route.ts: POST
+- app/api/verification/route.ts: GET
+- app/api/verification/route.ts: POST
+- app/auth/sign-in/page.tsx: default
+- app/auth/sign-up/page.tsx: default
+- app/comedians/[userId]/page.tsx: default
+- app/gigs/[id]/page.tsx: default
+- app/profiles/[slug]/page.tsx: generateStaticParams
+- app/profiles/[slug]/page.tsx: generateMetadata
+- app/profiles/[slug]/page.tsx: default
+- lib/ingest/sources/googleCSE.ts: hashResult
+- lib/ingest/sources/googleCSE.ts: GoogleCseResult (used in module)
+- lib/ingest/sources/googleCSE.ts: GoogleCseSearchParams (used in module)
+- lib/ingest/sources/googleCSE.ts: GoogleCseSearchResult (used in module)
+- lib/openmics/sources/cse.ts: FetchArgs (used in module)
+- lib/openmics/sources/meetup.ts: FetchArgs (used in module)
+- lib/openmics/sources/reddit.ts: FetchArgs (used in module)
+- app/api/applications/[id]/route.ts: PATCH
+- app/api/auth/login/route.ts: POST
+- app/api/auth/register/route.ts: POST
+- app/api/gigs/[id]/route.ts: PATCH
+- app/api/gigs/[id]/route.ts: DELETE
+- app/api/offers/[id]/route.ts: PATCH
+- app/api/profile/board/route.ts: GET
+- app/api/profile/board/route.ts: POST
+- app/api/profile/comedian/route.ts: PUT
+- app/api/profile/promoter/route.ts: PUT
+- app/api/profile/venue/route.ts: PUT
+- app/api/threads/[id]/route.ts: GET
+- app/api/threads/[id]/route.ts: PATCH
+- app/api/users/[id]/route.ts: GET
+- app/api/users/[id]/route.ts: PATCH
+- app/api/verification/[id]/route.ts: GET
+- app/api/verification/[id]/route.ts: PATCH
+- app/api/verification/me/route.ts: GET
+- app/auth/sign-up/comedian/page.tsx: default
+- app/auth/sign-up/comedian/page.tsx: metadata
+- app/api/bookings/[id]/pay/route.ts: POST
+- app/api/internal/openmics/ingest/route.ts: POST
+- app/api/offers/[id]/withdraw/route.ts: POST
+- app/api/profile/board/messages/route.ts: GET
+- app/api/profile/board/messages/route.ts: POST
+- app/api/threads/[id]/messages/route.ts: GET
+- app/api/threads/[id]/messages/route.ts: POST
+- app/api/users/[id]/profile/route.ts: GET
+- app/api/verification/[id]/decision/route.ts: POST
+- app/api/profile/board/messages/[id]/route.ts: PATCH

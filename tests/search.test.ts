@@ -342,4 +342,94 @@ describe("searchComedians", () => {
       "Aaron Standard",
     ]);
   });
+
+  it("keeps free comedians visible while prioritising premium", async () => {
+    const now = new Date("2024-01-01T00:00:00.000Z");
+    const fiveYearsAgo = new Date("2019-01-01T00:00:00.000Z");
+
+    const snapshot = emptySnapshot();
+    snapshot.users = [
+      {
+        id: "free-first",
+        name: "Free One",
+        email: "free.one@example.com",
+        hashedPassword: null,
+        role: "COMEDIAN",
+        createdAt: now.toISOString(),
+        isPremium: false,
+        premiumSince: null,
+      },
+      {
+        id: "free-second",
+        name: "Free Two",
+        email: "free.two@example.com",
+        hashedPassword: null,
+        role: "COMEDIAN",
+        createdAt: now.toISOString(),
+        isPremium: false,
+        premiumSince: null,
+      },
+      {
+        id: "premium-middle",
+        name: "Premium Star",
+        email: "premium@example.com",
+        hashedPassword: null,
+        role: "COMEDIAN",
+        createdAt: now.toISOString(),
+        isPremium: true,
+        premiumSince: now.toISOString(),
+      },
+      {
+        id: "free-third",
+        name: "Free Three",
+        email: "free.three@example.com",
+        hashedPassword: null,
+        role: "COMEDIAN",
+        createdAt: now.toISOString(),
+        isPremium: false,
+        premiumSince: null,
+      },
+    ];
+
+    snapshot.comedianProfiles = snapshot.users.map((user) => ({
+      userId: user.id,
+      stageName: user.name ?? "Comic",
+      bio: null,
+      credits: null,
+      website: null,
+      reelUrl: null,
+      instagram: null,
+      tiktokHandle: null,
+      youtubeChannel: null,
+      travelRadiusMiles: 50,
+      homeCity: "Seattle",
+      homeState: "WA",
+      styles: ["Observational"],
+      cleanRating: "PG13",
+      rateMin: 100,
+      rateMax: 200,
+      reelUrls: [],
+      photoUrls: [],
+      notableClubs: [],
+      availability: [],
+      createdAt: fiveYearsAgo.toISOString(),
+      updatedAt: now.toISOString(),
+    }));
+
+    snapshot.featureFlags = [
+      { key: "premiumBoost", enabled: true, updatedAt: now.toISOString() },
+    ];
+
+    await seedDatabase(snapshot);
+    const { searchComedians } = await import("@/lib/dataStore");
+
+    const result = await searchComedians({ pageSize: 4 });
+
+    expect(result.items.map((item) => item.profile.stageName)).toEqual([
+      "Premium Star",
+      "Free One",
+      "Free Three",
+      "Free Two",
+    ]);
+  });
 });

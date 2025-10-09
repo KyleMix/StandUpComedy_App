@@ -639,20 +639,18 @@ function applyPremiumBoost(items: ComedianSearchListItem[], enabled: boolean): C
     return items;
   }
 
-  const boosted = [...items];
-  for (let index = 1; index < boosted.length; index += 1) {
-    const current = boosted[index];
-    const previous = boosted[index - 1];
-    const currentPremium = current.user?.isPremium ?? false;
-    const previousPremium = previous.user?.isPremium ?? false;
+  const premium: ComedianSearchListItem[] = [];
+  const standard: ComedianSearchListItem[] = [];
 
-    if (currentPremium && !previousPremium) {
-      boosted[index - 1] = current;
-      boosted[index] = previous;
+  for (const item of items) {
+    if (item.user?.isPremium) {
+      premium.push(item);
+    } else {
+      standard.push(item);
     }
   }
 
-  return boosted;
+  return [...premium, ...standard];
 }
 
 export async function searchComedians(filters: ComedianSearchFilters = {}): Promise<ComedianSearchResult> {

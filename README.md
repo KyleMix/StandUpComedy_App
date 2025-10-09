@@ -16,6 +16,11 @@ Production-ready starter for a stand-up comedy marketplace built with Next.js 14
 
 ## Getting started
 
+### Prerequisites
+
+- **Node.js 20.x** and **npm 10+** (matching the CI matrix in `.github/workflows/ci.yml`).
+- Docker (optional) if you prefer containers over the local Node runtime.
+
 ### 1. Install dependencies
 
 ```bash
@@ -30,7 +35,15 @@ Copy `.env.example` to `.env` if you want to override the defaults:
 cp .env.example .env
 ```
 
-The application reads `SESSION_SECRET` for cookie signing and SMTP settings for notification emails. Set `DATABASE_URL` to a Postgres connection string when you want Prisma to talk to a real database; leaving it empty falls back to the built-in JSON datastore. If any of these variables are omitted the app still runs with sensible fallbacks (SMTP emails are skipped).
+Key variables:
+
+- `SESSION_SECRET` – required for production cookie signing.
+- `DATABASE_URL` – optional Postgres connection string enabling Prisma delegates (otherwise the JSON datastore is used).
+- `SMTP_*` – optional transactional email settings; when omitted the app skips outbound email sends.
+- `GOOGLE_CSE_*`, `OPENMIC_ALLOWED_SITES`, `DEFAULT_*`, `ENABLE_REDDIT_OPENMICS` – configure the optional open mic ingestion workflow (details below).
+- `NEXT_PUBLIC_VERCEL_URL` – hostname allowlist for deploying to Vercel.
+
+All variables have sensible defaults for local development. Leaving `DATABASE_URL` empty keeps persistence on `data/database.json`.
 
 ### 3. Start the app
 
@@ -38,9 +51,18 @@ The application reads `SESSION_SECRET` for cookie signing and SMTP settings for 
 npm run dev
 ```
 
-The app will be available at `http://localhost:3000` using the bundled JSON dataset. Sign in with the pre-seeded QA admin from `data/database.json`: `master@thefunny.local` / `TestingMaster!123`.
+The app is available at `http://localhost:3000` using the bundled JSON dataset. Sign in with the pre-seeded QA admin from `data/database.json`: `master@thefunny.local` / `TestingMaster!123`.
 
-### 4. Running in Docker
+### 4. Build for production
+
+```bash
+npm run build
+npm run start
+```
+
+`npm run build` runs the same checks as CI (`tsc`, `next lint`, unit tests) before generating the production bundle.
+
+### 5. Running in Docker
 
 ```bash
 docker-compose up --build
@@ -48,11 +70,12 @@ docker-compose up --build
 
 This starts the Next.js app using the same on-disk JSON datastore.
 
-### 5. Tests and linting
+### 6. Quality checks
 
 ```bash
-npm run test
-npm run lint
+npm run lint     # ESLint + Tailwind conventions
+npx tsc --noEmit # Type-check the project
+npm run test     # Vitest unit tests
 ```
 
 ## Project structure
@@ -62,6 +85,44 @@ npm run lint
 - `lib/` – shared utilities, auth, RBAC, rate limiting, mailer, datastore helpers
 - `data/` – JSON datastore seeded with demo users, gigs, and verification requests
 - `tests/` – Vitest unit tests
+- `scripts/` – data seeding (`seed.ts`) and long-running jobs (open mic cron harness)
+- `docs/architecture/` – current-state overview and demo walkthroughs for onboarding
+
+### Data & seeding
+
+- The default datastore (`data/database.json`) ships with a Pacific Northwest demo snapshot. Run `npm run db:seed` to regenerate the snapshot from `scripts/seed.ts`.
+- All demo accounts—including the QA admin and the `docs/architecture/02_demo_walkthrough.md` personas—share the password `DemoPass123!` (`TestingMaster!123` remains for the master QA admin).
+- Updating the JSON datastore is safe for demos; commit the regenerated file if you want to share changes.
+
+### Optional Postgres + Prisma
+
+While the JSON datastore is the default, setting `DATABASE_URL` flips the app into database-backed mode:
+
+1. Start a Postgres instance and expose the connection string in `.env`.
+2. Generate the Prisma client (schema lives in `prisma/schema.prisma`):
+   ```bash
+   npm run db:generate
+   ```
+3. Run migrations and seeds as needed:
+   ```bash
+   npm run db:migrate
+   npm run db:seed
+   ```
+
+The helper in [`lib/prisma.ts`](./lib/prisma.ts) proxies datastore calls when Postgres is unavailable, so the rest of the app code can stay agnostic.
+
+### Open mic ingestion workflow (optional)
+
+Set the `GOOGLE_CSE_*`, `OPENMIC_ALLOWED_SITES`, `DEFAULT_CITIES`, `DEFAULT_RADIUS_MILES`, `INGEST_WINDOW_DAYS`, and `ENABLE_REDDIT_OPENMICS` variables to enable ingestion.
+
+- **One-off import:** `npm run openmics:once` executes [`lib/openmics/ingest.ts`](./lib/openmics/ingest.ts) against the configured sources.
+- **Cron harness:** `npm run openmics:cron` starts the scheduler in [`scripts/openmic-cron.ts`](./scripts/openmic-cron.ts) for recurring syncs (configure `JOB_INTERVAL_CRON` to change the cadence).
+- Both commands require a Postgres-backed Prisma client because open mic data persists to relational tables.
+
+### Automation & CI
+
+- GitHub Actions (`.github/workflows/ci.yml`) installs dependencies with `npm ci`, runs `tsc --noEmit`, `npm run lint`, `npm test -- --run`, and `npm run build` on Node.js 20.x.
+- An optional Datadog Synthetics workflow (`.github/workflows/datadog-synthetics.yml`) is wired for tagged end-to-end checks when API and application keys are provided.
 
 ## Assets & Licenses
 
@@ -97,13 +158,13 @@ Always use the dedicated QA account when running manual checks:
 
 ## Default accounts
 
-Additional preloaded accounts from `data/database.json` are available for role-specific flows:
+Additional preloaded accounts from `data/database.json` are available for role-specific flows. Unless otherwise noted they all use `DemoPass123!`:
 
-- Admin: `admin@thefunny.local` / `password`
-- Promoter: `promoter@thefunny.local` / `password`
-- Venue: `venue@thefunny.local` / `password`
-- Comedians: `comic1@thefunny.local`, `comic2@thefunny.local` / `password`
-- Fan: `fan@thefunny.local` / `password`
+- Admin: `admin@thefunny.local`
+- Promoter: `promoter@thefunny.local`
+- Venue: `venue@thefunny.local`
+- Comedians: `comic1@thefunny.local`, `comic2@thefunny.local`
+- Fan: `fan@thefunny.local`
 
 ## Forum integration (NodeBB)
 

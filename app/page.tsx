@@ -12,8 +12,10 @@ import {
 import { format, formatDistanceToNow } from "date-fns";
 
 import { GigCard } from "@/components/GigCard";
+import { ComedianAvailabilityCalendar } from "@/components/dashboard/ComedianAvailabilityCalendar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { auth } from "@/lib/auth";
+import { getComedianAvailabilityData } from "@/lib/availability";
 import { prisma } from "@/lib/prisma";
 import { Role } from "@/lib/prismaEnums";
 import { roleLabelMap } from "@/lib/rbac";
@@ -561,11 +563,13 @@ export default async function HomePage() {
 
   const firstName = getFirstName(user.name ?? null, user.email);
   const content = await buildPersonalizedContent(user);
+  const comedianCalendar =
+    user.role === Role.COMEDIAN ? await getComedianAvailabilityData(user.id) : null;
 
   return (
     <div className="space-y-16">
       <HeroShell>
-        <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_280px]">
+        <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_320px]">
           <div className="space-y-6">
             <span className="badge badge-secondary badge-outline border-secondary/40 px-4 py-3 uppercase tracking-[0.3em]">
               Signed in as {roleLabelMap[user.role]}
@@ -578,7 +582,15 @@ export default async function HomePage() {
               ))}
             </div>
           </div>
-          <StatsPanel stats={content.stats} />
+          <div className="space-y-6">
+            <StatsPanel stats={content.stats} />
+            {comedianCalendar ? (
+              <ComedianAvailabilityCalendar
+                availability={comedianCalendar.availability}
+                bookings={comedianCalendar.bookings}
+              />
+            ) : null}
+          </div>
         </div>
       </HeroShell>
 

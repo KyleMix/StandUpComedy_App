@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { z } from "zod";
 import { auth } from "@/lib/auth";
 import {
   createReview,
@@ -8,13 +7,8 @@ import {
   listReviewsForGig,
   listReviewsForUser,
 } from "@/lib/dataStore";
-
-const createReviewSchema = z.object({
-  subjectUserId: z.string().min(1, "subjectUserId is required"),
-  gigId: z.string().min(1, "gigId is required"),
-  rating: z.number().int().min(1).max(5),
-  comment: z.string().min(10, "comment must be at least 10 characters"),
-});
+import { rateLimit } from "@/lib/rateLimit";
+import { reviewCreateSchema } from "@/lib/zodSchemas";
 
 function serializeReview(
   review:
@@ -64,6 +58,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  if (!rateLimit(`reviews:create:${session.user.id}`)) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+  }
+
   let payload: unknown;
   try {
     payload = await request.json();
@@ -71,7 +69,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid JSON payload" }, { status: 400 });
   }
 
-  const parsed = createReviewSchema.safeParse(payload);
+  const parsed = reviewCreateSchema.safeParse(payload);
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
@@ -97,12 +95,12 @@ export async function POST(request: Request) {
   if (!matchingBooking) {
     return NextResponse.json(
       { error: "A completed booking is required before leaving a review" },
-      { status: 400 },
+      { status: 403 },
     );
   }
 
   if (!matchingBooking.status || !["PAID", "COMPLETED"].includes(matchingBooking.status)) {
-    return NextResponse.json({ error: "Booking must be completed before review" }, { status: 400 });
+    return NextResponse.json({ error: "Booking must be completed before review" }, { status: 403 });
   }
 
   const eventTime = gig.dateStart.getTime();

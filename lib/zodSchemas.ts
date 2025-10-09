@@ -9,7 +9,12 @@ import {
   VerificationStatus
 } from "@/lib/prismaEnums";
 import { COMMUNITY_BOARD_CATEGORIES } from "@/lib/dataStore";
-import type { CommunityBoardCategory } from "@/types/database";
+import type {
+  AdSlotPage,
+  AdSlotPlacement,
+  CommunityBoardCategory,
+} from "@/types/database";
+import type { FeatureFlagKey } from "@/lib/config/flags";
 
 export const registerSchema = z.object({
   name: z.string().min(1),
@@ -55,6 +60,15 @@ const phoneSchema = z
 
 const boardCategoryEnum = z.enum(COMMUNITY_BOARD_CATEGORIES as [CommunityBoardCategory, ...CommunityBoardCategory[]]);
 const cleanRatingEnum = z.enum(["CLEAN", "PG13", "R"] as const);
+const adSlotPageEnum = z.enum(["home", "search", "profile"] as [AdSlotPage, ...AdSlotPage[]]);
+const adSlotPlacementEnum = z.enum([
+  "top",
+  "inline",
+  "sidebar",
+] as [AdSlotPlacement, ...AdSlotPlacement[]]);
+const featureFlagKeyEnum = z.enum(
+  ["premiumBoost", "premiumEarlyApply", "adsEnabled"] as [FeatureFlagKey, ...FeatureFlagKey[]]
+);
 
 const tagArraySchema = z
   .array(
@@ -204,12 +218,38 @@ export const offerCreateSchema = z.object({
   expiresAtISO: z.string().datetime().optional(),
 });
 
-export const offerStatusSchema = z.object({
-  status: z.enum(["PENDING", "ACCEPTED", "DECLINED", "EXPIRED"] as const),
-  gigId: z.string().trim().min(1).optional(),
-  comedianId: z.string().trim().min(1).optional(),
-  promoterId: z.string().trim().min(1).optional(),
-});
+export const offerStatusSchema = z
+  .object({
+    status: z.enum(["PENDING", "ACCEPTED", "DECLINED", "EXPIRED"] as const),
+    gigId: z.string().trim().min(1).optional(),
+    comedianId: z.string().trim().min(1).optional(),
+    promoterId: z.string().trim().min(1).optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.status === "ACCEPTED") {
+      if (!data.gigId) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["gigId"],
+          message: "gigId is required when accepting an offer",
+        });
+      }
+      if (!data.comedianId) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["comedianId"],
+          message: "comedianId is required when accepting an offer",
+        });
+      }
+      if (!data.promoterId) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["promoterId"],
+          message: "promoterId is required when accepting an offer",
+        });
+      }
+    }
+  });
 
 export const bookingCreateSchema = z.object({
   gigId: z.string().trim().min(1),
@@ -366,4 +406,65 @@ export const applicationStatusSchema = z.object({
 export const verificationDecisionSchema = z.object({
   status: z.nativeEnum(VerificationStatus),
   message: z.string().optional()
+});
+
+export const reviewCreateSchema = z.object({
+  subjectUserId: z.string().trim().min(1, "subjectUserId is required"),
+  gigId: z.string().trim().min(1, "gigId is required"),
+  rating: z.number().int().min(1).max(5),
+  comment: z.string().trim().min(10, "comment must be at least 10 characters"),
+});
+
+export const threadMessageSchema = z.discriminatedUnion("kind", [
+  z.object({
+    kind: z.literal("TEXT"),
+    body: z.string().trim().min(1),
+    fileUrl: z.string().trim().url().optional(),
+  }),
+  z.object({
+    kind: z.literal("FILE"),
+    body: z.string().trim().optional(),
+    fileUrl: z.string().trim().url(),
+  }),
+  z.object({
+    kind: z.literal("OFFER"),
+    body: z.string().trim().optional(),
+    offer: z.object({
+      amount: z.number().int().min(1),
+      currency: z.string().trim().length(3).default("USD"),
+      terms: z.string().trim().min(5),
+      eventDate: z.string().datetime(),
+      expiresAt: z.string().datetime().optional(),
+    }),
+  }),
+]);
+
+export const adSlotCreateSchema = z.object({
+  page: adSlotPageEnum,
+  placement: adSlotPlacementEnum,
+  html: z.string().trim().max(4000).nullable().optional(),
+  imageUrl: z.string().trim().url().nullable().optional(),
+  linkUrl: z.string().trim().url().nullable().optional(),
+  active: z.boolean().optional(),
+  priority: z.number().int().min(0).max(1000).optional(),
+});
+
+export const adSlotUpdateSchema = z.object({
+  page: adSlotPageEnum.optional(),
+  placement: adSlotPlacementEnum.optional(),
+  html: z.string().trim().max(4000).nullable().optional(),
+  imageUrl: z.string().trim().url().nullable().optional(),
+  linkUrl: z.string().trim().url().nullable().optional(),
+  active: z.boolean().optional(),
+  priority: z.number().int().min(0).max(1000).optional(),
+});
+
+export const premiumToggleSchema = z.object({
+  userId: z.string().trim().min(1),
+  enabled: z.boolean(),
+});
+
+export const featureFlagToggleSchema = z.object({
+  key: featureFlagKeyEnum,
+  enabled: z.boolean(),
 });

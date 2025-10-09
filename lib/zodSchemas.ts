@@ -280,6 +280,36 @@ export const gigFiltersSchema = z.object({
   path: ["dateEnd"]
 });
 
+const styleArraySchema = z
+  .array(z.string().trim().min(1).max(60))
+  .transform((styles) => Array.from(new Set(styles.map((style) => style.trim()))));
+
+export const comedianSearchFiltersSchema = z
+  .object({
+    search: z.string().trim().min(1).max(100).optional(),
+    city: citySchema,
+    state: stateSchema,
+    styles: styleArraySchema.optional(),
+    cleanRating: cleanRatingEnum.optional(),
+    rateMin: z.coerce.number().nonnegative().optional(),
+    rateMax: z.coerce.number().nonnegative().optional(),
+    minExperience: z.coerce.number().int().nonnegative().optional(),
+    sort: z.enum(["rating", "distance", "responsiveness", "premium"] as const).default("rating"),
+    page: z.coerce.number().int().min(1).default(1)
+  })
+  .refine(
+    (data) => {
+      if (data.rateMin !== undefined && data.rateMax !== undefined) {
+        return data.rateMax >= data.rateMin;
+      }
+      return true;
+    },
+    {
+      message: "Max rate must be greater than min rate",
+      path: ["rateMax"],
+    }
+  );
+
 const gigFormBaseSchema = z.object({
   id: z.string().optional(),
   title: z.string().trim().min(3).max(120),

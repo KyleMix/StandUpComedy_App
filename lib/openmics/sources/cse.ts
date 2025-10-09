@@ -1,5 +1,5 @@
 import axios from "axios";
-import * as cheerio from "cheerio";
+import { load as loadHtml } from "cheerio/slim";
 import { NormalizedMic, NormalizedMicT } from "../types";
 import { Allowlist, isAllowedUrl, looksLikeOpenMicPath } from "../allowlist";
 import { isComedyMic, parseDayOfWeek } from "../utils";
@@ -48,7 +48,7 @@ export async function fetchOpenMics(args: FetchArgs): Promise<NormalizedMicT[]> 
 
             try {
               const html = await axios.get(link, { timeout: 10000 }).then(r => r.data);
-              const $ = cheerio.load(html);
+              const $ = loadHtml(html);
               const t = $("h1").first().text().trim() || $("title").text().trim() || title;
               if (t) title = t;
 

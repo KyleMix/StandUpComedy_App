@@ -54,7 +54,12 @@ async function submitGig(formData: FormData) {
       state: parsed.data.state,
       minAge: parsed.data.minAge ?? null,
       isPublished: canPublish && parsed.data.isPublished === true,
-      status: "OPEN"
+      status: "OPEN",
+      format: null,
+      setLengthMinutes: null,
+      audienceDescription: null,
+      totalSpots: null,
+      perks: null
     }
   });
 

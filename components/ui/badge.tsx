@@ -7,14 +7,18 @@ export function Badge({
   className
 }: {
   children: React.ReactNode;
-  variant?: "default" | "outline";
+  variant?: "default" | "outline" | "secondary";
   className?: string;
 }) {
   return (
     <span
       className={cn(
         "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium",
-        variant === "default" ? "bg-brand/10 text-brand" : "border border-slate-200 text-slate-700",
+        variant === "default"
+          ? "bg-brand/10 text-brand"
+          : variant === "secondary"
+            ? "bg-secondary/10 text-secondary"
+            : "border border-slate-200 text-slate-700",
         className
       )}
     >

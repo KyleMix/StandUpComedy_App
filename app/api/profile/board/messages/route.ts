@@ -89,10 +89,14 @@ async function attachAuthors(messages: CommunityBoardMessage[]) {
       uniqueAuthors.set(message.authorId, message.authorRole);
     }
   });
+  type AuthorContext = Awaited<ReturnType<typeof resolveAuthorContext>>;
   const contextEntries = await Promise.all(
-    Array.from(uniqueAuthors.entries()).map(async ([id, role]) => [id, await resolveAuthorContext(id, role)])
+    Array.from(uniqueAuthors.entries()).map(async ([id, role]) => {
+      const context = await resolveAuthorContext(id, role);
+      return [id, context] as const;
+    })
   );
-  const contextMap = new Map(contextEntries);
+  const contextMap = new Map<string, AuthorContext>(contextEntries);
   return messages.map((message) => {
     const context = contextMap.get(message.authorId);
     return serializeMessage(message, context?.name ?? "Community member", context?.profile ?? null);
@@ -140,7 +144,8 @@ export async function POST(request: Request) {
   }
 
   const allowed = allowedCategoriesForRole(session.user.role);
-  if (!allowed.includes(parsed.data.category)) {
+  const category = parsed.data.category as CommunityBoardCategory;
+  if (!allowed.includes(category)) {
     return NextResponse.json({ error: "Category not allowed for your role" }, { status: 400 });
   }
 
@@ -148,7 +153,7 @@ export async function POST(request: Request) {
     authorId: session.user.id,
     authorRole: session.user.role,
     content: parsed.data.content,
-    category: parsed.data.category,
+    category,
     gigTitle: parsed.data.gigTitle ?? null,
     gigAddress: parsed.data.gigAddress ?? null,
     gigCity: parsed.data.gigCity ?? null,

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { CommunityBoardCategory } from "@/types/database";
 import { Role } from "@/lib/prismaEnums";
 import { cn } from "@/lib/utils";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -866,9 +866,9 @@ const ProfileWorkspace = ({ user, boardMessages }: ProfileWorkspaceProps) => {
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl font-semibold text-slate-900">Complete your profile</CardTitle>
-          <CardDescription>
+          <p className="text-sm text-slate-600">
             Switch between the three profile types to see what information is collected for each community member.
-          </CardDescription>
+          </p>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="flex flex-wrap gap-2">
@@ -1163,9 +1163,9 @@ const ProfileWorkspace = ({ user, boardMessages }: ProfileWorkspaceProps) => {
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl font-semibold text-slate-900">Community message board</CardTitle>
-          <CardDescription>
+          <p className="text-sm text-slate-600">
             Share updates with comedians, promoters, and venues. Each role sees a unique layout tailored to their workflow.
-          </CardDescription>
+          </p>
         </CardHeader>
         <CardContent className="space-y-6">
           <form onSubmit={handleMessageSubmit} className="space-y-3">

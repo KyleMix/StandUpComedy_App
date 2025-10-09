@@ -79,20 +79,22 @@ function serialize(
   };
 }
 
-function fieldsAllowedForRole(role: string) {
+type EditableMessageField = "content" | "category" | "isPinned";
+
+function fieldsAllowedForRole(role: string): EditableMessageField[] {
   if (role === "ADMIN") {
-    return ["content", "category", "isPinned"] as const;
+    return ["content", "category", "isPinned"];
   }
   if (role === "COMEDIAN") {
-    return ["content"] as const;
+    return ["content"];
   }
   if (role === "PROMOTER") {
-    return ["isPinned"] as const;
+    return ["isPinned"];
   }
   if (role === "VENUE") {
-    return ["category"] as const;
+    return ["category"];
   }
-  return [] as const;
+  return [];
 }
 
 export async function PATCH(request: Request, { params }: { params: { id: string } }) {
@@ -112,7 +114,9 @@ export async function PATCH(request: Request, { params }: { params: { id: string
   }
 
   const allowedFields = fieldsAllowedForRole(session.user.role);
-  const filteredEntries = Object.entries(parsed.data).filter(([key]) => allowedFields.includes(key as any));
+  const filteredEntries = Object.entries(parsed.data).filter(([key]) =>
+    allowedFields.includes(key as EditableMessageField)
+  );
   if (filteredEntries.length === 0) {
     return NextResponse.json({ error: "No editable fields for your role" }, { status: 400 });
   }

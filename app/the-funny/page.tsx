@@ -39,12 +39,19 @@ const Tooltip = ({ text, children }: { text: string; children: React.ReactNode }
 );
 
 // Skeleton Loader
-const Skeleton = ({ className = "" }) => (
+const Skeleton = ({ className = "" }: { className?: string }) => (
   <div className={`animate-pulse rounded-md bg-gray-200 ${className}`} />
 );
 
 // Modal
-const Modal = ({ open, onClose, title, children }: any) => {
+interface ModalProps {
+  open: boolean;
+  onClose: () => void;
+  title: string;
+  children: React.ReactNode;
+}
+
+const Modal = ({ open, onClose, title, children }: ModalProps) => {
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-4" role="dialog" aria-modal>
@@ -92,7 +99,7 @@ const Chip = ({ children }: { children: React.ReactNode }) => (
 );
 
 // Card helpers
-const Card = ({ children, className = "" }) => (
+const Card = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => (
   <div className={`rounded-2xl border border-gray-200 bg-white p-4 shadow-sm ${className}`}>{children}</div>
 );
 
@@ -286,7 +293,7 @@ const ComponentsGallery = () => {
   const [saving, setSaving] = useState(false);
   const [progress, setProgress] = useState(0);
   useEffect(()=>{
-    let id: any;
+    let id: ReturnType<typeof setInterval> | undefined;
     if (saving) {
       setProgress(0);
       id = setInterval(()=>{
@@ -297,7 +304,9 @@ const ComponentsGallery = () => {
         });
       }, 200);
     }
-    return ()=>clearInterval(id);
+    return () => {
+      if (id) clearInterval(id);
+    };
   }, [saving]);
 
   return (

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { canPublishGig } from "@/lib/rbac";
-import { gigFormSchema } from "@/lib/zodSchemas";
+import { gigFormUpdateSchema } from "@/lib/zodSchemas";
 import { rateLimit } from "@/lib/rateLimit";
 
 export async function PATCH(request: Request, { params }: { params: { id: string } }) {
@@ -21,7 +21,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
   }
 
   const data = await request.json();
-  const parsed = gigFormSchema.partial().safeParse(data);
+  const parsed = gigFormUpdateSchema.safeParse(data);
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }

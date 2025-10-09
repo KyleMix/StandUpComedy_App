@@ -1,6 +1,6 @@
 import { Queue, Worker, QueueScheduler, JobsOptions } from "bullmq";
 import { URL } from "node:url";
-import { LeadStatus } from "@prisma/client";
+import { LeadStatus } from "@/lib/prismaEnums";
 import { STARTER_ALLOWLIST } from "./allowlist";
 import { searchGoogleCse } from "./sources/googleCSE";
 import { normalizeLeadFromSnippet } from "./normalize";

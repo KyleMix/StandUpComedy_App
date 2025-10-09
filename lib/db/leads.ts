@@ -1,7 +1,7 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
-import { LeadStatus } from "@prisma/client";
+import { LeadStatus } from "@/lib/prismaEnums";
 import { getPrismaClient, isDatabaseEnabled } from "./client";
 
 export interface LeadInput {
@@ -127,15 +127,15 @@ export async function upsertLead(input: LeadInput): Promise<LeadRecord> {
 export async function listLeads(status?: LeadStatus): Promise<LeadRecord[]> {
   if (isDatabaseEnabled()) {
     const prisma = getPrismaClient();
-    const leads = await prisma.lead.findMany({
+    const leads = (await prisma.lead.findMany({
       where: status ? { status } : undefined,
       orderBy: { createdAt: "desc" },
-    });
-    return leads.map((lead) => ({
+    })) as Array<Record<string, any>>;
+    return (leads as Array<Record<string, any>>).map((lead) => ({
       ...lead,
-      createdAt: lead.createdAt,
-      updatedAt: lead.updatedAt,
-    }));
+      createdAt: lead.createdAt as Date,
+      updatedAt: lead.updatedAt as Date,
+    })) as LeadRecord[];
   }
   const leads = await readFallback();
   return status ? leads.filter((lead) => lead.status === status) : leads;

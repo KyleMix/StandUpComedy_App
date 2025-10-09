@@ -15,7 +15,33 @@ const fallbackVerificationStatus = {
 const fallbackGigStatus = {
   OPEN: "OPEN",
   CLOSED: "CLOSED",
-  CANCELLED: "CANCELLED"
+  CANCELLED: "CANCELLED",
+  DRAFT: "DRAFT",
+  PENDING: "PENDING",
+  PUBLISHED: "PUBLISHED",
+  ARCHIVED: "ARCHIVED"
+} as const;
+
+const fallbackGigType = {
+  OPEN_MIC: "OPEN_MIC",
+  BOOKED_SHOW: "BOOKED_SHOW",
+  PAID_GIG: "PAID_GIG"
+} as const;
+
+const fallbackSignUpMethod = {
+  WALKUP: "WALKUP",
+  ONLINE_FORM: "ONLINE_FORM",
+  DM: "DM",
+  EMAIL: "EMAIL",
+  OTHER: "OTHER"
+} as const;
+
+const fallbackLeadStatus = {
+  NEW: "NEW",
+  REVIEW: "REVIEW",
+  APPROVED: "APPROVED",
+  REJECTED: "REJECTED",
+  DUPLICATE: "DUPLICATE"
 } as const;
 
 const fallbackGigCompensationType = {
@@ -30,7 +56,10 @@ const fallbackApplicationStatus = {
   SHORTLISTED: "SHORTLISTED",
   ACCEPTED: "ACCEPTED",
   REJECTED: "REJECTED",
-  WITHDRAWN: "WITHDRAWN"
+  WITHDRAWN: "WITHDRAWN",
+  APPLIED: "APPLIED",
+  BOOKED: "BOOKED",
+  CANCELLED: "CANCELLED"
 } as const;
 
 const fallbackThreadState = {
@@ -105,6 +134,24 @@ export const GigStatus = loadPrismaEnum(
   fallbackGigStatus
 );
 export type GigStatus = (typeof GigStatus)[keyof typeof GigStatus];
+
+export const GigType = loadPrismaEnum(
+  (mod) => mod.GigType as Record<string, string> | undefined,
+  fallbackGigType
+);
+export type GigType = (typeof GigType)[keyof typeof GigType];
+
+export const SignUpMethod = loadPrismaEnum(
+  (mod) => mod.SignUpMethod as Record<string, string> | undefined,
+  fallbackSignUpMethod
+);
+export type SignUpMethod = (typeof SignUpMethod)[keyof typeof SignUpMethod];
+
+export const LeadStatus = loadPrismaEnum(
+  (mod) => mod.LeadStatus as Record<string, string> | undefined,
+  fallbackLeadStatus
+);
+export type LeadStatus = (typeof LeadStatus)[keyof typeof LeadStatus];
 
 export const GigCompensationType = loadPrismaEnum(
   (mod) => mod.GigCompensationType as Record<string, string> | undefined,

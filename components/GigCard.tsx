@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CalendarDays, MapPin, Mic } from "lucide-react";
+import { CalendarDays, Coins, MapPin, Mic, Users } from "lucide-react";
 import { Icon } from "@/components/Icon";
 import { formatDateShort } from "@/utils/format";
 
@@ -12,9 +12,60 @@ export interface GigCardProps {
   signupUrl: string;
   tags: string[];
   isOpenMic: boolean;
+  compensationType: "FLAT" | "DOOR_SPLIT" | "TIPS" | "UNPAID";
+  payoutUsd: number | null;
+  totalSpots: number | null;
+  spotsRemaining: number | null;
 }
 
-export function GigCard({ title, venue, city, dateISO, signupUrl, tags, isOpenMic }: GigCardProps) {
+const currencyFormatter = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "USD",
+  maximumFractionDigits: 0
+});
+
+function describeCompensation(type: GigCardProps["compensationType"], payoutUsd: number | null) {
+  if (type === "FLAT") {
+    return typeof payoutUsd === "number" ? `${currencyFormatter.format(payoutUsd)} flat` : "Flat guarantee";
+  }
+  if (type === "DOOR_SPLIT") {
+    return "Door split";
+  }
+  if (type === "TIPS") {
+    return "Tips for comics";
+  }
+  return "Stage time";
+}
+
+function describeSpots(totalSpots: number | null, spotsRemaining: number | null) {
+  if (typeof totalSpots === "number" && typeof spotsRemaining === "number") {
+    return `${spotsRemaining} of ${totalSpots} spots open`;
+  }
+  if (typeof totalSpots === "number") {
+    return `${totalSpots} total spots`;
+  }
+  if (typeof spotsRemaining === "number") {
+    return `${spotsRemaining} spots open`;
+  }
+  return "Rolling submissions";
+}
+
+export function GigCard({
+  title,
+  venue,
+  city,
+  dateISO,
+  signupUrl,
+  tags,
+  isOpenMic,
+  compensationType,
+  payoutUsd,
+  totalSpots,
+  spotsRemaining
+}: GigCardProps) {
+  const compensationLabel = describeCompensation(compensationType, payoutUsd);
+  const spotsLabel = describeSpots(totalSpots, spotsRemaining);
+
   return (
     <article className="card border border-base-300 bg-base-200/50 shadow-sm transition hover:border-primary/60 hover:shadow-md">
       <div className="card-body space-y-4">
@@ -42,6 +93,17 @@ export function GigCard({ title, venue, city, dateISO, signupUrl, tags, isOpenMi
           <div className="flex items-center gap-2 sm:col-span-2">
             <Icon icon={Mic} className="h-4 w-4" />
             <span>{isOpenMic ? "Comics welcome to sign up" : "Lineup curated by host"}</span>
+          </div>
+        </div>
+
+        <div className="grid gap-2 text-sm text-base-content/80 sm:grid-cols-2">
+          <div className="flex items-center gap-2">
+            <Icon icon={Coins} className="h-4 w-4" />
+            <span>{compensationLabel}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Icon icon={Users} className="h-4 w-4" />
+            <span>{spotsLabel}</span>
           </div>
         </div>
 

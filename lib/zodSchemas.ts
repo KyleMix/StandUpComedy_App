@@ -204,6 +204,26 @@ export const communityBoardMessageUpdateSchema = z
   })
   .refine((value) => Object.keys(value).length > 0, { message: "Provide at least one field to update" });
 
+export const communityPostSchema = z.object({
+  title: z.string().trim().min(3).max(120),
+  content: z.string().trim().min(1).max(2000),
+});
+
+export const communityReplySchema = z.object({
+  content: z.string().trim().min(1).max(1500),
+});
+
+export const communityVoteSchema = z.object({
+  targetType: z.enum(["POST", "REPLY"] as const),
+  targetId: z.string().trim().min(1),
+  value: z
+    .number()
+    .int()
+    .refine((val) => val === -1 || val === 0 || val === 1, {
+      message: "Vote must be -1, 0, or 1",
+    }),
+});
+
 export const offerCreateSchema = z.object({
   threadId: z.string().trim().min(1),
   amount: z.number().int().positive(),

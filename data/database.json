@@ -509,5 +509,8 @@
       "enabled": true,
       "updatedAt": "2024-01-01T08:00:00.000Z"
     }
-  ]
+  ],
+  "communityPosts": [],
+  "communityReplies": [],
+  "communityVotes": []
 }

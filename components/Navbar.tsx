@@ -12,6 +12,7 @@ const links = [
   { href: "/event-types", label: "Event Types" },
   { href: "/locations", label: "Locations" },
   { href: "/resources", label: "Resources" },
+  { href: "/community", label: "Community" },
   { href: "/help", label: "Help Center" },
   { href: "/about", label: "About" }
 ];

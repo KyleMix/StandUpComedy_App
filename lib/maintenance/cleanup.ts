@@ -39,6 +39,9 @@ const EMPTY_SNAPSHOT: DatabaseSnapshot = {
   availability: [],
   reports: [],
   communityBoardMessages: [],
+  communityPosts: [],
+  communityReplies: [],
+  communityVotes: [],
   adSlots: [],
   featureFlags: []
 };
@@ -74,6 +77,9 @@ function withDefaults(snapshot: Partial<DatabaseSnapshot>): DatabaseSnapshot {
     availability: snapshot.availability ?? [],
     reports: snapshot.reports ?? [],
     communityBoardMessages: snapshot.communityBoardMessages ?? [],
+    communityPosts: snapshot.communityPosts ?? [],
+    communityReplies: snapshot.communityReplies ?? [],
+    communityVotes: snapshot.communityVotes ?? [],
     adSlots: snapshot.adSlots ?? [],
     featureFlags: snapshot.featureFlags ?? []
   };
@@ -342,6 +348,41 @@ function pruneSnapshot(snapshot: DatabaseSnapshot): {
     reports
   );
 
+  const communityPosts = filterWithReport(
+    snapshot.communityPosts,
+    (post) => keptUserIds.has(post.authorId),
+    "communityPosts",
+    reports
+  );
+  const keptCommunityPostIds = new Set(communityPosts.map((post) => post.id));
+
+  const communityReplies = filterWithReport(
+    snapshot.communityReplies,
+    (reply) =>
+      keptCommunityPostIds.has(reply.postId) && keptUserIds.has(reply.authorId),
+    "communityReplies",
+    reports
+  );
+  const keptCommunityReplyIds = new Set(communityReplies.map((reply) => reply.id));
+
+  const communityVotes = filterWithReport(
+    snapshot.communityVotes,
+    (vote) => {
+      if (!keptUserIds.has(vote.userId)) {
+        return false;
+      }
+      if (vote.targetType === "POST") {
+        return keptCommunityPostIds.has(vote.targetId);
+      }
+      if (vote.targetType === "REPLY") {
+        return keptCommunityReplyIds.has(vote.targetId);
+      }
+      return false;
+    },
+    "communityVotes",
+    reports
+  );
+
   const reportsCollection = filterWithReport(
     snapshot.reports,
     (record) =>
@@ -383,6 +424,9 @@ function pruneSnapshot(snapshot: DatabaseSnapshot): {
     availability,
     reports: reportsCollection,
     communityBoardMessages,
+    communityPosts,
+    communityReplies,
+    communityVotes,
     adSlots,
     featureFlags: snapshot.featureFlags
   });

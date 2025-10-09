@@ -1,0 +1,60 @@
+{
+  "categories": [
+    {
+      "name": "🎟️ Gig Listings",
+      "description": "Opportunities for comedians. Only promoters and venues can create topics; everyone can reply.",
+      "parentCid": 0,
+      "order": 1,
+      "slug": "gig-listings",
+      "topicTemplate": "**Date:** \n**Location:** \n**Pay/Compensation:** \n**Description:** \n**How to Apply:** ",
+      "privileges": {
+        "groups": {
+          "registered-users": ["topics:read", "topics:reply", "topics:view", "topics:flag"],
+          "standup-comedians": ["topics:read", "topics:reply", "topics:view", "topics:flag"],
+          "standup-promoters": ["topics:read", "topics:reply", "topics:view", "topics:flag", "topics:create"],
+          "standup-venues": ["topics:read", "topics:reply", "topics:view", "topics:flag", "topics:create"],
+          "administrators": ["topics:read", "topics:reply", "topics:view", "topics:flag", "topics:create", "topics:delete", "posts:delete"]
+        }
+      }
+    },
+    {
+      "name": "💬 General Discussion",
+      "description": "Talk shop, share jokes, and hang out with the community.",
+      "parentCid": 0,
+      "order": 2,
+      "slug": "general",
+      "privileges": {
+        "groups": {
+          "registered-users": ["topics:read", "topics:reply", "topics:view", "topics:flag", "topics:create"],
+          "administrators": ["topics:delete", "posts:delete"]
+        }
+      }
+    },
+    {
+      "name": "📣 Promotions & Events",
+      "description": "Share upcoming shows, festivals, and promo opportunities.",
+      "parentCid": 0,
+      "order": 3,
+      "slug": "promotions",
+      "privileges": {
+        "groups": {
+          "registered-users": ["topics:read", "topics:reply", "topics:view", "topics:flag", "topics:create"],
+          "administrators": ["topics:delete", "posts:delete"]
+        }
+      }
+    }
+  ],
+  "calendar": {
+    "plugin": "nodebb-plugin-calendar",
+    "categoryMapping": {
+      "gig-listings": {
+        "icsEnabled": true,
+        "eventFields": {
+          "title": "Topic Title",
+          "startDate": "First Markdown line matching `Date:`",
+          "location": "First Markdown line matching `Location:`"
+        }
+      }
+    }
+  }
+}

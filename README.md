@@ -105,6 +105,10 @@ Additional preloaded accounts from `data/database.json` are available for role-s
 - Comedians: `comic1@thefunny.local`, `comic2@thefunny.local` / `password`
 - Fan: `fan@thefunny.local` / `password`
 
+## Forum integration (NodeBB)
+
+To run the companion community forum with comedian/promoter/venue profiles, install NodeBB and enable the custom plugin located at [`nodebb-plugin-user-role/`](./nodebb-plugin-user-role). Detailed setup instructions, category templates, and automation scripts live in [`docs/nodebb-setup.md`](./docs/nodebb-setup.md) and [`nodebb-config/categories.json`](./nodebb-config/categories.json).
+
 ## License
 
 MIT

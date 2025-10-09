@@ -240,6 +240,7 @@ export interface ReviewRecord {
   gigId: string;
   rating: 1 | 2 | 3 | 4 | 5;
   comment: string;
+  visible: boolean;
   createdAt: string;
 }
 
@@ -265,6 +266,12 @@ export interface AdSlotRecord {
   active: boolean;
   priority: number;
   createdAt: string;
+  updatedAt: string;
+}
+
+export interface FeatureFlagRecord {
+  key: string;
+  enabled: boolean;
   updatedAt: string;
 }
 
@@ -308,4 +315,5 @@ export interface DatabaseSnapshot {
   reports: ReportRecord[];
   communityBoardMessages: CommunityBoardMessageRecord[];
   adSlots: AdSlotRecord[];
+  featureFlags: FeatureFlagRecord[];
 }

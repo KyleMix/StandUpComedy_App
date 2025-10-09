@@ -5,6 +5,7 @@ import type {
   AdSlotPage,
   AdSlotPlacement,
   AdSlotRecord,
+  FeatureFlagRecord,
   ApplicationRecord,
   AvailabilityRecord,
   BookingRecord,
@@ -42,7 +43,7 @@ import type {
   VerificationStatus
 } from "@/lib/prismaEnums";
 import { sanitizeHtml } from "@/lib/sanitize";
-import { FEATURE_FLAGS } from "@/lib/config/flags";
+import { FeatureFlagKey, getDefaultFeatureFlags } from "@/lib/config/flags";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 const DATABASE_PATH = path.join(DATA_DIR, "database.json");
@@ -73,7 +74,8 @@ async function ensureDataStore() {
       availability: [],
       reports: [],
       communityBoardMessages: [],
-      adSlots: []
+      adSlots: [],
+      featureFlags: []
     };
     await fs.writeFile(DATABASE_PATH, JSON.stringify(emptySnapshot, null, 2));
   }
@@ -217,6 +219,10 @@ export interface AdSlot extends Omit<AdSlotRecord, "createdAt" | "updatedAt"> {
   updatedAt: Date;
 }
 
+export interface FeatureFlag extends Omit<FeatureFlagRecord, "updatedAt"> {
+  updatedAt: Date;
+}
+
 export interface Report extends Omit<ReportRecord, "createdAt" | "resolvedAt"> {
   createdAt: Date;
   resolvedAt: Date | null;
@@ -244,7 +250,8 @@ function withDefaults(snapshot: Partial<DatabaseSnapshot>): DatabaseSnapshot {
     availability: snapshot.availability ?? [],
     reports: snapshot.reports ?? [],
     communityBoardMessages: snapshot.communityBoardMessages ?? [],
-    adSlots: snapshot.adSlots ?? []
+    adSlots: snapshot.adSlots ?? [],
+    featureFlags: snapshot.featureFlags ?? []
   };
 }
 
@@ -516,8 +523,26 @@ function mapReview(record: ReviewRecord): Review {
   return {
     ...record,
     comment: record.comment ?? "",
+    visible: record.visible ?? true,
     createdAt: new Date(record.createdAt)
   };
+}
+
+function mapFeatureFlag(record: FeatureFlagRecord): FeatureFlag {
+  return {
+    ...record,
+    updatedAt: new Date(record.updatedAt)
+  };
+}
+
+const FEATURE_FLAG_DEFAULTS = getDefaultFeatureFlags();
+
+function getFeatureFlagValue(snapshot: DatabaseSnapshot, key: FeatureFlagKey): boolean {
+  const override = snapshot.featureFlags.find((flag) => flag.key === key);
+  if (override) {
+    return Boolean(override.enabled);
+  }
+  return FEATURE_FLAG_DEFAULTS[key];
 }
 
 function mapAdSlot(record: AdSlotRecord): AdSlot {
@@ -609,8 +634,8 @@ function compareByRating(a: ComedianSearchListItem, b: ComedianSearchListItem) {
   return a.profile.stageName.localeCompare(b.profile.stageName);
 }
 
-function applyPremiumBoost(items: ComedianSearchListItem[]): ComedianSearchListItem[] {
-  if (!FEATURE_FLAGS.premiumBoost) {
+function applyPremiumBoost(items: ComedianSearchListItem[], enabled: boolean): ComedianSearchListItem[] {
+  if (!enabled) {
     return items;
   }
 
@@ -632,6 +657,7 @@ function applyPremiumBoost(items: ComedianSearchListItem[]): ComedianSearchListI
 
 export async function searchComedians(filters: ComedianSearchFilters = {}): Promise<ComedianSearchResult> {
   const snapshot = await loadSnapshot();
+  const premiumBoostEnabled = getFeatureFlagValue(snapshot, "premiumBoost");
   const pageSize = Math.max(filters.pageSize ?? 12, 1);
   const page = Math.max(filters.page ?? 1, 1);
   const searchTerm = filters.search?.trim().toLowerCase() ?? "";
@@ -789,7 +815,7 @@ export async function searchComedians(filters: ComedianSearchFilters = {}): Prom
   const total = sorted.length;
   const start = (page - 1) * pageSize;
   const pageItems = sorted.slice(start, start + pageSize);
-  const paginated = applyPremiumBoost(pageItems);
+  const paginated = applyPremiumBoost(pageItems, premiumBoostEnabled);
 
   return {
     items: paginated,
@@ -1993,6 +2019,7 @@ export async function createReview(input: CreateReviewInput): Promise<Review> {
     gigId: input.gigId,
     rating: normalizeReviewRating(input.rating),
     comment: sanitizeHtml(input.comment),
+    visible: true,
     createdAt: now
   };
   snapshot.reviews.push(record);
@@ -2003,7 +2030,7 @@ export async function createReview(input: CreateReviewInput): Promise<Review> {
 export async function listReviewsForUser(subjectUserId: string): Promise<Review[]> {
   const snapshot = await loadSnapshot();
   return snapshot.reviews
-    .filter((review) => review.subjectUserId === subjectUserId)
+    .filter((review) => review.subjectUserId === subjectUserId && review.visible !== false)
     .map(mapReview)
     .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 }
@@ -2011,7 +2038,7 @@ export async function listReviewsForUser(subjectUserId: string): Promise<Review[
 export async function listReviewsForGig(gigId: string): Promise<Review[]> {
   const snapshot = await loadSnapshot();
   return snapshot.reviews
-    .filter((review) => review.gigId === gigId)
+    .filter((review) => review.gigId === gigId && review.visible !== false)
     .map(mapReview)
     .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 }
@@ -2068,6 +2095,59 @@ export async function scheduleReviewRemindersForPastBookings(): Promise<number> 
   }
 
   return created;
+}
+
+export async function listAllReviews(): Promise<Review[]> {
+  const snapshot = await loadSnapshot();
+  return snapshot.reviews.map(mapReview).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+}
+
+export async function setReviewVisibility(reviewId: string, visible: boolean): Promise<Review | null> {
+  const snapshot = await loadSnapshot();
+  const record = snapshot.reviews.find((review) => review.id === reviewId);
+  if (!record) return null;
+  record.visible = visible;
+  await persist(snapshot);
+  return mapReview(record);
+}
+
+export async function listFeatureFlags(): Promise<FeatureFlag[]> {
+  const snapshot = await loadSnapshot();
+  const overrides = snapshot.featureFlags ?? [];
+  const overrideMap = new Map(overrides.map((flag) => [flag.key, flag] as const));
+  const keys = Object.keys(FEATURE_FLAG_DEFAULTS) as FeatureFlagKey[];
+
+  return keys.map((key) => {
+    const record = overrideMap.get(key);
+    if (record) {
+      return mapFeatureFlag(record);
+    }
+    const defaultFlag: FeatureFlag = {
+      key,
+      enabled: FEATURE_FLAG_DEFAULTS[key],
+      updatedAt: new Date(0),
+    };
+    return defaultFlag;
+  });
+}
+
+export async function setFeatureFlag(key: FeatureFlagKey, enabled: boolean): Promise<FeatureFlag> {
+  const snapshot = await loadSnapshot();
+  const now = new Date().toISOString();
+  const record = snapshot.featureFlags.find((flag) => flag.key === key);
+  if (record) {
+    record.enabled = enabled;
+    record.updatedAt = now;
+  } else {
+    snapshot.featureFlags.push({ key, enabled, updatedAt: now });
+  }
+  await persist(snapshot);
+  return mapFeatureFlag({ key, enabled, updatedAt: now });
+}
+
+export async function isFeatureFlagEnabled(key: FeatureFlagKey): Promise<boolean> {
+  const snapshot = await loadSnapshot();
+  return getFeatureFlagValue(snapshot, key);
 }
 
 export async function listAvailabilityForUser(userId: string): Promise<Availability[]> {

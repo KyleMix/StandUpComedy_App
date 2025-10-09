@@ -1,6 +1,6 @@
 "use client";
 
-import { useTheme } from "next-themes";
+import { useTheme } from "@/components/providers/theme-provider";
 import { Laptop2, MoonStar, SunMedium } from "lucide-react";
 import { useEffect, useMemo, useState, type ComponentType } from "react";
 

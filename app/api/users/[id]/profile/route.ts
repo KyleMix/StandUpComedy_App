@@ -5,7 +5,7 @@ import {
   getPromoterProfile,
   getUserById,
   getVenueProfile,
-  listConversationReviewsForUser
+  listReviewsForUser
 } from "@/lib/dataStore";
 
 function computeProfileStrength(values: Array<string | number | null | undefined>) {
@@ -33,7 +33,7 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
     getComedianProfile(user.id),
     getPromoterProfile(user.id),
     getVenueProfile(user.id),
-    listConversationReviewsForUser(user.id)
+    listReviewsForUser(user.id)
   ]);
 
   const ratingAvg = reviews.length ? reviews.reduce((total, review) => total + review.rating, 0) / reviews.length : 0;

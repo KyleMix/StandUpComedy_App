@@ -6,7 +6,9 @@ import {
   listBookingsForThread,
   listMessagesForThread,
   listOffersForThread,
-  listThreadsForUser
+  listReviewsForGig,
+  listThreadsForUser,
+  scheduleReviewRemindersForPastBookings
 } from "@/lib/dataStore";
 import { SAFETY_TIPS } from "@/lib/config/commerce";
 import { Badge } from "@/components/ui/badge";
@@ -30,6 +32,8 @@ export default async function InboxPage() {
       </Card>
     );
   }
+
+  await scheduleReviewRemindersForPastBookings();
 
   const threads = await listThreadsForUser(session.user.id);
   if (threads.length === 0) {
@@ -59,13 +63,15 @@ export default async function InboxPage() {
       const participants = await Promise.all(thread.participantIds.map((id) => getUserById(id)));
       const messages = await listMessagesForThread(thread.id);
       const offers = await listOffersForThread(thread.id);
+      const reviews = await listReviewsForGig(thread.gigId);
       return {
         thread,
         gig,
         participants: participants.filter((value): value is NonNullable<typeof value> => Boolean(value)),
         messages,
         offers,
-        bookings: await listBookingsForThread(thread.id)
+        bookings: await listBookingsForThread(thread.id),
+        reviews
       };
     })
   );
@@ -148,6 +154,15 @@ export default async function InboxPage() {
                   expiresAtISO: offer.expiresAt ? offer.expiresAt.toISOString() : null,
                   status: offer.status,
                   createdAtISO: offer.createdAt.toISOString()
+                }))}
+                reviews={reviews.map((review) => ({
+                  id: review.id,
+                  authorUserId: review.authorUserId,
+                  subjectUserId: review.subjectUserId,
+                  gigId: review.gigId,
+                  rating: review.rating,
+                  comment: review.comment,
+                  createdAtISO: review.createdAt.toISOString()
                 }))}
                 participants={participants.map((participant) => ({
                   id: participant.id,

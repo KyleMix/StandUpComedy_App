@@ -23,6 +23,7 @@ import type {
   PromoterProfileRecord,
   ReportRecord,
   ReviewRecord,
+  ReviewReminderRecord,
   ThreadRecord,
   UserRecord,
   VenueProfileRecord,
@@ -68,6 +69,7 @@ async function ensureDataStore() {
       bookings: [],
       conversationReviews: [],
       reviews: [],
+      reviewReminders: [],
       availability: [],
       reports: [],
       communityBoardMessages: [],
@@ -204,6 +206,12 @@ export interface Review extends Omit<ReviewRecord, "createdAt"> {
   createdAt: Date;
 }
 
+export interface ReviewReminder extends Omit<ReviewReminderRecord, "sendAt" | "createdAt" | "sentAt"> {
+  sendAt: Date;
+  createdAt: Date;
+  sentAt: Date | null;
+}
+
 export interface AdSlot extends Omit<AdSlotRecord, "createdAt"> {
   createdAt: Date;
 }
@@ -231,6 +239,7 @@ function withDefaults(snapshot: Partial<DatabaseSnapshot>): DatabaseSnapshot {
     bookings: snapshot.bookings ?? [],
     conversationReviews: snapshot.conversationReviews ?? [],
     reviews: snapshot.reviews ?? [],
+    reviewReminders: snapshot.reviewReminders ?? [],
     availability: snapshot.availability ?? [],
     reports: snapshot.reports ?? [],
     communityBoardMessages: snapshot.communityBoardMessages ?? [],
@@ -1826,6 +1835,14 @@ export async function listBookingsForPromoter(userId: string): Promise<Booking[]
     .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
 }
 
+export async function listBookingsForGig(gigId: string): Promise<Booking[]> {
+  const snapshot = await loadSnapshot();
+  return snapshot.bookings
+    .filter((booking) => booking.gigId === gigId)
+    .map(mapBooking)
+    .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+}
+
 export async function updateBooking(
   bookingId: string,
   data: Partial<Omit<BookingRecord, "id" | "gigId" | "comedianId" | "promoterId" | "offerId" | "createdAt">>
@@ -1922,6 +1939,60 @@ export async function listReviewsForGig(gigId: string): Promise<Review[]> {
     .filter((review) => review.gigId === gigId)
     .map(mapReview)
     .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+}
+
+export async function scheduleReviewRemindersForPastBookings(): Promise<number> {
+  const snapshot = await loadSnapshot();
+  const gigMap = new Map(snapshot.gigs.map((gig) => [gig.id, gig]));
+  const now = Date.now();
+  let created = 0;
+
+  for (const booking of snapshot.bookings) {
+    if (!booking) continue;
+    if (!booking.status || !["PAID", "COMPLETED"].includes(booking.status)) {
+      continue;
+    }
+
+    const gig = gigMap.get(booking.gigId);
+    if (!gig) continue;
+
+    const eventTime = new Date(gig.dateStart).getTime();
+    if (!Number.isFinite(eventTime) || eventTime > now) {
+      continue;
+    }
+
+    const participantIds = [booking.comedianId, booking.promoterId].filter(Boolean);
+    for (const participantId of participantIds) {
+      const offsets = [24, 24 * 7];
+      for (const hours of offsets) {
+        const sendAt = new Date(eventTime + hours * 60 * 60 * 1000).toISOString();
+        const exists = snapshot.reviewReminders.some(
+          (reminder) =>
+            reminder.bookingId === booking.id &&
+            reminder.recipientUserId === participantId &&
+            reminder.sendAt === sendAt
+        );
+
+        if (!exists) {
+          snapshot.reviewReminders.push({
+            id: randomUUID(),
+            bookingId: booking.id,
+            recipientUserId: participantId,
+            sendAt,
+            sentAt: null,
+            createdAt: nowIso(),
+          });
+          created += 1;
+        }
+      }
+    }
+  }
+
+  if (created > 0) {
+    await persist(snapshot);
+  }
+
+  return created;
 }
 
 export async function listAvailabilityForUser(userId: string): Promise<Availability[]> {

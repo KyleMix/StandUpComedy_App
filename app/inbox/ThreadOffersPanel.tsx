@@ -40,6 +40,16 @@ interface BookingSummary {
   createdAtISO: string;
 }
 
+interface ReviewSummary {
+  id: string;
+  authorUserId: string;
+  subjectUserId: string;
+  gigId: string;
+  rating: number;
+  comment: string;
+  createdAtISO: string;
+}
+
 interface ThreadOffersPanelProps {
   threadId: string;
   gigId: string;
@@ -48,6 +58,7 @@ interface ThreadOffersPanelProps {
   participants: ParticipantSummary[];
   offers: OfferSummary[];
   bookings: BookingSummary[];
+  reviews: ReviewSummary[];
 }
 
 interface ComposerState {
@@ -111,6 +122,18 @@ function mapBookingResponse(booking: Record<string, unknown>): BookingSummary {
   };
 }
 
+function mapReviewResponse(review: Record<string, unknown>): ReviewSummary {
+  return {
+    id: String(review.id ?? ""),
+    authorUserId: String(review.authorUserId ?? ""),
+    subjectUserId: String(review.subjectUserId ?? ""),
+    gigId: String(review.gigId ?? ""),
+    rating: Number(review.rating ?? 0),
+    comment: String(review.comment ?? ""),
+    createdAtISO: String(review.createdAt ?? new Date().toISOString()),
+  };
+}
+
 export function ThreadOffersPanel({
   threadId,
   gigId,
@@ -119,9 +142,11 @@ export function ThreadOffersPanel({
   participants,
   offers: initialOffers,
   bookings: initialBookings,
+  reviews: initialReviews,
 }: ThreadOffersPanelProps) {
   const [offers, setOffers] = useState<OfferSummary[]>(initialOffers);
   const [bookings, setBookings] = useState<BookingSummary[]>(initialBookings);
+  const [reviews, setReviews] = useState<ReviewSummary[]>(initialReviews);
   const [composer, setComposer] = useState<ComposerState>(defaultComposerState);
   const [composerError, setComposerError] = useState<string | null>(null);
   const [composerSuccess, setComposerSuccess] = useState<string | null>(null);
@@ -161,6 +186,16 @@ export function ThreadOffersPanel({
       ) ?? null,
     [participants]
   );
+
+  const otherParticipantId = useMemo(() => {
+    if (currentUserId === comedian?.id) {
+      return promoter?.id ?? null;
+    }
+    if (currentUserId === promoter?.id) {
+      return comedian?.id ?? null;
+    }
+    return comedian?.id ?? promoter?.id ?? null;
+  }, [comedian, promoter, currentUserId]);
 
   const canComposeOffer =
     currentUserRole === Role.PROMOTER || currentUserRole === Role.VENUE;
@@ -530,6 +565,17 @@ export function ThreadOffersPanel({
                         <span className="font-medium text-slate-700">Cancellation policy</span>
                         <span className="uppercase">{booking.cancellationPolicy}</span>
                       </div>
+                      <BookingReviewPrompt
+                        booking={booking}
+                        offer={offer}
+                        gigId={gigId}
+                        currentUserId={currentUserId}
+                        otherParticipantId={otherParticipantId}
+                        reviews={reviews}
+                        onReviewCreated={(review) =>
+                          setReviews((previous) => [review, ...previous.filter((item) => item.id !== review.id)])
+                        }
+                      />
                     </CardContent>
                   </Card>
                 )}
@@ -538,6 +584,163 @@ export function ThreadOffersPanel({
           })}
         </ol>
       </div>
+    </div>
+  );
+}
+
+interface BookingReviewPromptProps {
+  booking: BookingSummary;
+  offer: OfferSummary;
+  gigId: string;
+  currentUserId: string;
+  otherParticipantId: string | null;
+  reviews: ReviewSummary[];
+  onReviewCreated: (review: ReviewSummary) => void;
+}
+
+function BookingReviewPrompt({
+  booking,
+  offer,
+  gigId,
+  currentUserId,
+  otherParticipantId,
+  reviews,
+  onReviewCreated,
+}: BookingReviewPromptProps) {
+  const [open, setOpen] = useState(false);
+  const [rating, setRating] = useState("5");
+  const [comment, setComment] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const eventDate = new Date(offer.eventDateISO);
+  const eventHasPassed = Number.isFinite(eventDate.getTime()) && eventDate.getTime() < Date.now();
+  const bookingCompleted =
+    booking.status === BookingStatus.PAID || booking.status === BookingStatus.COMPLETED;
+  const alreadySubmitted = reviews.some((review) => review.authorUserId === currentUserId);
+  const canReview = Boolean(otherParticipantId) && eventHasPassed && bookingCompleted;
+
+  if (!canReview) {
+    return null;
+  }
+
+  if (alreadySubmitted) {
+    return (
+      <div className="rounded-md border border-slate-100 bg-slate-50 p-3 text-xs text-slate-600">
+        Thanks for sharing your experience!
+      </div>
+    );
+  }
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError(null);
+
+    const numericRating = Number.parseInt(rating, 10);
+    if (!Number.isFinite(numericRating) || numericRating < 1 || numericRating > 5) {
+      setError("Rating must be between 1 and 5.");
+      return;
+    }
+
+    if (comment.trim().length < 10) {
+      setError("Share a few details (10+ characters).");
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const response = await fetch("/api/reviews", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          subjectUserId: otherParticipantId,
+          gigId,
+          rating: numericRating,
+          comment,
+        }),
+      });
+
+      const payload = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(payload.error?.message ?? payload.error ?? "Failed to submit review.");
+      }
+
+      if (!payload.review) {
+        throw new Error("Review created but response was missing data.");
+      }
+
+      const review = mapReviewResponse(payload.review as Record<string, unknown>);
+      onReviewCreated(review);
+      setOpen(false);
+      setComment("");
+      setRating(String(review.rating || numericRating));
+    } catch (submissionError) {
+      setError(
+        submissionError instanceof Error
+          ? submissionError.message
+          : "Failed to submit review.",
+      );
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  return (
+    <div className="pt-2">
+      {open ? (
+        <form className="space-y-2" onSubmit={handleSubmit}>
+          <div className="flex items-center gap-2">
+            <label
+              className="text-xs font-medium text-slate-600"
+              htmlFor={`${booking.id}-review-rating`}
+            >
+              Rating
+            </label>
+            <Input
+              id={`${booking.id}-review-rating`}
+              type="number"
+              min={1}
+              max={5}
+              value={rating}
+              onChange={(event) => setRating(event.target.value)}
+              className="h-8 w-16 text-sm"
+            />
+          </div>
+          <Textarea
+            value={comment}
+            onChange={(event) => setComment(event.target.value)}
+            placeholder="How did the show go?"
+            rows={3}
+          />
+          {error && (
+            <p className="text-xs text-red-600" role="alert">
+              {error}
+            </p>
+          )}
+          <div className="flex items-center gap-2">
+            <Button type="submit" size="sm" disabled={submitting}>
+              {submitting ? "Submitting…" : "Submit review"}
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setOpen(false);
+                setError(null);
+              }}
+              disabled={submitting}
+            >
+              Cancel
+            </Button>
+          </div>
+        </form>
+      ) : (
+        <Button size="sm" variant="outline" onClick={() => setOpen(true)}>
+          Leave a review
+        </Button>
+      )}
     </div>
   );
 }

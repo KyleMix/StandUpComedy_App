@@ -7,6 +7,10 @@ export interface GigSample {
   signupUrl: string;
   tags: string[];
   isOpenMic: boolean;
+  compensationType: "FLAT" | "DOOR_SPLIT" | "TIPS" | "UNPAID";
+  payoutUsd: number | null;
+  totalSpots: number | null;
+  spotsRemaining: number | null;
 }
 
 export interface ProfileSample {
@@ -27,7 +31,11 @@ export const gigs: GigSample[] = [
     dateISO: "2025-02-14",
     signupUrl: "/gigs/oly-midnight-oil",
     tags: ["booked", "paid"],
-    isOpenMic: false
+    isOpenMic: false,
+    compensationType: "FLAT",
+    payoutUsd: 100,
+    totalSpots: 6,
+    spotsRemaining: 2
   },
   {
     id: "oly-open-late",
@@ -37,7 +45,11 @@ export const gigs: GigSample[] = [
     dateISO: "2025-02-19",
     signupUrl: "/gigs/oly-open-late",
     tags: ["open mic"],
-    isOpenMic: true
+    isOpenMic: true,
+    compensationType: "TIPS",
+    payoutUsd: null,
+    totalSpots: 18,
+    spotsRemaining: 7
   },
   {
     id: "tacoma-sunday",
@@ -47,7 +59,11 @@ export const gigs: GigSample[] = [
     dateISO: "2025-02-23",
     signupUrl: "/gigs/tacoma-sunday",
     tags: ["booked"],
-    isOpenMic: false
+    isOpenMic: false,
+    compensationType: "DOOR_SPLIT",
+    payoutUsd: null,
+    totalSpots: 5,
+    spotsRemaining: 1
   },
   {
     id: "tacoma-backroom",
@@ -57,7 +73,11 @@ export const gigs: GigSample[] = [
     dateISO: "2025-03-02",
     signupUrl: "/gigs/tacoma-backroom",
     tags: ["open mic"],
-    isOpenMic: true
+    isOpenMic: true,
+    compensationType: "UNPAID",
+    payoutUsd: null,
+    totalSpots: null,
+    spotsRemaining: null
   },
   {
     id: "seattle-late-show",
@@ -67,7 +87,11 @@ export const gigs: GigSample[] = [
     dateISO: "2025-03-07",
     signupUrl: "/gigs/seattle-late-show",
     tags: ["booked", "paid"],
-    isOpenMic: false
+    isOpenMic: false,
+    compensationType: "FLAT",
+    payoutUsd: 200,
+    totalSpots: 8,
+    spotsRemaining: 4
   },
   {
     id: "seattle-rain-city",
@@ -77,7 +101,11 @@ export const gigs: GigSample[] = [
     dateISO: "2025-03-12",
     signupUrl: "/gigs/seattle-rain-city",
     tags: ["open mic"],
-    isOpenMic: true
+    isOpenMic: true,
+    compensationType: "TIPS",
+    payoutUsd: null,
+    totalSpots: 16,
+    spotsRemaining: 9
   },
   {
     id: "portland-bridge",
@@ -87,7 +115,11 @@ export const gigs: GigSample[] = [
     dateISO: "2025-03-16",
     signupUrl: "/gigs/portland-bridge",
     tags: ["booked"],
-    isOpenMic: false
+    isOpenMic: false,
+    compensationType: "DOOR_SPLIT",
+    payoutUsd: null,
+    totalSpots: 5,
+    spotsRemaining: 0
   },
   {
     id: "portland-diy",
@@ -97,7 +129,11 @@ export const gigs: GigSample[] = [
     dateISO: "2025-03-20",
     signupUrl: "/gigs/portland-diy",
     tags: ["open mic"],
-    isOpenMic: true
+    isOpenMic: true,
+    compensationType: "UNPAID",
+    payoutUsd: null,
+    totalSpots: 20,
+    spotsRemaining: 12
   }
 ];
 

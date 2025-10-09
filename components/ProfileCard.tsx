@@ -32,7 +32,7 @@ export function ProfileCard({ slug, displayName, role, city, avatarUrl, tagline 
           <img
             src={imageSrc}
             alt={displayName}
-            className="h-16 w-16 rounded-full border border-base-300/60 bg-base-100 object-cover"
+            className="h-16 w-16 rounded-lg border border-base-300/60 bg-base-100 object-cover"
             loading="lazy"
           />
           <div className="space-y-1">

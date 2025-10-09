@@ -97,6 +97,8 @@ export default async function ProfilePage() {
     redirect("/");
   }
 
+  const dataStoreUser = await getUserById(user.id);
+
   const comedianProfile = user.comedian
     ? {
         ...user.comedian,
@@ -126,6 +128,7 @@ export default async function ProfilePage() {
     name: user.name,
     email: user.email,
     role: user.role,
+    avatarUrl: dataStoreUser?.avatarUrl ?? null,
     comedian: comedianProfile,
     promoter: user.promoter
       ? {

@@ -320,7 +320,7 @@
       "minAge": 18,
       "isPublished": true,
       "status": "OPEN",
-      "format": "Sign up in advance or at the door — 5 minute sets, 7 minute headliners.",
+      "format": "Sign up in advance or at the door \u2014 5 minute sets, 7 minute headliners.",
       "setLengthMinutes": 5,
       "audienceDescription": "Supportive comics and night owls testing fresh material.",
       "totalSpots": 20,
@@ -521,7 +521,9 @@
       "userId": "user-promoter",
       "roleRequested": "PROMOTER",
       "message": "Production company specializing in indie comedy.",
-      "documents": {"taxId": "123-45-6789"},
+      "documents": {
+        "taxId": "123-45-6789"
+      },
       "status": "APPROVED",
       "reviewedBy": "user-admin",
       "createdAt": "2024-02-01T12:00:00.000Z",
@@ -532,7 +534,9 @@
       "userId": "user-venue",
       "roleRequested": "VENUE",
       "message": "Neighborhood comedy loft seeking verified status.",
-      "documents": {"businessLicense": "LIC-2024-001"},
+      "documents": {
+        "businessLicense": "LIC-2024-001"
+      },
       "status": "PENDING",
       "reviewedBy": null,
       "createdAt": "2024-02-05T12:00:00.000Z",
@@ -554,7 +558,10 @@
       "id": "thread-1",
       "gigId": "gig-1",
       "createdById": "user-promoter",
-      "participantIds": ["user-promoter", "user-comic1"],
+      "participantIds": [
+        "user-promoter",
+        "user-comic1"
+      ],
       "state": "QUOTE",
       "lastMessageAt": "2024-03-25T18:00:00.000Z",
       "createdAt": "2024-03-24T16:00:00.000Z",
@@ -669,5 +676,6 @@
       "status": "free"
     }
   ],
-  "reports": []
+  "reports": [],
+  "featureFlags": []
 }

@@ -6,6 +6,7 @@ import {
   listAllAdSlots as listStoreAllAdSlots,
   updateAdSlot as updateStoreAdSlot,
   type AdSlot as StoreAdSlot,
+  isFeatureFlagEnabled,
 } from "@/lib/dataStore";
 import type { AdSlotPage, AdSlotPlacement } from "@/types/database";
 
@@ -97,6 +98,11 @@ function buildPrismaUpdateData(input: UpdateAdSlotInput) {
 }
 
 export async function listActiveAdSlots(page: AdSlotPage, placement: AdSlotPlacement): Promise<AdSlot[]> {
+  const adsEnabled = await isFeatureFlagEnabled("adsEnabled");
+  if (!adsEnabled) {
+    return [];
+  }
+
   if (isDatabaseEnabled()) {
     const client = getPrismaClient();
     const slots = await client.adSlot.findMany({

@@ -97,18 +97,36 @@ export default async function ProfilePage() {
     redirect("/");
   }
 
+  const comedianProfile = user.comedian
+    ? {
+        ...user.comedian,
+        styles: Array.isArray(user.comedian.styles) ? user.comedian.styles : [],
+        cleanRating: user.comedian.cleanRating ?? "PG13",
+        rateMin: user.comedian.rateMin ?? null,
+        rateMax: user.comedian.rateMax ?? null,
+        reelUrls: Array.isArray(user.comedian.reelUrls) ? user.comedian.reelUrls : [],
+        photoUrls: Array.isArray(user.comedian.photoUrls) ? user.comedian.photoUrls : [],
+        notableClubs: Array.isArray(user.comedian.notableClubs) ? user.comedian.notableClubs : [],
+        availability: Array.isArray(user.comedian.availability)
+          ? user.comedian.availability.map((entry) => ({
+              ...entry,
+              date:
+                entry.date instanceof Date
+                  ? entry.date.toISOString()
+                  : new Date(entry.date).toISOString(),
+            }))
+          : [],
+        createdAt: user.comedian.createdAt.toISOString(),
+        updatedAt: user.comedian.updatedAt.toISOString(),
+      }
+    : null;
+
   const workspaceUser: ProfileWorkspaceProps["user"] = {
     id: user.id,
     name: user.name,
     email: user.email,
     role: user.role,
-    comedian: user.comedian
-      ? {
-          ...user.comedian,
-          createdAt: user.comedian.createdAt.toISOString(),
-          updatedAt: user.comedian.updatedAt.toISOString()
-        }
-      : null,
+    comedian: comedianProfile,
     promoter: user.promoter
       ? {
           ...user.promoter,

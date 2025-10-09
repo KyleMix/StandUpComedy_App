@@ -88,6 +88,40 @@ export interface ComedianProfile
   availability: Availability[];
 }
 
+export type ComedianSortOption = "rating" | "distance" | "responsiveness" | "premium";
+
+export interface ComedianSearchFilters {
+  search?: string;
+  city?: string;
+  state?: string;
+  styles?: string[];
+  cleanRating?: ComedianCleanRating;
+  rateMin?: number;
+  rateMax?: number;
+  minExperienceYears?: number;
+  sort?: ComedianSortOption;
+  page?: number;
+  pageSize?: number;
+}
+
+export interface ComedianSearchListItem {
+  profile: ComedianProfile;
+  user: Pick<User, "id" | "name" | "isPremium"> | null;
+  averageRating: number | null;
+  reviewCount: number;
+  responsivenessScore: number | null;
+  responseCount: number;
+  experienceYears: number | null;
+  distanceRank: number;
+}
+
+export interface ComedianSearchResult {
+  items: ComedianSearchListItem[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+
 export interface ComedianVideo extends Omit<ComedianVideoRecord, "postedAt"> {
   postedAt: Date;
 }
@@ -494,6 +528,241 @@ function normalizeReviewRating(value: number): 1 | 2 | 3 | 4 | 5 {
 
 function nowIso() {
   return new Date().toISOString();
+}
+
+function normalizeText(value: string | null | undefined) {
+  return value ? value.toLowerCase() : "";
+}
+
+function computeAverage(total: number, count: number): number | null {
+  if (count === 0) return null;
+  return Number((total / count).toFixed(2));
+}
+
+function computeExperienceYears(profile: ComedianProfile, appearances: ComedianAppearanceRecord[]): number | null {
+  const timestamps = appearances
+    .filter((appearance) => appearance.comedianUserId === profile.userId)
+    .map((appearance) => new Date(appearance.performedAt).getTime())
+    .filter((value) => Number.isFinite(value));
+
+  const earliestTimestamp = timestamps.length > 0 ? Math.min(...timestamps) : profile.createdAt.getTime();
+  if (!Number.isFinite(earliestTimestamp)) {
+    return null;
+  }
+  const now = Date.now();
+  if (now <= earliestTimestamp) {
+    return 0;
+  }
+  const millisecondsPerYear = 1000 * 60 * 60 * 24 * 365;
+  return Math.max(0, Math.floor((now - earliestTimestamp) / millisecondsPerYear));
+}
+
+function computeDistanceRank(
+  profile: ComedianProfile,
+  cityFilter: string | undefined,
+  stateFilter: string | undefined
+) {
+  if (!cityFilter && !stateFilter) {
+    return Number.POSITIVE_INFINITY;
+  }
+  const city = normalizeText(profile.homeCity);
+  const state = profile.homeState ? profile.homeState.toUpperCase() : "";
+
+  if (cityFilter && stateFilter) {
+    if (city === cityFilter && state === stateFilter) {
+      return 0;
+    }
+  }
+  if (cityFilter && !stateFilter && city === cityFilter) {
+    return 0;
+  }
+  if (stateFilter && state === stateFilter) {
+    return 1;
+  }
+  if (cityFilter && city.includes(cityFilter)) {
+    return 2;
+  }
+  return 3;
+}
+
+function compareByRating(a: ComedianSearchListItem, b: ComedianSearchListItem) {
+  const aRating = a.averageRating ?? 0;
+  const bRating = b.averageRating ?? 0;
+  if (aRating !== bRating) {
+    return bRating - aRating;
+  }
+  if (a.reviewCount !== b.reviewCount) {
+    return b.reviewCount - a.reviewCount;
+  }
+  return a.profile.stageName.localeCompare(b.profile.stageName);
+}
+
+export async function searchComedians(filters: ComedianSearchFilters = {}): Promise<ComedianSearchResult> {
+  const snapshot = await loadSnapshot();
+  const pageSize = Math.max(filters.pageSize ?? 12, 1);
+  const page = Math.max(filters.page ?? 1, 1);
+  const searchTerm = filters.search?.trim().toLowerCase() ?? "";
+  const cityFilter = filters.city?.trim().toLowerCase() || undefined;
+  const stateFilter = filters.state?.trim().toUpperCase() || undefined;
+  const normalizedStyles = (filters.styles ?? [])
+    .map((style) => style.trim())
+    .filter((style) => style.length > 0)
+    .map((style) => style.toLowerCase());
+
+  const reviewTotals = new Map<string, { total: number; count: number }>();
+  for (const review of snapshot.reviews) {
+    const existing = reviewTotals.get(review.subjectUserId) ?? { total: 0, count: 0 };
+    existing.total += review.rating;
+    existing.count += 1;
+    reviewTotals.set(review.subjectUserId, existing);
+  }
+
+  const conversationTotals = new Map<string, { total: number; count: number }>();
+  for (const conversationReview of snapshot.conversationReviews) {
+    const existing = conversationTotals.get(conversationReview.toUserId) ?? { total: 0, count: 0 };
+    existing.total += conversationReview.rating;
+    existing.count += 1;
+    conversationTotals.set(conversationReview.toUserId, existing);
+  }
+
+  const usersById = new Map(snapshot.users.map((record) => [record.id, mapUser(record)]));
+
+  const profiles = snapshot.comedianProfiles.map(mapComedian);
+
+  const items: ComedianSearchListItem[] = profiles.map((profile) => {
+    const reviewStats = reviewTotals.get(profile.userId) ?? { total: 0, count: 0 };
+    const conversationStats = conversationTotals.get(profile.userId) ?? { total: 0, count: 0 };
+    const experienceYears = computeExperienceYears(profile, snapshot.comedianAppearances);
+    const distanceRank = computeDistanceRank(profile, cityFilter, stateFilter);
+    const user = usersById.get(profile.userId);
+    return {
+      profile,
+      user: user ? { id: user.id, name: user.name, isPremium: user.isPremium } : null,
+      averageRating: computeAverage(reviewStats.total, reviewStats.count),
+      reviewCount: reviewStats.count,
+      responsivenessScore: computeAverage(conversationStats.total, conversationStats.count),
+      responseCount: conversationStats.count,
+      experienceYears,
+      distanceRank,
+    };
+  });
+
+  const filtered = items.filter((item) => {
+    const { profile } = item;
+    if (searchTerm) {
+      const haystack = [
+        profile.stageName,
+        profile.bio ?? "",
+        profile.credits ?? "",
+        profile.homeCity ?? "",
+        profile.homeState ?? "",
+        profile.styles.join(" "),
+        item.user?.name ?? "",
+      ]
+        .join(" ")
+        .toLowerCase();
+      if (!haystack.includes(searchTerm)) {
+        return false;
+      }
+    }
+
+    if (cityFilter) {
+      const profileCity = profile.homeCity ? profile.homeCity.toLowerCase() : "";
+      if (!profileCity.includes(cityFilter)) {
+        return false;
+      }
+    }
+
+    if (stateFilter) {
+      if (!profile.homeState || profile.homeState.toUpperCase() !== stateFilter) {
+        return false;
+      }
+    }
+
+    if (filters.cleanRating && profile.cleanRating !== filters.cleanRating) {
+      return false;
+    }
+
+    if (normalizedStyles.length > 0) {
+      const profileStyles = new Set(profile.styles.map((style) => style.toLowerCase()));
+      for (const style of normalizedStyles) {
+        if (!profileStyles.has(style)) {
+          return false;
+        }
+      }
+    }
+
+    if (filters.rateMin !== undefined) {
+      const maxRate = profile.rateMax ?? profile.rateMin;
+      if (maxRate == null || maxRate < filters.rateMin) {
+        return false;
+      }
+    }
+
+    if (filters.rateMax !== undefined) {
+      const minRate = profile.rateMin ?? profile.rateMax;
+      if (minRate == null || minRate > filters.rateMax) {
+        return false;
+      }
+    }
+
+    if (filters.minExperienceYears !== undefined) {
+      if (item.experienceYears == null || item.experienceYears < filters.minExperienceYears) {
+        return false;
+      }
+    }
+
+    return true;
+  });
+
+  const sortOption = filters.sort ?? "rating";
+  const sorted = filtered.sort((a, b) => {
+    switch (sortOption) {
+      case "distance": {
+        const aRank = a.distanceRank;
+        const bRank = b.distanceRank;
+        if (Number.isFinite(aRank) || Number.isFinite(bRank)) {
+          if (aRank !== bRank) {
+            return aRank - bRank;
+          }
+        }
+        return compareByRating(a, b);
+      }
+      case "responsiveness": {
+        const aScore = a.responsivenessScore ?? 0;
+        const bScore = b.responsivenessScore ?? 0;
+        if (aScore !== bScore) {
+          return bScore - aScore;
+        }
+        if (a.responseCount !== b.responseCount) {
+          return b.responseCount - a.responseCount;
+        }
+        return compareByRating(a, b);
+      }
+      case "premium": {
+        const aPremium = a.user?.isPremium ? 1 : 0;
+        const bPremium = b.user?.isPremium ? 1 : 0;
+        if (aPremium !== bPremium) {
+          return bPremium - aPremium;
+        }
+        return compareByRating(a, b);
+      }
+      case "rating":
+      default:
+        return compareByRating(a, b);
+    }
+  });
+
+  const total = sorted.length;
+  const start = (page - 1) * pageSize;
+  const paginated = sorted.slice(start, start + pageSize);
+
+  return {
+    items: paginated,
+    total,
+    page,
+    pageSize,
+  };
 }
 
 export async function listComedianProfiles(): Promise<ComedianProfile[]> {

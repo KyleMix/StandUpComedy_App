@@ -9,6 +9,7 @@ import {
   listReviewsForUser,
   type ComedianProfile,
 } from "@/lib/dataStore";
+import { slugFromStageName } from "@/lib/profileSlug";
 import { cn } from "@/lib/utils";
 import { avatarFor } from "@/utils/avatar";
 import { Calendar, Camera, DollarSign, MapPin, Star, Video } from "lucide-react";
@@ -27,13 +28,6 @@ const CLEAN_RATING_LABELS: Record<ComedianProfile["cleanRating"], string> = {
   PG13: "PG-13",
   R: "R-rated",
 };
-
-function slugFromStageName(value: string) {
-  return value
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)+/g, "");
-}
 
 function formatRateRange(profile: ComedianProfile) {
   if (profile.rateMin == null && profile.rateMax == null) {

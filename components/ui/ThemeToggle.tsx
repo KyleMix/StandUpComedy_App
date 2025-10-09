@@ -4,7 +4,6 @@ import { useTheme } from "@/components/providers/theme-provider";
 import { Laptop2, MoonStar, SunMedium } from "lucide-react";
 import { useEffect, useMemo, useState, type ComponentType } from "react";
 
-import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -46,20 +45,15 @@ export function ThemeToggle({ className }: { className?: string }) {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          className={cn(
-            "relative h-9 w-9 rounded-full border border-border/70 bg-background/80 shadow-sm backdrop-blur",
-            className
-          )}
-          aria-label="Toggle theme"
-        >
-          <ActiveIcon className="h-4 w-4" aria-hidden />
-          <span className="sr-only">Change theme</span>
-        </Button>
+      <DropdownMenuTrigger
+        className={cn(
+          "relative inline-flex h-9 w-9 items-center justify-center rounded-full border border-border/70 bg-background/80 shadow-sm backdrop-blur transition hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+          className
+        )}
+        aria-label="Toggle theme"
+      >
+        <ActiveIcon className="h-4 w-4" aria-hidden />
+        <span className="sr-only">Change theme</span>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" sideOffset={8} className="w-44">
         <DropdownMenuLabel className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Theme</DropdownMenuLabel>

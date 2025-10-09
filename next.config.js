@@ -4,10 +4,19 @@ if (process.env.NEXT_PUBLIC_VERCEL_URL) {
   allowedOrigins.push(process.env.NEXT_PUBLIC_VERCEL_URL);
 }
 
+const isDevelopment = process.env.NODE_ENV !== "production";
+
+const scriptSrc = ["'self'", "'unsafe-inline'", "'wasm-unsafe-eval'", "'inline-speculation-rules'"];
+const styleSrc = ["'self'", "'unsafe-inline'"];
+
+if (isDevelopment) {
+  scriptSrc.push("'unsafe-eval'");
+}
+
 const cspDirectives = [
   "default-src 'self'",
-  "script-src 'self'",
-  "style-src 'self'",
+  `script-src ${scriptSrc.join(' ')}`,
+  `style-src ${styleSrc.join(' ')}`,
   "img-src 'self' data: blob:",
   "font-src 'self' data:",
   "connect-src 'self' https://plausible.io https://*.plausible.io",

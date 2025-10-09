@@ -23,7 +23,9 @@ export default function ProfilesPage() {
     return profiles.filter((profile) => {
       const matchesTab = activeTab === "all" || profile.role === activeTab;
       const matchesSearch = normalizedSearch
-        ? `${profile.displayName} ${profile.city}`.toLowerCase().includes(normalizedSearch)
+        ? `${profile.displayName} ${profile.city} ${profile.tagline ?? ""}`
+            .toLowerCase()
+            .includes(normalizedSearch)
         : true;
 
       return matchesTab && matchesSearch;
@@ -78,7 +80,7 @@ export default function ProfilesPage() {
         </p>
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
           {filteredProfiles.map((profile) => (
-            <ProfileCard key={`${profile.displayName}-${profile.city}`} {...profile} />
+            <ProfileCard key={profile.slug} {...profile} />
           ))}
         </div>
         {filteredProfiles.length === 0 && (

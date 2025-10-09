@@ -1757,6 +1757,22 @@ export async function updateOfferStatus(offerId: string, status: OfferStatus): P
   return mapOffer(record);
 }
 
+export async function listBookingsForThread(threadId: string): Promise<Booking[]> {
+  const snapshot = await loadSnapshot();
+  const offerIdsForThread = new Set(
+    snapshot.offers.filter((offer) => offer.threadId === threadId).map((offer) => offer.id)
+  );
+
+  if (offerIdsForThread.size === 0) {
+    return [];
+  }
+
+  return snapshot.bookings
+    .filter((booking) => offerIdsForThread.has(booking.offerId))
+    .map(mapBooking)
+    .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+}
+
 interface CreateBookingInput {
   gigId: string;
   comedianId: string;

@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import {
   getGigById,
   getUserById,
+  listBookingsForThread,
   listMessagesForThread,
   listOffersForThread,
   listThreadsForUser
@@ -10,6 +11,7 @@ import {
 import { SAFETY_TIPS } from "@/lib/config/commerce";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ThreadOffersPanel } from "./ThreadOffersPanel";
 
 export default async function InboxPage() {
   const session = await auth();
@@ -62,7 +64,8 @@ export default async function InboxPage() {
         gig,
         participants: participants.filter((value): value is NonNullable<typeof value> => Boolean(value)),
         messages,
-        offers
+        offers,
+        bookings: await listBookingsForThread(thread.id)
       };
     })
   );
@@ -87,7 +90,7 @@ export default async function InboxPage() {
       </Card>
 
       <div className="space-y-6">
-        {hydrated.map(({ thread, gig, participants, messages, offers }) => (
+        {hydrated.map(({ thread, gig, participants, messages, offers, bookings }) => (
           <Card key={thread.id}>
             <CardHeader>
               <CardTitle className="flex items-center justify-between gap-2 text-base">
@@ -113,31 +116,45 @@ export default async function InboxPage() {
                       </div>
                       {message.body && <p className="mt-2 whitespace-pre-line text-slate-700">{message.body}</p>}
                       {offer && (
-                        <div className="mt-3 rounded-md border border-brand/30 bg-brand/5 p-3 text-sm">
-                          <div className="flex items-center justify-between">
-                            <span className="font-semibold">Offer</span>
-                            <Badge variant="outline">{offer.status}</Badge>
-                          </div>
-                          <dl className="mt-2 space-y-1 text-xs text-slate-600">
-                            <div className="flex items-center justify-between">
-                              <dt>Amount</dt>
-                              <dd>${(offer.amount / 100).toFixed(2)} {offer.currency}</dd>
-                            </div>
-                            <div className="flex items-center justify-between">
-                              <dt>Event date</dt>
-                              <dd>{offer.eventDate.toLocaleString()}</dd>
-                            </div>
-                            <div>
-                              <dt className="font-medium text-slate-700">Terms</dt>
-                              <dd>{offer.terms}</dd>
-                            </div>
-                          </dl>
+                        <div className="mt-3 rounded-md bg-brand/5 p-2 text-xs text-brand">
+                          Offer attached – review the timeline below for full details.
                         </div>
                       )}
                     </div>
                   );
                 })}
               </div>
+
+              <ThreadOffersPanel
+                bookings={bookings.map((booking) => ({
+                  id: booking.id,
+                  offerId: booking.offerId,
+                  status: booking.status,
+                  payoutProtection: booking.payoutProtection,
+                  cancellationPolicy: booking.cancellationPolicy,
+                  createdAtISO: booking.createdAt.toISOString()
+                }))}
+                currentUserId={session.user.id}
+                currentUserRole={session.user.role}
+                threadId={thread.id}
+                gigId={thread.gigId}
+                offers={offers.map((offer) => ({
+                  id: offer.id,
+                  fromUserId: offer.fromUserId,
+                  amount: offer.amount,
+                  currency: offer.currency,
+                  terms: offer.terms,
+                  eventDateISO: offer.eventDate.toISOString(),
+                  expiresAtISO: offer.expiresAt ? offer.expiresAt.toISOString() : null,
+                  status: offer.status,
+                  createdAtISO: offer.createdAt.toISOString()
+                }))}
+                participants={participants.map((participant) => ({
+                  id: participant.id,
+                  name: participant.name,
+                  role: participant.role
+                }))}
+              />
 
               <div>
                 <h3 className="text-xs uppercase tracking-wide text-slate-500">Safety tips</h3>

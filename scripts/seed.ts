@@ -505,6 +505,9 @@ const snapshot: DatabaseSnapshot = {
   availability,
   reports: [],
   communityBoardMessages: [],
+  communityPosts: [],
+  communityReplies: [],
+  communityVotes: [],
   adSlots,
   featureFlags,
 };

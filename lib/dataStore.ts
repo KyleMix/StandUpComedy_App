@@ -15,6 +15,10 @@ import type {
   ComedianVideoRecord,
   CommunityBoardMessageRecord,
   CommunityBoardCategory,
+  CommunityPostRecord,
+  CommunityReplyRecord,
+  CommunityVoteRecord,
+  CommunityVoteTarget,
   ConversationReviewRecord,
   DatabaseSnapshot,
   FavoriteRecord,
@@ -74,6 +78,9 @@ async function ensureDataStore() {
       availability: [],
       reports: [],
       communityBoardMessages: [],
+      communityPosts: [],
+      communityReplies: [],
+      communityVotes: [],
       adSlots: [],
       featureFlags: []
     };
@@ -190,6 +197,21 @@ export interface CommunityBoardMessage
   updatedAt: Date;
 }
 
+export interface CommunityPost extends Omit<CommunityPostRecord, "createdAt" | "updatedAt"> {
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface CommunityReply extends Omit<CommunityReplyRecord, "createdAt" | "updatedAt"> {
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface CommunityVote extends Omit<CommunityVoteRecord, "createdAt" | "updatedAt"> {
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export const COMMUNITY_BOARD_CATEGORIES: CommunityBoardCategory[] = ["ASK", "OFFER", "ANNOUNCEMENT"];
 
 export interface Booking extends Omit<BookingRecord, "createdAt"> {
@@ -250,6 +272,9 @@ function withDefaults(snapshot: Partial<DatabaseSnapshot>): DatabaseSnapshot {
     availability: snapshot.availability ?? [],
     reports: snapshot.reports ?? [],
     communityBoardMessages: snapshot.communityBoardMessages ?? [],
+    communityPosts: snapshot.communityPosts ?? [],
+    communityReplies: snapshot.communityReplies ?? [],
+    communityVotes: snapshot.communityVotes ?? [],
     adSlots: snapshot.adSlots ?? [],
     featureFlags: snapshot.featureFlags ?? []
   };
@@ -484,6 +509,32 @@ function mapCommunityBoardMessage(record: CommunityBoardMessageRecord): Communit
     gigContactEmail: record.gigContactEmail ?? null,
     gigSlotsAvailable: record.gigSlotsAvailable ?? null,
     content: record.content,
+    createdAt: new Date(record.createdAt),
+    updatedAt: new Date(record.updatedAt)
+  };
+}
+
+function mapCommunityPost(record: CommunityPostRecord): CommunityPost {
+  return {
+    ...record,
+    title: record.title,
+    content: record.content,
+    createdAt: new Date(record.createdAt),
+    updatedAt: new Date(record.updatedAt)
+  };
+}
+
+function mapCommunityReply(record: CommunityReplyRecord): CommunityReply {
+  return {
+    ...record,
+    createdAt: new Date(record.createdAt),
+    updatedAt: new Date(record.updatedAt)
+  };
+}
+
+function mapCommunityVote(record: CommunityVoteRecord): CommunityVote {
+  return {
+    ...record,
     createdAt: new Date(record.createdAt),
     updatedAt: new Date(record.updatedAt)
   };
@@ -1686,6 +1737,150 @@ export async function updateCommunityBoardMessage(
   record.updatedAt = nowIso();
   await persist(snapshot);
   return mapCommunityBoardMessage(record);
+}
+
+export async function listCommunityPosts(): Promise<CommunityPost[]> {
+  const snapshot = await loadSnapshot();
+  return snapshot.communityPosts
+    .map(mapCommunityPost)
+    .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+}
+
+export async function getCommunityPostById(id: string): Promise<CommunityPost | null> {
+  const snapshot = await loadSnapshot();
+  const record = snapshot.communityPosts.find((post) => post.id === id);
+  return record ? mapCommunityPost(record) : null;
+}
+
+export async function listCommunityReplies(): Promise<CommunityReply[]> {
+  const snapshot = await loadSnapshot();
+  return snapshot.communityReplies
+    .map(mapCommunityReply)
+    .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+}
+
+export async function listCommunityRepliesForPost(postId: string): Promise<CommunityReply[]> {
+  const snapshot = await loadSnapshot();
+  return snapshot.communityReplies
+    .filter((reply) => reply.postId === postId)
+    .map(mapCommunityReply)
+    .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+}
+
+export async function getCommunityReplyById(id: string): Promise<CommunityReply | null> {
+  const snapshot = await loadSnapshot();
+  const record = snapshot.communityReplies.find((reply) => reply.id === id);
+  return record ? mapCommunityReply(record) : null;
+}
+
+interface CreateCommunityPostInput {
+  authorId: string;
+  title: string;
+  content: string;
+}
+
+export async function createCommunityPost(input: CreateCommunityPostInput): Promise<CommunityPost> {
+  const snapshot = await loadSnapshot();
+  const now = nowIso();
+  const record: CommunityPostRecord = {
+    id: randomUUID(),
+    authorId: input.authorId,
+    title: sanitizeHtml(input.title),
+    content: sanitizeHtml(input.content),
+    createdAt: now,
+    updatedAt: now
+  };
+  snapshot.communityPosts.push(record);
+  await persist(snapshot);
+  return mapCommunityPost(record);
+}
+
+interface CreateCommunityReplyInput {
+  postId: string;
+  authorId: string;
+  content: string;
+}
+
+export async function createCommunityReply(
+  input: CreateCommunityReplyInput
+): Promise<CommunityReply | null> {
+  const snapshot = await loadSnapshot();
+  const postExists = snapshot.communityPosts.some((post) => post.id === input.postId);
+  if (!postExists) {
+    return null;
+  }
+  const now = nowIso();
+  const record: CommunityReplyRecord = {
+    id: randomUUID(),
+    postId: input.postId,
+    authorId: input.authorId,
+    content: sanitizeHtml(input.content),
+    createdAt: now,
+    updatedAt: now
+  };
+  snapshot.communityReplies.push(record);
+  await persist(snapshot);
+  return mapCommunityReply(record);
+}
+
+interface SetCommunityVoteInput {
+  userId: string;
+  targetType: CommunityVoteTarget;
+  targetId: string;
+  value: -1 | 0 | 1;
+}
+
+export async function setCommunityVote(
+  input: SetCommunityVoteInput
+): Promise<CommunityVote | null> {
+  const snapshot = await loadSnapshot();
+  const existing = snapshot.communityVotes.find(
+    (vote) =>
+      vote.userId === input.userId &&
+      vote.targetType === input.targetType &&
+      vote.targetId === input.targetId
+  );
+
+  if (input.value === 0) {
+    if (existing) {
+      snapshot.communityVotes = snapshot.communityVotes.filter((vote) => vote !== existing);
+      await persist(snapshot);
+    }
+    return null;
+  }
+
+  const normalizedValue: -1 | 1 = input.value < 0 ? -1 : 1;
+
+  if (existing) {
+    if (existing.value === normalizedValue) {
+      snapshot.communityVotes = snapshot.communityVotes.filter((vote) => vote !== existing);
+      await persist(snapshot);
+      return null;
+    }
+    existing.value = normalizedValue;
+    existing.updatedAt = nowIso();
+    await persist(snapshot);
+    return mapCommunityVote(existing);
+  }
+
+  const now = nowIso();
+  const record: CommunityVoteRecord = {
+    id: randomUUID(),
+    targetType: input.targetType,
+    targetId: input.targetId,
+    userId: input.userId,
+    value: normalizedValue,
+    createdAt: now,
+    updatedAt: now
+  };
+  snapshot.communityVotes.push(record);
+  await persist(snapshot);
+  return mapCommunityVote(record);
+}
+
+export async function listCommunityVotes(): Promise<CommunityVote[]> {
+  const snapshot = await loadSnapshot();
+  return snapshot.communityVotes.map(mapCommunityVote);
 }
 
 interface CreateAdSlotInput {

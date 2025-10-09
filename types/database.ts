@@ -119,6 +119,36 @@ export interface CommunityBoardMessageRecord {
   updatedAt: string;
 }
 
+export interface CommunityPostRecord {
+  id: string;
+  authorId: string;
+  title: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CommunityReplyRecord {
+  id: string;
+  postId: string;
+  authorId: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type CommunityVoteTarget = "POST" | "REPLY";
+
+export interface CommunityVoteRecord {
+  id: string;
+  targetType: CommunityVoteTarget;
+  targetId: string;
+  userId: string;
+  value: -1 | 1;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface GigRecord {
   id: string;
   createdByUserId: string;
@@ -314,6 +344,9 @@ export interface DatabaseSnapshot {
   availability: AvailabilityRecord[];
   reports: ReportRecord[];
   communityBoardMessages: CommunityBoardMessageRecord[];
+  communityPosts: CommunityPostRecord[];
+  communityReplies: CommunityReplyRecord[];
+  communityVotes: CommunityVoteRecord[];
   adSlots: AdSlotRecord[];
   featureFlags: FeatureFlagRecord[];
 }
